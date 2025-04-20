@@ -82,3 +82,9 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turbo.build/docs/core-concepts/monorepos/filtering)
 - [Configuration Options](https://turbo.build/docs/reference/configuration)
 - [CLI Usage](https://turbo.build/docs/reference/command-line-reference)
+
+## 環境構築
+
+https://zenn.dev/shrry2/articles/b640c3fd6eb4ff
+
+https://turbo.build/docs/crafting-your-repository/structuring-a-repository
