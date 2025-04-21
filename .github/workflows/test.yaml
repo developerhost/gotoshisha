@@ -1,0 +1,90 @@
+name: Jest Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run mobile app tests
+        run: pnpm --filter mobile test -- --ci --coverage
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: apps/mobile/coverage
+
+      - name: Post test summary
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              if (fs.existsSync('apps/mobile/coverage/coverage-summary.json')) {
+                const summary = JSON.parse(fs.readFileSync('apps/mobile/coverage/coverage-summary.json', 'utf8'));
+                const total = summary.total;
+                
+                const createCoverageTable = (coverage) => {
+                  return `
+                  | Type | Covered | Total | Coverage |
+                  |------|---------|-------|----------|
+                  | Statements | ${coverage.statements.covered} | ${coverage.statements.total} | ${coverage.statements.pct}% |
+                  | Branches | ${coverage.branches.covered} | ${coverage.branches.total} | ${coverage.branches.pct}% |
+                  | Functions | ${coverage.functions.covered} | ${coverage.functions.total} | ${coverage.functions.pct}% |
+                  | Lines | ${coverage.lines.covered} | ${coverage.lines.total} | ${coverage.lines.pct}% |
+                  `;
+                };
+                
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `## テスト結果サマリー
+                  
+                  ### カバレッジレポート
+                  
+                  ${createCoverageTable(total)}
+                  
+                  詳細なレポートはアーティファクトからダウンロードできます。
+                  `
+                });
+              }
+            } catch (error) {
+              console.error('Error creating test summary:', error);
+            }
