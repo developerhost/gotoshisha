@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BlurTabBarBackground() {
   // 二重の型アサーションを使用して型エラーを解決
+  // TODO: これは一時的な解決策であり、将来的にはより良い方法を見つける必要があります。
   const BlurViewComponent = BlurView as unknown as React.ComponentType<any>;
   return (
     <BlurViewComponent
