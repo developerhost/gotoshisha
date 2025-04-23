@@ -21,17 +21,23 @@ export default function HomeScreen() {
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">テスト</ThemedText>
+        <ThemedText type="subtitle">地図から探す</ThemedText>
         <ThemedText>
           Edit{" "}
           <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
           to see changes. Press{" "}
           <ThemedText type="defaultSemiBold">
-            {Platform.select({
+            {typeof Platform.select({
               ios: "cmd + d",
               android: "cmd + m",
               web: "F12",
-            })}
+            }) === "object"
+              ? "developer menu"
+              : Platform.select({
+                  ios: "cmd + d",
+                  android: "cmd + m",
+                  web: "F12",
+                })}
           </ThemedText>{" "}
           to open developer tools.
         </ThemedText>
