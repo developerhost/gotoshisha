@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Platform } from "react-native";
+import { router } from "expo-router";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -20,44 +21,20 @@ export default function HomeScreen() {
         <ThemedText type="title">ごーとぅシーシャ</ThemedText>
         <HelloWave />
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">地図から探す</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {typeof Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            }) === "object"
-              ? "developer menu"
-              : Platform.select({
-                  ios: "cmd + d",
-                  android: "cmd + m",
-                  web: "F12",
-                })}
-          </ThemedText>{" "}
-          to open developer tools.
+      <ThemedView style={styles.linkButtonsContainer}>
+        <ThemedText
+          type="link"
+          onPress={() => router.push("/map")}
+          style={styles.linkButton}
+        >
+          地図から探す
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{" "}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+        <ThemedText
+          type="link"
+          onPress={() => router.push("/region")}
+          style={styles.linkButton}
+        >
+          地域から探す
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
@@ -65,6 +42,18 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  linksContainer: {
+    gap: 8,
+    marginBottom: 8,
+  },
+  linkButtonsContainer: {
+    flexDirection: "row",
+    gap: 16,
+    marginTop: 8,
+  },
+  linkButton: {
+    padding: 8,
+  },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",
