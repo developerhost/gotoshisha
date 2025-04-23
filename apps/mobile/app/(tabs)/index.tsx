@@ -21,24 +21,21 @@ export default function HomeScreen() {
         <ThemedText type="title">ごーとぅシーシャ</ThemedText>
         <HelloWave />
       </ThemedView>
-      <ThemedView style={styles.linksContainer}>
-        <ThemedText type="subtitle">シーシャバーを探す</ThemedText>
-        <ThemedView style={styles.linkButtonsContainer}>
-          <ThemedText
-            type="link"
-            onPress={() => router.push("/map")}
-            style={styles.linkButton}
-          >
-            地図から探す
-          </ThemedText>
-          <ThemedText
-            type="link"
-            onPress={() => router.push("/region")}
-            style={styles.linkButton}
-          >
-            地域から探す
-          </ThemedText>
-        </ThemedView>
+      <ThemedView style={styles.linkButtonsContainer}>
+        <ThemedText
+          type="link"
+          onPress={() => router.push("/map")}
+          style={styles.linkButton}
+        >
+          地図から探す
+        </ThemedText>
+        <ThemedText
+          type="link"
+          onPress={() => router.push("/region")}
+          style={styles.linkButton}
+        >
+          地域から探す
+        </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
   );
