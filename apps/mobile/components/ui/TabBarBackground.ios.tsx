@@ -20,7 +20,13 @@ export default function BlurTabBarBackground() {
 }
 
 export function useBottomTabOverflow() {
-  const tabHeight = useBottomTabBarHeight();
-  const { bottom } = useSafeAreaInsets();
-  return tabHeight - bottom;
+  try {
+    const tabHeight = useBottomTabBarHeight();
+    const { bottom } = useSafeAreaInsets();
+    return tabHeight - bottom;
+  } catch (error) {
+    // タブナビゲーション外の場合はセーフエリアの下部の高さを返す
+    const { bottom } = useSafeAreaInsets();
+    return bottom;
+  }
 }
