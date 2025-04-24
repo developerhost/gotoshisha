@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/base.json",
+  "extends": "../../packages/typescript-config/base.json",
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
@@ -13,7 +13,7 @@
     "jsxImportSource": "hono/jsx"
   },
   "include": [
-    "**/*.ts",
+    "**/*.ts"
   ],
   "exclude": [
     "node_modules",
