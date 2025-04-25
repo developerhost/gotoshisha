@@ -92,3 +92,4 @@ Learn more about the power of Turborepo:
 
 ## キャッチアップ
 - [expo](https://docs.expo.dev/develop/tools/)
+- [ライブラリ選定](https://reactnative.directory/)
