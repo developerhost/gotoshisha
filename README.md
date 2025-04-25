@@ -85,6 +85,10 @@ Learn more about the power of Turborepo:
 
 ## 環境構築
 
-https://zenn.dev/shrry2/articles/b640c3fd6eb4ff
+- [expo, React Native入門](https://zenn.dev/shrry2/articles/b640c3fd6eb4ff)
 
-https://turbo.build/docs/crafting-your-repository/structuring-a-repository
+- [turbo repo](https://turbo.build/docs/crafting-your-repository/structuring-a-repository)
+
+
+## キャッチアップ
+- [expo](https://docs.expo.dev/develop/tools/)
