@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "YOUR_IOS_API_KEY"
-      }
+      },
+      "bundleIdentifier": "com.anonymous.mobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +24,8 @@
         "googleMaps": {
           "apiKey": "YOUR_ANDROID_API_KEY"
         }
-      }
+      },
+      "package": "com.anonymous.mobile"
     },
     "web": {
       "bundler": "metro",
