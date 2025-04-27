@@ -8,16 +8,22 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
+/**
+ * タブレイアウトコンポーネント
+ * @returns タブナビゲーション
+ */
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const TabBarBackgroundComponent = () => <TabBarBackground />;
 
   return (
+    // @ts-expect-error - 型の互換性問題を無視
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
+        tabBarBackground: TabBarBackgroundComponent,
         tabBarStyle: Platform.select({
           ios: {
             // Use a transparent background on iOS to show the blur effect

@@ -4,7 +4,8 @@ import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function BlurTabBarBackground() {
+// コンポーネントをエクスポート（関数ではなくコンポーネント自体を返す）
+const BlurTabBarBackground = () => {
   // 二重の型アサーションを使用して型エラーを解決
   const BlurViewComponent = BlurView as unknown as React.ComponentType<any>;
 
@@ -19,7 +20,9 @@ export default function BlurTabBarBackground() {
       />
     </View>
   );
-}
+};
+
+export default BlurTabBarBackground;
 
 export function useBottomTabOverflow() {
   try {
