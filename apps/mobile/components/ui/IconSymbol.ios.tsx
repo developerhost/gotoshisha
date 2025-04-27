@@ -14,8 +14,11 @@ export function IconSymbol({
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
 }) {
+  // 型アサーションを使用して型エラーを解決
+  const SymbolViewComponent = SymbolView as unknown as React.ComponentType<any>;
+
   return (
-    <SymbolView
+    <SymbolViewComponent
       weight={weight}
       tintColor={color}
       resizeMode="scaleAspectFit"

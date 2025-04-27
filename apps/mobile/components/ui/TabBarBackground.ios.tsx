@@ -4,9 +4,9 @@ import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// コンポーネントをエクスポート（関数ではなくコンポーネント自体を返す）
+// コンポーネントをエクスポート
 const BlurTabBarBackground = () => {
-  // 二重の型アサーションを使用して型エラーを解決
+  // 型アサーションを使用して型エラーを解決
   const BlurViewComponent = BlurView as unknown as React.ComponentType<any>;
 
   return (
