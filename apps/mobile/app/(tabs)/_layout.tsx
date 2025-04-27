@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import type { ReactNode } from "react";
 import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
@@ -12,6 +13,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    // @ts-ignore - React 19との型互換性の問題を回避
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
