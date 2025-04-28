@@ -1,7 +1,6 @@
 import { Image, StyleSheet, Platform } from "react-native";
 import { router } from "expo-router";
 
-import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -19,23 +18,6 @@ export default function HomeScreen() {
     >
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">ごーとぅシーシャ</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.linkButtonsContainer}>
-        <ThemedText
-          type="link"
-          onPress={() => router.push("/map")}
-          style={styles.linkButton}
-        >
-          地図から探す
-        </ThemedText>
-        <ThemedText
-          type="link"
-          onPress={() => router.push("/region")}
-          style={styles.linkButton}
-        >
-          地域から探す
-        </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
   );
