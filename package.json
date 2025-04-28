@@ -1,6 +1,5 @@
 {
   "name": "gotoshisha",
-<<<<<<< HEAD
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -18,7 +17,6 @@
   "engines": {
     "node": ">=18"
   }
-=======
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -68,7 +66,4 @@
     "jest-expo": "~52.0.6",
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
-  },
-  "private": true
->>>>>>> 1fec4d1 (Initial commit)
-}
+  }

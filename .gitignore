@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # Dependencies
@@ -37,7 +36,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
-=======
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
@@ -76,4 +74,4 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
->>>>>>> 1fec4d1 (Initial commit)
+
