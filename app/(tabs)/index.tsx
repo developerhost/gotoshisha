@@ -1,10 +1,11 @@
 import { Image, StyleSheet, Platform } from "react-native";
 import { Link } from "expo-router";
+import { Button, Text } from "tamagui";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { HelloWave } from "components/HelloWave";
+import ParallaxScrollView from "components/ParallaxScrollView";
+import { ThemedText } from "components/ThemedText";
+import { ThemedView } from "components/ThemedView";
 
 export default function HomeScreen() {
   return (
@@ -12,21 +13,28 @@ export default function HomeScreen() {
       headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
       headerImage={
         <Image
-          source={require("@/assets/images/partial-react-logo.png")}
+          source={require("assets/images/partial-react-logo.png")}
           style={styles.reactLogo}
         />
       }
     >
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">ごーとぅーしーしゃ!</ThemedText>
-        <HelloWave />
       </ThemedView>
       <ThemedView style={styles.buttonContainer}>
-        <Link href="./map" style={styles.button}>
-          <ThemedText style={styles.buttonText}>マップから探す</ThemedText>
+        <Link href="./map">
+          <Button backgroundColor="#007BFF" padding={10} borderRadius={5}>
+            <Text color="#fff" fontSize={16}>
+              地図からシーシャを探す
+            </Text>
+          </Button>
         </Link>
-        <Link href="./area" style={styles.button}>
-          <ThemedText style={styles.buttonText}>地域から探す</ThemedText>
+        <Link href="./area">
+          <Button backgroundColor="#007BFF" padding={10} borderRadius={5}>
+            <Text color="#fff" fontSize={16}>
+              地域から探す
+            </Text>
+          </Button>
         </Link>
       </ThemedView>
     </ParallaxScrollView>
@@ -35,7 +43,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     gap: 8,
   },
@@ -51,12 +59,12 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: "column",
+    gap: 16,
+    alignItems: "center",
     marginTop: 20,
   },
   button: {
-    backgroundColor: "#007BFF",
     padding: 10,
     borderRadius: 5,
   },

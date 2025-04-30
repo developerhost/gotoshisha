@@ -41,6 +41,7 @@ DO NOT read or modify:
 
 ## ライブラリ
 - ルーティングはexpo routerを使用すること
+- UIにはtamaguiを使用すること
 
 ## ディレクトリ構成
 
