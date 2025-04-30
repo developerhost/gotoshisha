@@ -20,7 +20,6 @@ export default function HomeScreen() {
     >
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">ごーとぅーしーしゃ!</ThemedText>
-        <HelloWave />
       </ThemedView>
       <ThemedView style={styles.buttonContainer}>
         <Link href="./map">
@@ -44,7 +43,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     gap: 8,
   },
