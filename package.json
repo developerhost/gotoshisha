@@ -19,6 +19,8 @@
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.0.14",
+    "@tamagui/button": "^1.126.4",
+    "@tamagui/core": "^1.126.4",
     "@tamagui/font-inter": "^1.126.4",
     "@tamagui/shorthands": "^1.126.4",
     "@tamagui/themes": "^1.126.4",
