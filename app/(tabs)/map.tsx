@@ -1,21 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
-
+/**
+ * プラットフォームごとに .native.tsx / .web.tsx で分岐
+ * このファイルはExpo Routerのルーティング要件のためのダミーです
+ */
 export default function MapScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>マップから探す</Text>
-    </View>
-  );
+  return null;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-});
