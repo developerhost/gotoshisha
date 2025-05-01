@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { useState, useEffect } from "react";
 
 /**
@@ -12,7 +12,6 @@ export default function MapScreen() {
       <Text style={styles.title}>マップから探す</Text>
       <MapView
         style={styles.map}
-        provider={PROVIDER_DEFAULT}
         initialRegion={{
           latitude: 35.6895,
           longitude: 139.6917,
