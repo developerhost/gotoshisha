@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "start:clear": "npx expo start --tunnel --clear"
   },
   "dependencies": {
     "expo": "^53.0.9",
