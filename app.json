@@ -1,61 +1,39 @@
 {
   "expo": {
-    "name": "shisya-map",
-    "slug": "shisya-map",
+    "name": "expo-react-native-maps-demo",
+    "slug": "expo-react-native-maps-demo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "shisyamap",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.shisyamap",
-      "config": {
-        "googleMapsApiKey": "YOUR_IOS_API_KEY_HERE"
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.yourcompany.shisyamap",
-      "config": {
-        "googleMaps": {
-          "apiKey": "YOUR_ANDROID_API_KEY_HERE"
-        }
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-camera",
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
-        }
-      ],
-      [
-        "react-native-maps",
-        {
-          "googleMapsApiKey": "YOUR_API_KEY_HERE"
-        }
-      ]
+    "scheme": "expo-react-native-maps-demo",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
     ],
-    "experiments": {
-      "typedRoutes": true
-    }
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
