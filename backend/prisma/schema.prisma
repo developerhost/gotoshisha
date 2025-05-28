@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザーモデル
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  posts     Post[]
+  likes     Like[]
+  comments  Comment[]
+
+  @@map("users")
+}
+
+// 投稿モデル
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?
+  imageUrl    String?
+  latitude    Float?
+  longitude   Float?
+  address     String?
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 外部キー
+  authorId    String
+  
+  // リレーション
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes       Like[]
+  comments    Comment[]
+  tags        PostTag[]
+
+  @@map("posts")
+}
+
+// いいねモデル
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // 外部キー
+  userId    String
+  postId    String
+
+  // リレーション
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // 複合ユニーク制約（同じユーザーが同じ投稿に複数回いいねできない）
+  @@unique([userId, postId])
+  @@map("likes")
+}
+
+// コメントモデル
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 外部キー
+  userId    String
+  postId    String
+
+  // リレーション
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+// タグモデル
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String?  // タグの色（HEXコード）
+  createdAt DateTime @default(now())
+
+  // リレーション
+  posts     PostTag[]
+
+  @@map("tags")
+}
+
+// 投稿とタグの中間テーブル
+model PostTag {
+  id     String @id @default(cuid())
+  postId String
+  tagId  String
+
+  // リレーション
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  // 複合ユニーク制約
+  @@unique([postId, tagId])
+  @@map("post_tags")
+}
