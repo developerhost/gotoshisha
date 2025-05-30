@@ -2,6 +2,7 @@
   "name": "gotoshisha-backend",
   "version": "1.0.0",
   "description": "Backend API for gotoshisha using Hono + Cloudflare Workers + D1 + Prisma",
+  "type": "module",
   "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
@@ -13,8 +14,8 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx scripts/seed.ts",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui"

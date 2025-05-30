@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
-import { createPrismaClient, checkDatabaseHealth } from "@/lib/db";
-import { createSuccessResponse, createErrorResponse } from "@/lib/utils";
+import { checkDatabaseHealth, createPrismaClient } from "@/lib/db";
+import { createErrorResponse, createSuccessResponse } from "@/lib/utils";
 import type { Env } from "@/types";
 import type { PrismaClient } from "@prisma/client";
 
@@ -73,7 +73,10 @@ app.get("/health", async (c) => {
       })
     );
   } catch (error) {
-    return c.json(createErrorResponse("ヘルスチェックに失敗しました"), 500);
+    return c.json(
+      createErrorResponse(`ヘルスチェックに失敗しました ${error}`),
+      500
+    );
   }
 });
 

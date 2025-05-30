@@ -1,7 +1,7 @@
 import type {
   ApiResponse,
-  PaginationParams,
   PaginatedResponse,
+  PaginationParams,
   ValidationError,
 } from "@/types";
 
