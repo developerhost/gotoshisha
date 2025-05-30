@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type check
+        run: yarn type-check
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Run tests
+        run: yarn test:run
+
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma client
+        working-directory: ./backend
+        run: yarn db:generate
+
+      - name: Type check
+        working-directory: ./backend
+        run: yarn type-check
+
+      - name: Lint
+        working-directory: ./backend
+        run: yarn lint
+
+      - name: Run tests
+        working-directory: ./backend
+        run: yarn test:run
+
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma client
+        working-directory: ./backend
+        run: yarn db:generate
+
+      - name: Build backend
+        working-directory: ./backend
+        run: yarn build
+
+      - name: Check Expo build (iOS)
+        run: npx expo export --platform ios --output-dir dist-ios
+
+      - name: Check Expo build (Android)
+        run: npx expo export --platform android --output-dir dist-android

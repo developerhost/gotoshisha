@@ -10,5 +10,8 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# Package manager lock files (use yarn.lock only)
+package-lock.json
+
 # macOS
 .DS_Store
