@@ -1,171 +1,171 @@
-# Gotoshisha - React Native Maps Application
+# Gotoshisha - React Native マップアプリケーション
 
-This project is a React Native application using Expo and React Native Maps, with a backend API built using Hono + Cloudflare Workers.
+このプロジェクトは、Expo と React Native Maps を使用した React Native アプリケーションで、Hono + Cloudflare Workers で構築されたバックエンド API を持っています。
 
-## Project Structure
+## プロジェクト構成
 
-- **Frontend**: React Native + Expo + TypeScript
-- **Backend**: Hono + Cloudflare Workers + D1 Database + Prisma
-- **Testing**: Vitest for both frontend and backend
-- **Linting**: ESLint with TypeScript support
-- **CI/CD**: GitHub Actions for automated testing and linting
+- **フロントエンド**: React Native + Expo + TypeScript
+- **バックエンド**: Hono + Cloudflare Workers + D1 Database + Prisma
+- **テスト**: フロントエンドとバックエンドの両方で Vitest を使用
+- **リンティング**: TypeScript サポート付き ESLint
+- **CI/CD**: 自動テストとリンティングのための GitHub Actions
 
-## Development Setup
+## 開発環境のセットアップ
 
-### Prerequisites
+### 前提条件
 
 - Node.js 20+
-- Yarn package manager
+- Yarn パッケージマネージャー
 - Expo CLI
 
-### Frontend Setup
+### フロントエンドのセットアップ
 
-1. Install dependencies:
+1. 依存関係をインストール:
    ```bash
    yarn install
    ```
 
-2. Start the development server:
+2. 開発サーバーを起動:
    ```bash
    yarn start
-   # or for iOS
+   # または iOS の場合
    yarn ios
-   # or for Android
+   # または Android の場合
    yarn android
    ```
 
-3. For tunnel mode (recommended for testing):
+3. トンネルモード（テスト推奨）:
    ```bash
    yarn start:clear
    ```
 
-### Backend Setup
+### バックエンドのセットアップ
 
-1. Navigate to backend directory:
+1. バックエンドディレクトリに移動:
    ```bash
    cd backend
    ```
 
-2. Install dependencies:
+2. 依存関係をインストール:
    ```bash
    yarn install
    ```
 
-3. Set up environment variables:
+3. 環境変数を設定:
    ```bash
    cp .env.example .env
    ```
 
-4. Generate Prisma client:
+4. Prisma クライアントを生成:
    ```bash
    yarn db:generate
    ```
 
-5. Start development server:
+5. 開発サーバーを起動:
    ```bash
    yarn dev
    ```
 
-## Available Scripts
+## 利用可能なスクリプト
 
-### Frontend Scripts
+### フロントエンドスクリプト
 
-- `yarn start` - Start Expo development server
-- `yarn ios` - Start iOS simulator
-- `yarn android` - Start Android emulator
-- `yarn web` - Start web development server
-- `yarn lint` - Run ESLint
-- `yarn lint:fix` - Fix ESLint issues automatically
-- `yarn test` - Run tests in watch mode
-- `yarn test:run` - Run tests once
-- `yarn type-check` - Run TypeScript type checking
+- `yarn start` - Expo 開発サーバーを起動
+- `yarn ios` - iOS シミュレーターを起動
+- `yarn android` - Android エミュレーターを起動
+- `yarn web` - Web 開発サーバーを起動
+- `yarn lint` - ESLint を実行
+- `yarn lint:fix` - ESLint の問題を自動修正
+- `yarn test` - ウォッチモードでテストを実行
+- `yarn test:run` - テストを一度実行
+- `yarn type-check` - TypeScript 型チェックを実行
 
-### Backend Scripts
+### バックエンドスクリプト
 
-- `yarn dev` - Start development server with Wrangler
-- `yarn build` - Build for production
-- `yarn deploy` - Deploy to Cloudflare Workers
-- `yarn lint` - Run ESLint
-- `yarn test:run` - Run tests
-- `yarn db:generate` - Generate Prisma client
-- `yarn db:push` - Push schema changes to database
+- `yarn dev` - Wrangler で開発サーバーを起動
+- `yarn build` - プロダクション用にビルド
+- `yarn deploy` - Cloudflare Workers にデプロイ
+- `yarn lint` - ESLint を実行
+- `yarn test:run` - テストを実行
+- `yarn db:generate` - Prisma クライアントを生成
+- `yarn db:push` - スキーマ変更をデータベースにプッシュ
 
 ## CI/CD
 
-This project uses GitHub Actions for continuous integration. The CI pipeline includes:
+このプロジェクトは継続的インテグレーションのために GitHub Actions を使用しています。CI パイプラインには以下が含まれます：
 
-### Frontend CI
-- TypeScript type checking
-- ESLint linting
-- Vitest unit tests
+### フロントエンド CI
+- TypeScript 型チェック
+- ESLint リンティング
+- Vitest ユニットテスト
 
-### Backend CI
-- Prisma client generation
-- TypeScript type checking
-- ESLint linting
-- Vitest unit tests
+### バックエンド CI
+- Prisma クライアント生成
+- TypeScript 型チェック
+- ESLint リンティング
+- Vitest ユニットテスト
 
-### Build Check
-- Backend build verification
-- Expo web export verification
+### ビルドチェック
+- バックエンドビルド検証
+- Expo Web エクスポート検証
 
-The CI runs on:
-- Push to `main` and `develop` branches
-- Pull requests to `main` and `develop` branches
+CI は以下の場合に実行されます：
+- `main` および `develop` ブランチへのプッシュ
+- `main` および `develop` ブランチへのプルリクエスト
 
-## Testing
+## テスト
 
-### Running Tests
+### テストの実行
 
 ```bash
-# Frontend tests
+# フロントエンドテスト
 yarn test:run
 
-# Backend tests
+# バックエンドテスト
 cd backend && yarn test:run
 
-# All tests (from root)
+# 全テスト（ルートから）
 yarn test:run
 ```
 
-### Test Structure
+### テスト構造
 
-- Frontend tests are located in `src/` directory alongside source files
-- Backend tests are located in `backend/src/` directory
-- Test files follow the pattern `*.test.ts`
-- Tests use Vitest with Japanese descriptions following the project guidelines
+- フロントエンドテストは `src/` ディレクトリ内のソースファイルと同じ場所に配置
+- バックエンドテストは `backend/src/` ディレクトリ内に配置
+- テストファイルは `*.test.ts` パターンに従う
+- テストはプロジェクトガイドラインに従って日本語の説明で Vitest を使用
 
-## Code Quality
+## コード品質
 
-### Linting
+### リンティング
 
 ```bash
-# Frontend linting
+# フロントエンドリンティング
 yarn lint
 
-# Backend linting
+# バックエンドリンティング
 cd backend && yarn lint
 
-# Fix linting issues
+# リンティング問題の修正
 yarn lint:fix
 ```
 
-### Type Checking
+### 型チェック
 
 ```bash
-# Frontend type checking
+# フロントエンド型チェック
 yarn type-check
 
-# Backend type checking
+# バックエンド型チェック
 cd backend && yarn type-check
 ```
 
-### Expected Result
+### 期待される結果
 
-![Expected result](./docs/expected.png)
+![期待される結果](./docs/expected.png)
 
-### Actual result
+### 実際の結果
 
-By simulating the result of asset bundling by using expo-asset to cache the assets on startup on App.tsx.
+App.tsx でスタートアップ時に expo-asset を使用してアセットをキャッシュすることで、アセットバンドリングの結果をシミュレートしています。
 
-![Actual result](./docs/actual.png)
+![実際の結果](./docs/actual.png)
