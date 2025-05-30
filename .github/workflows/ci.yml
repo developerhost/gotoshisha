@@ -19,7 +19,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -45,8 +44,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "yarn"
-          cache-dependency-path: "backend/yarn.lock"
 
       - name: Install dependencies
         working-directory: ./backend
@@ -81,7 +78,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "yarn"
 
       - name: Install frontend dependencies
         run: yarn install --frozen-lockfile
