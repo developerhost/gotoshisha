@@ -3,6 +3,15 @@ import { PrismaD1 } from '@prisma/adapter-d1';
 import type { Env } from '@/types';
 
 /**
+ * 環境に応じたPrismaのログレベルを決定する
+ * @param environment - 環境変数（'development' | 'production' など）
+ * @returns ログレベルの配列
+ */
+export function determineLogLevels(environment: string): Array<'query' | 'info' | 'warn' | 'error'> {
+  return environment === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'];
+}
+
+/**
  * Prismaクライアントのインスタンスを作成
  * Cloudflare D1データベースアダプターを使用
  */
@@ -11,7 +20,7 @@ export function createPrismaClient(env: Env): PrismaClient {
   
   return new PrismaClient({
     adapter,
-    log: env.ENVIRONMENT === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+    log: determineLogLevels(env.ENVIRONMENT),
   });
 }
 
