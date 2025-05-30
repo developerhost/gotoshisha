@@ -94,5 +94,8 @@ jobs:
         working-directory: ./backend
         run: yarn build
 
-      - name: Check Expo build
-        run: npx expo export --platform web --output-dir dist
+      - name: Check Expo build (iOS)
+        run: npx expo export --platform ios --output-dir dist-ios
+
+      - name: Check Expo build (Android)
+        run: npx expo export --platform android --output-dir dist-android

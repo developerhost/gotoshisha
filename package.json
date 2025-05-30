@@ -1,13 +1,11 @@
 {
   "name": "expo-react-native-maps-demo",
   "version": "1.0.0",
-  "type": "module",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
     "start:clear": "npx expo start --tunnel --clear",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
