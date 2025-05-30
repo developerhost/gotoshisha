@@ -55,6 +55,10 @@ export async function closeDatabaseConnection(
   try {
     await prisma.$disconnect();
   } catch (error) {
-    console.error("Error closing database connection:", error);
+    if (error instanceof Error) {
+      console.error(`Failed to close database connection: ${error.message}`);
+    } else {
+      console.error("Failed to close database connection: Unknown error");
+    }
   }
 }
