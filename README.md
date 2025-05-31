@@ -15,28 +15,28 @@
 ### 前提条件
 
 - Node.js 20+
-- Yarn パッケージマネージャー
+- pnpm パッケージマネージャー
 - Expo CLI
 
 ### フロントエンドのセットアップ
 
 1. 依存関係をインストール:
    ```bash
-   yarn install
+   pnpm install
    ```
 
 2. 開発サーバーを起動:
    ```bash
-   yarn start
+   pnpm start
    # または iOS の場合
-   yarn ios
+   pnpm ios
    # または Android の場合
-   yarn android
+   pnpm android
    ```
 
 3. トンネルモード（テスト推奨）:
    ```bash
-   yarn start:clear
+   pnpm start:clear
    ```
 
 ### バックエンドのセットアップ
@@ -48,7 +48,7 @@
 
 2. 依存関係をインストール:
    ```bash
-   yarn install
+   pnpm install
    ```
 
 3. 環境変数を設定:
@@ -58,37 +58,37 @@
 
 4. Prisma クライアントを生成:
    ```bash
-   yarn db:generate
+   pnpm db:generate
    ```
 
 5. 開発サーバーを起動:
    ```bash
-   yarn dev
+   pnpm dev
    ```
 
 ## 利用可能なスクリプト
 
 ### フロントエンドスクリプト
 
-- `yarn start` - Expo 開発サーバーを起動
-- `yarn ios` - iOS シミュレーターを起動
-- `yarn android` - Android エミュレーターを起動
-- `yarn web` - Web 開発サーバーを起動
-- `yarn lint` - ESLint を実行
-- `yarn lint:fix` - ESLint の問題を自動修正
-- `yarn test` - ウォッチモードでテストを実行
-- `yarn test:run` - テストを一度実行
-- `yarn type-check` - TypeScript 型チェックを実行
+- `pnpm start` - Expo 開発サーバーを起動
+- `pnpm ios` - iOS シミュレーターを起動
+- `pnpm android` - Android エミュレーターを起動
+- `pnpm web` - Web 開発サーバーを起動
+- `pnpm lint` - ESLint を実行
+- `pnpm lint:fix` - ESLint の問題を自動修正
+- `pnpm test` - ウォッチモードでテストを実行
+- `pnpm test:run` - テストを一度実行
+- `pnpm type-check` - TypeScript 型チェックを実行
 
 ### バックエンドスクリプト
 
-- `yarn dev` - Wrangler で開発サーバーを起動
-- `yarn build` - プロダクション用にビルド
-- `yarn deploy` - Cloudflare Workers にデプロイ
-- `yarn lint` - ESLint を実行
-- `yarn test:run` - テストを実行
-- `yarn db:generate` - Prisma クライアントを生成
-- `yarn db:push` - スキーマ変更をデータベースにプッシュ
+- `pnpm dev` - Wrangler で開発サーバーを起動
+- `pnpm build` - プロダクション用にビルド
+- `pnpm deploy` - Cloudflare Workers にデプロイ
+- `pnpm lint` - ESLint を実行
+- `pnpm test:run` - テストを実行
+- `pnpm db:generate` - Prisma クライアントを生成
+- `pnpm db:push` - スキーマ変更をデータベースにプッシュ
 
 ## CI/CD
 
@@ -119,13 +119,13 @@ CI は以下の場合に実行されます：
 
 ```bash
 # フロントエンドテスト
-yarn test:run
+pnpm test:run
 
 # バックエンドテスト
-cd backend && yarn test:run
+cd backend && pnpm test:run
 
 # 全テスト（ルートから）
-yarn test:run
+pnpm test:run
 ```
 
 ### テスト構造
@@ -141,23 +141,23 @@ yarn test:run
 
 ```bash
 # フロントエンドリンティング
-yarn lint
+pnpm lint
 
 # バックエンドリンティング
-cd backend && yarn lint
+cd backend && pnpm lint
 
 # リンティング問題の修正
-yarn lint:fix
+pnpm lint:fix
 ```
 
 ### 型チェック
 
 ```bash
 # フロントエンド型チェック
-yarn type-check
+pnpm type-check
 
 # バックエンド型チェック
-cd backend && yarn type-check
+cd backend && pnpm type-check
 ```
 
 ### 期待される結果

@@ -20,17 +20,27 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.5.0
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Type check
-        run: yarn type-check
+        run: pnpm type-check
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
 
       - name: Run tests
-        run: yarn test:run
+        run: pnpm test:run
 
   backend:
     name: Backend CI
@@ -45,25 +55,35 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.5.0
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
       - name: Install dependencies
         working-directory: ./backend
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         working-directory: ./backend
-        run: yarn db:generate
+        run: pnpm db:generate
 
       - name: Type check
         working-directory: ./backend
-        run: yarn type-check
+        run: pnpm type-check
 
       - name: Lint
         working-directory: ./backend
-        run: yarn lint
+        run: pnpm lint
 
       - name: Run tests
         working-directory: ./backend
-        run: yarn test:run
+        run: pnpm test:run
 
   build-check:
     name: Build Check
@@ -79,20 +99,30 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.5.0
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
       - name: Install frontend dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install backend dependencies
         working-directory: ./backend
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         working-directory: ./backend
-        run: yarn db:generate
+        run: pnpm db:generate
 
       - name: Build backend
         working-directory: ./backend
-        run: yarn build
+        run: pnpm build
 
       - name: Check Expo build (iOS)
         run: npx expo export --platform ios --output-dir dist-ios

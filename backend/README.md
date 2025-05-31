@@ -16,7 +16,7 @@ Hono + Cloudflare Workers + Cloudflare D1 + Prismaを使用したバックエン
 
 ```bash
 cd backend
-yarn install
+pnpm install
 ```
 
 ### 2. Cloudflare Workers CLIの設定
@@ -24,7 +24,7 @@ yarn install
 Cloudflareアカウントにログインします：
 
 ```bash
-yarn wrangler login
+pnpm wrangler login
 ```
 
 ### 3. データベースの作成
@@ -55,19 +55,19 @@ database_id = "ここにデータベースIDを設定"
 ### 5. Prismaクライアントの生成
 
 ```bash
-yarn db:generate
+pnpm db:generate
 ```
 
 ### 6. データベーススキーマの適用
 
 ```bash
-yarn db:push
+pnpm db:push
 ```
 
 ### 7. シードデータの投入（オプション）
 
 ```bash
-yarn db:seed
+pnpm db:seed
 ```
 
 ## 開発
@@ -75,7 +75,7 @@ yarn db:seed
 ### 開発サーバーの起動
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 開発サーバーは `http://localhost:8787` で起動します。
@@ -96,26 +96,26 @@ yarn dev
 
 ```bash
 # 開発環境でのマイグレーション
-yarn db:migrate
+pnpm db:migrate
 
 # 本番環境でのマイグレーション
-yarn wrangler d1 migrations apply gotoshisha-db-prod --remote
+pnpm wrangler d1 migrations apply gotoshisha-db-prod --remote
 ```
 
 ### Prisma Studio
 
 ```bash
-yarn db:studio
+pnpm db:studio
 ```
 
 ### データベースのリセット
 
 ```bash
 # スキーマを再適用
-yarn db:push --force-reset
+pnpm db:push --force-reset
 
 # シードデータを再投入
-yarn db:seed
+pnpm db:seed
 ```
 
 ## デプロイ
@@ -123,13 +123,13 @@ yarn db:seed
 ### ステージング環境
 
 ```bash
-yarn wrangler deploy --env staging
+pnpm wrangler deploy --env staging
 ```
 
 ### 本番環境
 
 ```bash
-yarn wrangler deploy --env production
+pnpm wrangler deploy --env production
 ```
 
 ## プロジェクト構造
@@ -181,22 +181,22 @@ cp .env.example .env
 
 ```bash
 # Prismaクライアントを再生成
-yarn db:generate
+pnpm db:generate
 
 # node_modulesをクリア
-rm -rf node_modules yarn.lock
-yarn install
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
 ```
 
 ### 型エラー
 
-現在、パッケージのインストール前のため型エラーが表示されていますが、`yarn install`実行後に解決されます。
+現在、パッケージのインストール前のため型エラーが表示されていますが、`pnpm install`実行後に解決されます。
 
 ## 次のステップ
 
-1. 依存関係をインストール: `yarn install`
+1. 依存関係をインストール: `pnpm install`
 2. データベースをセットアップ: `./scripts/setup-db.sh`
-3. 開発サーバーを起動: `yarn dev`
+3. 開発サーバーを起動: `pnpm dev`
 4. APIルートの実装
 5. 認証機能の追加
 6. テストの実装
