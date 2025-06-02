@@ -4,7 +4,7 @@
     "slug": "expo-react-native-maps-demo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -13,13 +13,15 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dirtyman69.exporeactnativemapsdemo"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.dirtyman69.exporeactnativemapsdemo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -27,11 +29,7 @@
     "scheme": "expo-react-native-maps-demo",
     "platforms": ["ios", "android", "web"],
     "plugins": [
-      "expo-router",
-      "react-native-auth0",
-      {
-        "domain": "dev-cz7g2cer3i7mpz25.jp.auth0.com"
-      }
+      "expo-router"
     ]
   }
 }
