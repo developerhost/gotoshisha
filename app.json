@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -27,13 +25,13 @@
       "favicon": "./assets/favicon.png"
     },
     "scheme": "expo-react-native-maps-demo",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "react-native-auth0",
+      {
+        "domain": "dev-cz7g2cer3i7mpz25.jp.auth0.com"
+      }
     ]
   }
 }
