@@ -1868,12 +1868,12 @@ DEPENDENCIES:
   - "EXConstants (from `../node_modules/.pnpm/expo-constants@17.1.6_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-na_3aa155c090d50df829f116e81cac2cde/node_modules/expo-constants/ios`)"
   - "Expo (from `../node_modules/.pnpm/expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-native@0.79.2_@babel+cor_1052bd30491700fa50852b27aae1f4e8/node_modules/expo`)"
   - "ExpoAsset (from `../node_modules/.pnpm/expo-asset@11.1.5_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-native_13dbb27fc257e4beab6baf4fddbc87ef/node_modules/expo-asset/ios`)"
-  - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
-  - ExpoFont (from `../node_modules/expo-font/ios`)
+  - "ExpoFileSystem (from `../node_modules/.pnpm/expo-file-system@18.1.10_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react_33b631e0026da75f21de2e3b4fe673e2/node_modules/expo-file-system/ios`)"
+  - "ExpoFont (from `../node_modules/.pnpm/expo-font@13.3.1_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-native@_0c3ddd35f0db07355dec6d06a259ebb9/node_modules/expo-font/ios`)"
   - "ExpoHead (from `../node_modules/.pnpm/expo-router@5.0.7_59fb55db03679cfc859233e160e4c1a2/node_modules/expo-router/ios`)"
-  - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
+  - "ExpoKeepAwake (from `../node_modules/.pnpm/expo-keep-awake@14.1.4_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-n_a11e2313bb597e21b04eb3d4f47955ee/node_modules/expo-keep-awake/ios`)"
   - "ExpoLinking (from `../node_modules/.pnpm/expo-linking@7.1.5_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-nativ_07ffb3ba73602949aeb2290be31a01bc/node_modules/expo-linking/ios`)"
-  - ExpoModulesCore (from `../node_modules/expo-modules-core`)
+  - "ExpoModulesCore (from `../node_modules/.pnpm/expo-modules-core@2.3.13/node_modules/expo-modules-core`)"
   - "fast_float (from `../node_modules/.pnpm/react-native@0.79.2_@babel+core@7.27.4_@types+react@19.0.14_react@19.0.0/node_modules/react-native/third-party-podspecs/fast_float.podspec`)"
   - "FBLazyVector (from `../node_modules/.pnpm/react-native@0.79.2_@babel+core@7.27.4_@types+react@19.0.14_react@19.0.0/node_modules/react-native/Libraries/FBLazyVector`)"
   - "fmt (from `../node_modules/.pnpm/react-native@0.79.2_@babel+core@7.27.4_@types+react@19.0.14_react@19.0.0/node_modules/react-native/third-party-podspecs/fmt.podspec`)"
@@ -1969,17 +1969,17 @@ EXTERNAL SOURCES:
   ExpoAsset:
     :path: "../node_modules/.pnpm/expo-asset@11.1.5_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-native_13dbb27fc257e4beab6baf4fddbc87ef/node_modules/expo-asset/ios"
   ExpoFileSystem:
-    :path: "../node_modules/expo-file-system/ios"
+    :path: "../node_modules/.pnpm/expo-file-system@18.1.10_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react_33b631e0026da75f21de2e3b4fe673e2/node_modules/expo-file-system/ios"
   ExpoFont:
-    :path: "../node_modules/expo-font/ios"
+    :path: "../node_modules/.pnpm/expo-font@13.3.1_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-native@_0c3ddd35f0db07355dec6d06a259ebb9/node_modules/expo-font/ios"
   ExpoHead:
     :path: "../node_modules/.pnpm/expo-router@5.0.7_59fb55db03679cfc859233e160e4c1a2/node_modules/expo-router/ios"
   ExpoKeepAwake:
-    :path: "../node_modules/expo-keep-awake/ios"
+    :path: "../node_modules/.pnpm/expo-keep-awake@14.1.4_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-n_a11e2313bb597e21b04eb3d4f47955ee/node_modules/expo-keep-awake/ios"
   ExpoLinking:
     :path: "../node_modules/.pnpm/expo-linking@7.1.5_expo@53.0.9_@babel+core@7.27.4_@expo+metro-runtime@5.0.4_react-nativ_07ffb3ba73602949aeb2290be31a01bc/node_modules/expo-linking/ios"
   ExpoModulesCore:
-    :path: "../node_modules/expo-modules-core"
+    :path: "../node_modules/.pnpm/expo-modules-core@2.3.13/node_modules/expo-modules-core"
   fast_float:
     :podspec: "../node_modules/.pnpm/react-native@0.79.2_@babel+core@7.27.4_@types+react@19.0.14_react@19.0.0/node_modules/react-native/third-party-podspecs/fast_float.podspec"
   FBLazyVector:
