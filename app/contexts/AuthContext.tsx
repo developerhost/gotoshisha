@@ -22,8 +22,29 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, isLoading, authorize, clearSession, error } = useAuth0();
+  const { user, authorize, clearSession, error } = useAuth0();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    // 初期化処理
+    const checkAuth = async () => {
+      try {
+        // Auth0は自動的にセッションを復元しないため、
+        // 初回は未認証として扱う
+        setIsAuthenticated(false);
+        setIsLoading(false);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error("Auth check error:", e);
+        setAuthError(e as Error);
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     setIsAuthenticated(!!user);
@@ -31,20 +52,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const login = async () => {
     try {
+      setIsLoading(true);
+      setAuthError(null);
       await authorize();
+      setIsLoading(false);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Login error:", e);
+      setAuthError(e as Error);
+      setIsLoading(false);
       throw e;
     }
   };
 
   const logout = async () => {
     try {
+      setIsLoading(true);
       await clearSession();
+      setIsAuthenticated(false);
+      setIsLoading(false);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Logout error:", e);
+      setIsLoading(false);
       throw e;
     }
   };
@@ -57,7 +87,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         isAuthenticated,
         login,
         logout,
-        error,
+        error: authError || error,
       }}
     >
       {children}

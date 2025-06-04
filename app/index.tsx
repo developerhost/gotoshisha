@@ -1,12 +1,35 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { useAuth } from "./contexts/AuthContext";
+import { useEffect } from "react";
 
 export default function HomeScreen() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/routes/login");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>読み込み中...</Text>
+      </View>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>React Native Maps Demo</Text>
       <Text style={styles.subtitle}>Expo Router を使用したマップアプリ</Text>
-      
+
       <Link href="/routes/map" asChild>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>マップを表示</Text>
