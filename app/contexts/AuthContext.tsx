@@ -1,104 +1,63 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import { useAuth0 } from "react-native-auth0";
+import React, { createContext, useContext, ReactNode } from "react";
+import { useAuth0 as useAuth0Native } from "react-native-auth0";
+import { UseAuth0Result } from "../utils/auth/useAuth0";
 
-interface AuthContextData {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  user: any | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
-  error: Error | null;
-}
+interface AuthContextData extends UseAuth0Result {}
 
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
+/**
+ * ネイティブプラットフォーム用の認証プロバイダーコンポーネント
+ * expo-auth-sessionの代わりにreact-native-auth0を使用
+ */
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, authorize, clearSession, error } = useAuth0();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [authError, setAuthError] = useState<Error | null>(null);
+  const { user, authorize, clearSession, error, isLoading } = useAuth0Native();
 
-  useEffect(() => {
-    // 初期化処理
-    const checkAuth = async () => {
+  const authContextValue: AuthContextData = {
+    user: user
+      ? {
+          sub: user.sub || "",
+          ...user,
+        }
+      : null,
+    isLoading,
+    isAuthenticated: !!user,
+    error,
+    login: async () => {
       try {
-        // Auth0は自動的にセッションを復元しないため、
-        // 初回は未認証として扱う
-        setIsAuthenticated(false);
-        setIsLoading(false);
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error("Auth check error:", e);
-        setAuthError(e as Error);
-        setIsLoading(false);
+        await authorize();
+      } catch (err) {
+        console.error("ログインエラー:", err);
+        throw err;
       }
-    };
-
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    setIsAuthenticated(!!user);
-  }, [user]);
-
-  const login = async () => {
-    try {
-      setIsLoading(true);
-      setAuthError(null);
-      await authorize();
-      setIsLoading(false);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error("Login error:", e);
-      setAuthError(e as Error);
-      setIsLoading(false);
-      throw e;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      setIsLoading(true);
-      await clearSession();
-      setIsAuthenticated(false);
-      setIsLoading(false);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error("Logout error:", e);
-      setIsLoading(false);
-      throw e;
-    }
+    },
+    logout: async () => {
+      try {
+        await clearSession();
+      } catch (err) {
+        console.error("ログアウトエラー:", err);
+        throw err;
+      }
+    },
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        isAuthenticated,
-        login,
-        logout,
-        error: authError || error,
-      }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
+/**
+ * 認証コンテキストにアクセスするためのフック
+ * @throws AuthProviderの外で使用された場合エラー
+ */
+export const useAuth = (): AuthContextData => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuthはAuthProvider内で使用してください");
   }
   return context;
 };
