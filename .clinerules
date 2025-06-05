@@ -5,6 +5,8 @@
 DO NOT read or modify:
 
 - .env files
+- .env.* files
+- wrangler.toml (contains D1 database IDs)
 - \*_/config/secrets._
 - \*_/_.pem
 - Any file containing API keys, tokens, or credentials
@@ -14,6 +16,7 @@ DO NOT read or modify:
 - Never commit sensitive files
 - Use environment variables for secrets
 - Keep credentials out of logs and output
+- Never expose Auth0 credentials or database connection strings
 
 ## 開発方針
 
@@ -21,102 +24,117 @@ DO NOT read or modify:
 
 - できるだけ状態管理を減らすこと
 - component内はもちろん、hook内のコードもできるだけ単一責任原則を意識して、純粋なJS/TSの関数に切り出し、関数に対しては必ずユニットテストを書くこと
-- テストはJestを用い、describeとitは必ず日本語で記載すること
+- テストはVitestを用い、describeとitは必ず日本語で記載すること
 - 複雑なモックが必要になる場合は関数自体の責務が大きすぎる可能性があるので、必ず確認し、フリーキーテストが発生しないようにすることを意識すること
 - できる限りコメントは書くこと
 - 単一責任原則を意識すること
 
-## React Native
+## React Native & Expo
 
 - React.FCは使用せず、型注釈を書くこと
-- コンポーネントは必ずアロー関数を使用してください。
-- import React from 'react' の記載は不要です。
+- コンポーネントは必ずアロー関数を使用してください
+- import React from 'react' の記載は不要です
+- Expo SDK 53の機能を活用すること
+- expo-routerを使用したファイルベースルーティング
+
+## バックエンド (Cloudflare Workers)
+
+- Hono frameworkを使用したAPIエンドポイント
+- Cloudflare D1を使用したサーバーレスデータベース
+- Prismaを使用したORM
+- Zodを使用したバリデーション
+- wrangler.tomlで環境設定を管理
 
 ## ライブラリ
 - ルーティングはexpo routerを使用すること
+- 地図機能はreact-native-mapsを使用すること
+- 認証はreact-native-auth0を使用すること
 
 ## ディレクトリ構成
 
-- 基本ディレクトリ構成例:
+- 現在のプロジェクト構成:
 
 ```
-https://github.com/t3-oss/t3-env
+gotoshisha/
+├── app/                       # Expo Router用のルーティングディレクトリ
+│   ├── _layout.tsx            # ルートレイアウト
+│   ├── index.tsx              # ホーム画面
+│   ├── routes/                # 各画面のコンポーネント
+│   │   ├── home.tsx           # ホーム画面
+│   │   └── map.tsx            # 地図画面
+│   └── constants/             # 定数定義
+│       └── location.ts        # 位置情報関連の定数
+├── src/                       # ソースコード
+│   ├── assets/                # 画像やアイコンなどの静的リソース
+│   │   └── pin*.png           # 地図マーカー用アイコン
+│   └── utils/                 # ユーティリティ関数
+│       └── test-utils.ts      # テスト用ユーティリティ
+├── backend/                   # バックエンド（Cloudflare Workers）
+│   ├── src/
+│   │   ├── index.ts           # APIエントリーポイント（Hono）
+│   │   ├── lib/               # ライブラリとユーティリティ
+│   │   │   ├── db.ts          # データベース接続とクエリ
+│   │   │   ├── utils.ts       # 共通ユーティリティ
+│   │   │   └── validation.ts  # Zodバリデーション
+│   │   └── types/             # TypeScript型定義
+│   ├── prisma/
+│   │   └── schema.prisma      # Prismaスキーマ定義
+│   ├── migrations/            # D1データベースマイグレーション
+│   └── wrangler.toml          # Cloudflare Workers設定
+├── assets/                    # アプリ全体の静的リソース
+├── ios/                       # iOSネイティブコード
+├── android/                   # Androidネイティブコード
+└── docs/                      # ドキュメント
 ```
 
-- 詳細ディレクトリ構成例:
+- 推奨される詳細ディレクトリ構成:
 
 ```
-src
-├── app
-│   ├── routes                # アプリケーションのルーティング関連
-│   │   ├── Home
-│   │   │   ├── Home.tsx      # ホームページコンポーネント
-│   │   │   ├── Home.test.tsx # ホームページのJestテスト
-│   │   │   └── index.ts
-│   │   └── About
-│   │       ├── About.tsx      # アバウトページコンポーネント
-│   │       ├── About.test.tsx # アバウトページのJestテスト
-│   │       └── index.ts
-│   ├── app.tsx                # アプリケーションエントリーポイント
-│   ├── provider.tsx           # グローバルプロバイダー設定
-│   └── router.tsx             # ルーター設定
-├── assets                     # 画像やフォントなどの静的リソース
-├── components               # 共有コンポーネント（UIパーツなど）
-│   ├── CustomButton           # コンポーネントはAntdを使用するので、カスタムなコンポーネントを使用しないと行けない場合に作成する
-│   │   ├── Button.tsx         # Buttonコンポーネント
-│   │   ├── Button.test.tsx    # Buttonコンポーネントのテスト
-│   │   ├── Button.styles.ts   # Button用のスタイル
+app/
+├── (auth)/                    # 認証が必要な画面グループ
+│   ├── _layout.tsx            # 認証レイアウト
+│   ├── profile.tsx            # プロフィール画面
+│   └── posts/                 # 投稿関連画面
+│       ├── index.tsx          # 投稿一覧
+│       ├── [id].tsx           # 投稿詳細（動的ルート）
+│       └── create.tsx         # 投稿作成
+├── (tabs)/                    # タブナビゲーション
+│   ├── _layout.tsx            # タブレイアウト
+│   ├── home.tsx               # ホームタブ
+│   ├── map.tsx                # 地図タブ
+│   └── search.tsx             # 検索タブ
+├── _layout.tsx                # ルートレイアウト
+└── index.tsx                  # エントリーポイント
+
+src/
+├── components/                # 共有コンポーネント
+│   ├── map/                   # 地図関連コンポーネント
+│   │   ├── MapView.tsx        # 地図表示コンポーネント
+│   │   ├── Marker.tsx         # マーカーコンポーネント
 │   │   └── index.ts
-│   └── CustomModal            # コンポーネントはAntdを使用するので、カスタムなコンポーネントを使用しないと行けない場合に作成する
-│       ├── Modal.tsx          # Modalコンポーネント
-│       ├── Modal.test.tsx     # Modalコンポーネントのテスト
-│       ├── Modal.styles.ts    # Modal用のスタイル
+│   └── ui/                    # 汎用UIコンポーネント
+│       ├── Button.tsx
+│       ├── Card.tsx
 │       └── index.ts
-├── features                 # 機能（ドメイン）ごとのモジュール
-│   ├── authentication       # 認証機能
-│   │   ├── components       # 認証関連のUIコンポーネント
-│   │   │   ├── LoginForm.tsx         # ログインフォームコンポーネント
-│   │   │   ├── LoginForm.test.tsx    # ログインフォームのテスト
-│   │   │   └── index.ts
-│   │   ├── hooks            # 認証機能専用のカスタムフック
-│   │   │   ├── useAuth.ts
-│   │   │   └── useAuth.test.ts
-│   │   ├── api              # 認証に関するAPI呼び出し
-│   │   │   ├── authAPI.ts
-│   │   │   └── authAPI.test.ts
-│   │   ├── stores           # 認証状態管理ストア
-│   │   │   ├── authStore.ts
-│   │   │   └── authStore.test.ts
-│   │   ├── types            # 認証機能で使用する型定義
-│   │   │   └── authTypes.ts
-│   │   └── utils            # 認証関連のユーティリティ関数
-│   │       ├── authUtils.ts
-│   │       └── authUtils.test.ts
-│   └── dashboard            # ダッシュボード機能
-│       ├── components       # ダッシュボード専用のUIコンポーネント
-│       │   ├── DashboardHeader.tsx
-│       │   ├── DashboardHeader.test.tsx
-│       │   └── index.ts
-│       ├── hooks            # ダッシュボード機能専用のカスタムフック
-│       │   ├── useDashboard.ts
-│       │   └── useDashboard.test.ts
-│       ├── api              # ダッシュボードに関するAPI呼び出し
-│       │   ├── dashboardAPI.ts
-│       │   └── dashboardAPI.test.ts
-│       ├── stores           # ダッシュボード用状態管理ストア
-│       │   ├── dashboardStore.ts
-│       │   └── dashboardStore.test.ts
-│       ├── types            # ダッシュボード機能で使用する型定義
-│       │   └── dashboardTypes.ts
-│       └── utils            # ダッシュボード関連のユーティリティ関数
-│           ├── dashboardUtils.ts
-│           └── dashboardUtils.test.ts
-├── hooks                    # アプリ全体で再利用するカスタムフック
-├── lib                      # 共通ライブラリ、事前設定済みユーティリティ
-├── stores                   # アプリ全体のグローバル状態管理
-├── testing                  # 共通テストユーティリティ、モック、テスト設定
-├── types                    # プロジェクト全体で利用する型定義
-└── utils                    # アプリ全体で利用するユーティリティ関数
+├── features/                  # 機能別モジュール
+│   ├── auth/                  # 認証機能（Auth0）
+│   │   ├── hooks/
+│   │   │   └── useAuth.ts
+│   │   ├── components/
+│   │   └── types/
+│   ├── posts/                 # 投稿機能
+│   │   ├── hooks/
+│   │   ├── api/
+│   │   └── types/
+│   └── location/              # 位置情報機能
+│       ├── hooks/
+│       └── utils/
+├── hooks/                     # グローバルカスタムフック
+├── lib/                       # ライブラリ設定
+│   ├── auth0.ts               # Auth0設定
+│   └── api.ts                 # APIクライアント設定
+├── types/                     # 共通型定義
+└── utils/                     # ユーティリティ関数
 ```
 
 ## 参考資料
@@ -171,22 +189,30 @@ Create ADRs in /docs/adr for:
 
 ## ロール定義
 
-あなたは React Native + expo のエキスパートエンジニア兼 UI/UX デザイナーとして対応してください。
+あなたは React Native + Expo + Cloudflare Workers のエキスパートエンジニア兼 UI/UX デザイナーとして対応してください。
 
 ## 技術スタック
 
-- フロントエンド
-  - React19
-  - TypeScript
-  - expo
-  - expo router
-  - Jotai
-- バックエンド
-  - Node.js
-- ユニットテスト
-  - Jest
-- フォーマッター
-  - Prettier
+### フロントエンド
+- React Native 0.79.2
+- TypeScript
+- Expo SDK 53
+- Expo Router v5 (ファイルベースルーティング)
+- React Native Maps (地図機能)
+- React Native Auth0 (認証)
+
+### バックエンド
+- Cloudflare Workers (エッジコンピューティング)
+- Hono v4.6.3 (Webフレームワーク)
+- Cloudflare D1 (サーバーレスSQLite)
+- Prisma v5.22.0 (ORM)
+- Zod v3.23.8 (バリデーション)
+
+### テスト・開発ツール
+- Vitest v3.1.4 (テストランナー)
+- pnpm (パッケージマネージャー)
+- Wrangler (Cloudflare CLI)
+- ESLint + TypeScript
 
 ## 期待する回答
 
@@ -194,7 +220,7 @@ Create ADRs in /docs/adr for:
 - TypeScript の型定義も含める
 - React.FCは使用せずに必ずJSDOCと型推論を記載すること
 - セキュリティのベストプラクティスに従った実装
-- レスポンシブデザインを考慮した UI/UX 提案
+- モバイルファーストのUI/UX提案
 - 日本語での詳細な説明
 
 # セキュリティ
@@ -229,7 +255,8 @@ Create ADRs in /docs/adr for:
 ### 2. コンポーネントの実装
 
 - hooksを使用し、実装すること。適宜カスタムhooksを作成すること
-- 状態管理にはJotaiを使用し、コンポーネントはストアを介してデータにアクセス
+- 状態管理は必要最小限に留め、React標準のuseStateやuseReducerを活用
+- グローバルな状態管理が必要な場合はContext APIを使用
 
 ### 3. UI/UXデザイン
 
@@ -439,24 +466,38 @@ validateUtil.mockRejectedValue(new Error("バリデーションエラー"));
 ## コード変更後の確認
 
 1. ビルドの確認
+   ```bash
+   # iOS
    pnpm run ios
+   
+   # Android
+   pnpm run android
+   
+   # Web
+   pnpm run web
+   ```
 
 2. 変更したファイルのユニットテスト実行
 
-- テストファイルの命名規則: `[FileName].test.ts`
+- テストファイルの命名規則: `[FileName].test.ts` または `[FileName].test.tsx`
 - テストは純粋関数のみテストを追加すること
-- テストファイルの配置: `src/test/` 以下の対応するディレクトリ
-  - ユーティリティ: `src/test/utils/`
+- テストファイルは同じディレクトリにソースファイルと並べて配置
 
 例：
 
+```bash
+# フロントエンドのテスト
+pnpm test
+
+# バックエンドのテスト
+cd backend && pnpm test
+
 # 特定のテストファイルを実行
+pnpm test src/utils/test-utils.test.ts
 
-yarn run test:unit src/test/utils/example.test.ts
-
-# 特定のディレクトリ内の全テストを実行
-
-pnpm run test:unit src/test/utils/
+# ウォッチモードでテスト実行
+pnpm test:watch
+```
 
 注意：
 
@@ -561,7 +602,7 @@ feature(reviews): ドキュメントレビュー承認機能を追加
 
 ### 1. 基本ルール
 
-- ベースブランチは development に固定
+- ベースブランチは main に固定
 - タイトルとボディは日本語で記述
 
 ### 2. タイトル・ボディの作成
@@ -593,7 +634,7 @@ current_branch=$(git branch --show-current)
 # プルリクエスト作成コマンド
 
 gh pr create \
- --base development \
+ --base main \
  --head "$current_branch" \
  --title "[コミットタイプ] 変更内容の要約" \
  --body "## 変更内容
@@ -616,3 +657,112 @@ gh pr create \
 
 - 特に確認してほしい点を明記
 - コードの複雑な部分には補足説明を追加
+
+## API開発規約 (Cloudflare Workers + Hono)
+
+### 1. エンドポイント設計
+
+- RESTful APIの原則に従う
+- パスは複数形を使用 (例: `/users`, `/posts`)
+- HTTPメソッドを適切に使用 (GET, POST, PUT, DELETE)
+- APIバージョニングを検討 (例: `/api/v1/`)
+
+### 2. Honoルーティング
+
+```typescript
+// 良い例
+app.get('/posts', async (c) => {
+  // 投稿一覧取得
+})
+
+app.post('/posts', async (c) => {
+  // 投稿作成
+})
+
+app.get('/posts/:id', async (c) => {
+  // 特定の投稿取得
+})
+```
+
+### 3. バリデーション
+
+- Zodを使用してリクエストボディをバリデーション
+- エラーレスポンスは統一フォーマットで返す
+
+```typescript
+// スキーマ定義
+const createPostSchema = z.object({
+  title: z.string().min(1).max(100),
+  content: z.string().min(1),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+})
+
+// バリデーション実行
+const result = createPostSchema.safeParse(body)
+if (!result.success) {
+  return c.json({ error: result.error.flatten() }, 400)
+}
+```
+
+### 4. エラーハンドリング
+
+- 適切なHTTPステータスコードを返す
+- エラーメッセージは日本語で分かりやすく
+- ログを適切に出力
+
+### 5. CORS設定
+
+- 開発環境と本番環境で適切なCORS設定
+- 必要なヘッダーのみ許可
+
+## データベース規約 (Prisma + D1)
+
+### 1. スキーマ設計
+
+- テーブル名は複数形を使用
+- カラム名はcamelCaseを使用
+- 適切なインデックスを設定
+- 外部キー制約を活用
+
+### 2. マイグレーション
+
+```bash
+# スキーマ変更後
+cd backend
+pnpm prisma generate
+pnpm prisma migrate dev
+
+# D1へのマイグレーション
+pnpm run migrate:d1
+```
+
+### 3. クエリ最適化
+
+- N+1問題を避けるため、includeを適切に使用
+- 必要なフィールドのみselect
+- ページネーションを実装
+
+### 4. トランザクション
+
+- 複数のテーブル更新時は必ずトランザクションを使用
+- エラー時のロールバックを確実に行う
+
+## 認証規約 (Auth0)
+
+### 1. 認証フロー
+
+- Auth0のUniversal Loginを使用
+- JWTトークンの検証を適切に実装
+- リフレッシュトークンの管理
+
+### 2. セキュリティ
+
+- 機密情報は環境変数で管理
+- トークンをセキュアに保存
+- 適切なスコープを設定
+
+### 3. ユーザー情報
+
+- Auth0のユーザー情報とローカルDBを同期
+- プロフィール更新時の整合性を保つ
