@@ -26,11 +26,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "expo-react-native-maps-demo",
+    "scheme": "gotoshisha",
     "platforms": ["ios", "android", "web"],
     "plugins": [
-      "expo-router",
-      ["react-native-auth0", { "domain": "dev-cz7g2cer3i7mpz25.jp.auth0.com" }]
+      "expo-router"
     ]
   }
 }

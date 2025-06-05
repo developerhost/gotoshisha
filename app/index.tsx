@@ -1,6 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/AuthContext.web";
 import { useEffect } from "react";
 
 export default function HomeScreen() {
@@ -25,21 +31,71 @@ export default function HomeScreen() {
     return null;
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>React Native Maps Demo</Text>
-      <Text style={styles.subtitle}>Expo Router を使用したマップアプリ</Text>
+  const { user, logout } = useAuth();
 
-      <Link href="/routes/map" asChild>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>マップを表示</Text>
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace("/routes/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
+        <Text style={styles.welcomeText}>
+          ようこそ、{user?.name || user?.email || "ユーザー"}さん
+        </Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>ログアウト</Text>
         </TouchableOpacity>
-      </Link>
-    </View>
+      </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>React Native Maps Demo</Text>
+        <Text style={styles.subtitle}>Expo Router を使用したマップアプリ</Text>
+
+        <Link href="/routes/map" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>マップを表示</Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  welcomeText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  logoutButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 5,
+    backgroundColor: "#f44336",
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
