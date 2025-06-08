@@ -10,7 +10,7 @@ import { useAuth } from "./contexts/AuthContext.web";
 import { useEffect } from "react";
 
 export default function HomeScreen() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -30,8 +30,6 @@ export default function HomeScreen() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
