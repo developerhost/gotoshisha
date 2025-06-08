@@ -10,6 +10,10 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# Expo generated native projects
+android/
+ios/
+
 # Package manager lock files (use pnpm-lock.yaml only)
 package-lock.json
 yarn.lock
