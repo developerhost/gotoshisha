@@ -29,7 +29,7 @@ export function useAuth0(): UseAuth0Result {
 
   // リダイレクトURIの設定
   const redirectUri = makeRedirectUri({
-    scheme: "gotoshisha",
+    scheme: auth0Config.scheme,
     path: "redirect",
   });
 
@@ -42,7 +42,7 @@ export function useAuth0(): UseAuth0Result {
       clientId: auth0Config.clientId,
       scopes: ["openid", "profile", "email", "offline_access"],
       redirectUri,
-      responseType: ResponseType.Token,
+      responseType: ResponseType.Code,
       extraParams: {
         audience: `https://${auth0Config.domain}/api/v2/`,
       },
@@ -57,10 +57,19 @@ export function useAuth0(): UseAuth0Result {
     try {
       const tokens = await AuthStorage.load();
       if (tokens) {
+        if (!tokens.accessToken || !tokens.user) {
+          // eslint-disable-next-line no-console
+          console.warn("Invalid stored tokens, clearing storage");
+          await AuthStorage.clear();
+          return;
+        }
         setUser(tokens.user);
       }
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("保存された認証情報の読み込みに失敗:", err);
+      // Clear potentially corrupted storage
+      await AuthStorage.clear();
       setError(err as Error);
     } finally {
       setIsLoading(false);
@@ -77,6 +86,7 @@ export function useAuth0(): UseAuth0Result {
       setUser(userInfo);
       setError(null);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("認証成功処理に失敗:", err);
       setError(err as Error);
       throw err;
@@ -92,8 +102,35 @@ export function useAuth0(): UseAuth0Result {
     if (!response) return;
 
     const handleResponse = async (authResponse: AuthSessionResult) => {
-      if (authResponse.type === "success" && authResponse.params.access_token) {
-        await handleAuthSuccess(authResponse.params.access_token);
+      if (authResponse.type === "success") {
+        // For Authorization Code flow, we need to exchange the code for tokens
+        if (!authResponse.params.code) {
+          setError(new Error("認証レスポンスに認可コードが含まれていません"));
+          setIsLoading(false);
+          return;
+        }
+
+        try {
+          // Exchange authorization code for tokens
+          const tokenResponse = await Auth0Api.exchangeCodeForToken(
+            authResponse.params.code,
+            redirectUri,
+            authResponse.params.code_verifier || ""
+          );
+
+          if (!tokenResponse.access_token) {
+            throw new Error(
+              "トークン交換レスポンスにアクセストークンが含まれていません"
+            );
+          }
+
+          await handleAuthSuccess(tokenResponse.access_token);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error("トークン交換に失敗:", err);
+          setError(err as Error);
+          setIsLoading(false);
+        }
       } else if (authResponse.type === "error") {
         setError(
           new Error(authResponse.error?.message || "認証に失敗しました")
@@ -105,7 +142,7 @@ export function useAuth0(): UseAuth0Result {
     };
 
     handleResponse(response);
-  }, [response, handleAuthSuccess]);
+  }, [response, handleAuthSuccess, redirectUri]);
 
   /**
    * 認証状態の初期化
@@ -123,6 +160,7 @@ export function useAuth0(): UseAuth0Result {
       setError(null);
       await promptAsync();
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("ログインエラー:", err);
       setError(err as Error);
       setIsLoading(false);
@@ -140,6 +178,7 @@ export function useAuth0(): UseAuth0Result {
       await AuthStorage.clear();
       setUser(null);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("ログアウトエラー:", err);
       setError(err as Error);
       throw err;
