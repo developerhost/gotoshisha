@@ -125,6 +125,7 @@ export function unique<T>(array: T[]): T[] {
 /**
  * オブジェクトから未定義の値を除去
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function removeUndefined<T extends Record<string, any>>(
   obj: T
 ): Partial<T> {
