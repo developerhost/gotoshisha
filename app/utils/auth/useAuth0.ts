@@ -8,7 +8,8 @@ import {
 } from "expo-auth-session";
 import { auth0Config } from "../../config/auth0";
 import { AuthStorage } from "./storage";
-import { Auth0Api, UserInfo } from "./auth0Api";
+import { Auth0Api } from "./auth0Api";
+import { UserInfo } from "./types";
 
 export interface UseAuth0Result {
   user: UserInfo | null;

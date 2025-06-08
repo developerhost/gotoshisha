@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useAuth0 as useAuth0Native } from "react-native-auth0";
 import { UseAuth0Result } from "../utils/auth/useAuth0";
-import { UserInfo } from "../utils/auth/auth0Api";
+import { UserInfo } from "../utils/auth/types";
 
 interface AuthContextData extends UseAuth0Result {}
 

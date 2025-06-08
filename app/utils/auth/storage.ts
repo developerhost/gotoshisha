@@ -1,9 +1,10 @@
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { UserInfo } from "./types";
 
 export interface AuthTokens {
   accessToken: string;
-  user: any;
+  user: UserInfo;
 }
 
 export const AUTH_STORAGE_KEYS = {

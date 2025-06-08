@@ -1,36 +1,5 @@
 import { auth0Config } from "../../config/auth0";
-
-interface Address {
-  formatted?: string;
-  street_address?: string;
-  locality?: string;
-  region?: string;
-  postal_code?: string;
-  country?: string;
-}
-
-export interface UserInfo {
-  sub: string;
-  name?: string;
-  given_name?: string;
-  family_name?: string;
-  middle_name?: string;
-  nickname?: string;
-  preferred_username?: string;
-  profile?: string;
-  picture?: string;
-  website?: string;
-  email?: string;
-  email_verified?: boolean;
-  gender?: string;
-  birthdate?: string;
-  zoneinfo?: string;
-  locale?: string;
-  phone_number?: string;
-  phone_number_verified?: boolean;
-  address?: Address;
-  updated_at?: string;
-}
+import { UserInfo, TokenResponse, Auth0ErrorResponse } from "./types";
 
 /**
  * Auth0 API ユーティリティ関数
@@ -94,7 +63,7 @@ export class Auth0Api {
     code: string,
     redirectUri: string,
     codeVerifier: string
-  ): Promise<{ access_token: string; token_type: string; expires_in: number }> {
+  ): Promise<TokenResponse> {
     const response = await fetch(`${Auth0Api.baseUrl}/oauth/token`, {
       method: "POST",
       headers: {
@@ -110,7 +79,7 @@ export class Auth0Api {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData: Auth0ErrorResponse = await response.json();
       throw new Error(
         `トークン交換に失敗: ${
           errorData.error_description || response.statusText
