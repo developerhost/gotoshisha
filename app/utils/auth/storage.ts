@@ -75,12 +75,18 @@ export class AuthStorage {
    * 認証トークンをクリア
    */
   static async clear(): Promise<void> {
-    if (Platform.OS === "web") {
-      localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(AUTH_STORAGE_KEYS.USER);
-    } else {
-      await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.TOKEN);
-      await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.USER);
+    try {
+      if (Platform.OS === "web") {
+        localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(AUTH_STORAGE_KEYS.USER);
+      } else {
+        await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.TOKEN);
+        await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.USER);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("認証データのクリアに失敗:", error);
+      // Continue execution as clearing storage shouldn't block logout
     }
   }
 
