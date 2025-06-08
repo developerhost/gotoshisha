@@ -10,9 +10,19 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# Expo generated native projects
+android/
+ios/
+
 # Package manager lock files (use pnpm-lock.yaml only)
 package-lock.json
 yarn.lock
 
 # macOS
 .DS_Store
+
+# env files
+.env
+.env.local
+.env.production
+.env.development
