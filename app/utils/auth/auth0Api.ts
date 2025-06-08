@@ -1,5 +1,14 @@
 import { auth0Config } from "../../config/auth0";
 
+interface Address {
+  formatted?: string;
+  street_address?: string;
+  locality?: string;
+  region?: string;
+  postal_code?: string;
+  country?: string;
+}
+
 export interface UserInfo {
   sub: string;
   name?: string;
@@ -19,7 +28,7 @@ export interface UserInfo {
   locale?: string;
   phone_number?: string;
   phone_number_verified?: boolean;
-  address?: any;
+  address?: Address;
   updated_at?: string;
 }
 
@@ -103,7 +112,9 @@ export class Auth0Api {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        `トークン交換に失敗: ${errorData.error_description || response.statusText}`
+        `トークン交換に失敗: ${
+          errorData.error_description || response.statusText
+        }`
       );
     }
 

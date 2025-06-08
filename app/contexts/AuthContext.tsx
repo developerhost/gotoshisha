@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useAuth0 as useAuth0Native } from "react-native-auth0";
 import { UseAuth0Result } from "../utils/auth/useAuth0";
+import { UserInfo } from "../utils/auth/auth0Api";
 
 interface AuthContextData extends UseAuth0Result {}
 
@@ -15,13 +16,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const { user, authorize, clearSession, error, isLoading } = useAuth0Native();
 
+  // Convert react-native-auth0 user to our UserInfo type
+  const convertedUser: UserInfo | null = user
+    ? {
+        sub: user.sub || "",
+        name: user.name,
+        given_name: user.givenName,
+        family_name: user.familyName,
+        middle_name: user.middleName,
+        nickname: user.nickname,
+        preferred_username: user.preferredUsername,
+        profile: user.profile,
+        picture: user.picture,
+        website: user.website,
+        email: user.email,
+        email_verified: user.emailVerified,
+        gender: user.gender,
+        birthdate: user.birthdate,
+        zoneinfo: user.zoneinfo,
+        locale: user.locale,
+        phone_number: user.phoneNumber,
+        phone_number_verified: user.phoneNumberVerified,
+        // Note: react-native-auth0 returns address as string, not object
+        address: user.address ? undefined : undefined,
+        updated_at: user.updatedAt,
+      }
+    : null;
+
   const authContextValue: AuthContextData = {
-    user: user
-      ? {
-          sub: user.sub || "",
-          ...user,
-        }
-      : null,
+    user: convertedUser,
     isLoading,
     isAuthenticated: !!user,
     error,
@@ -29,6 +52,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         await authorize();
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error("ログインエラー:", err);
         throw err;
       }
@@ -37,6 +61,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         await clearSession();
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error("ログアウトエラー:", err);
         throw err;
       }
