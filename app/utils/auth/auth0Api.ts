@@ -62,7 +62,7 @@ export class Auth0Api {
   ): string {
     const params = new URLSearchParams({
       client_id: auth0Config.clientId,
-      response_type: "token",
+      response_type: "code",
       redirect_uri: redirectUri,
       scope: "openid profile email offline_access",
       state,
@@ -72,6 +72,42 @@ export class Auth0Api {
     });
 
     return `${Auth0Api.baseUrl}/authorize?${params.toString()}`;
+  }
+
+  /**
+   * 認可コードをアクセストークンと交換
+   * @param code - 認可コード
+   * @param redirectUri - リダイレクトURI
+   * @param codeVerifier - PKCEコード検証器
+   * @returns トークンレスポンス
+   */
+  static async exchangeCodeForToken(
+    code: string,
+    redirectUri: string,
+    codeVerifier: string
+  ): Promise<{ access_token: string; token_type: string; expires_in: number }> {
+    const response = await fetch(`${Auth0Api.baseUrl}/oauth/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        client_id: auth0Config.clientId,
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: codeVerifier,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        `トークン交換に失敗: ${errorData.error_description || response.statusText}`
+      );
+    }
+
+    return response.json();
   }
 
   /**

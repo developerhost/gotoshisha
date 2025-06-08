@@ -82,7 +82,7 @@ describe("Auth0Api", () => {
 
       const expectedUrl = new URL(`https://${auth0Config.domain}/authorize`);
       expectedUrl.searchParams.set("client_id", auth0Config.clientId);
-      expectedUrl.searchParams.set("response_type", "token");
+      expectedUrl.searchParams.set("response_type", "code");
       expectedUrl.searchParams.set("redirect_uri", redirectUri);
       expectedUrl.searchParams.set(
         "scope",
