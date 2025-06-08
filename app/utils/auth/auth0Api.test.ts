@@ -11,6 +11,7 @@ vi.mock("../../config/auth0", () => ({
 }));
 
 // fetchのモック
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 global.fetch = vi.fn() as any;
 
 describe("Auth0Api", () => {
@@ -107,19 +108,23 @@ describe("Auth0Api", () => {
 
     it("domainが無い場合はfalseを返す", () => {
       const originalDomain = auth0Config.domain;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (auth0Config as any).domain = "";
 
       expect(Auth0Api.validateConfig()).toBe(false);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (auth0Config as any).domain = originalDomain;
     });
 
     it("clientIdが無い場合はfalseを返す", () => {
       const originalClientId = auth0Config.clientId;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (auth0Config as any).clientId = "";
 
       expect(Auth0Api.validateConfig()).toBe(false);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (auth0Config as any).clientId = originalClientId;
     });
   });

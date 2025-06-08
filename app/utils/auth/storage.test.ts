@@ -29,7 +29,7 @@ describe("AuthStorage", () => {
   beforeEach(() => {
     // すべてのモックをクリア
     vi.clearAllMocks();
-    
+
     // localStorageをクリア
     if (typeof localStorage !== "undefined") {
       localStorage.clear();
@@ -38,15 +38,16 @@ describe("AuthStorage", () => {
 
   describe("Webプラットフォーム", () => {
     beforeAll(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Platform as any).OS = "web";
     });
 
     describe("save", () => {
       it("localStorageにトークンを保存できる", async () => {
         const setItemSpy = vi.spyOn(Storage.prototype, "setItem");
-        
+
         await AuthStorage.save(mockTokens);
-        
+
         expect(setItemSpy).toHaveBeenCalledWith(
           AUTH_STORAGE_KEYS.TOKEN,
           mockTokens.accessToken
@@ -121,6 +122,7 @@ describe("AuthStorage", () => {
 
   describe("ネイティブプラットフォーム", () => {
     beforeAll(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Platform as any).OS = "ios";
     });
 

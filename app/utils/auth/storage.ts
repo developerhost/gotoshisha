@@ -65,6 +65,7 @@ export class AuthStorage {
         };
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("認証トークンの読み込みに失敗:", error);
       return null;
     }
