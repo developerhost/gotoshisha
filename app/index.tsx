@@ -36,6 +36,7 @@ export default function HomeScreen() {
       await logout();
       router.replace("/routes/login");
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Logout error:", error);
     }
   };
