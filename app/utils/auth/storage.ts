@@ -20,6 +20,9 @@ export class AuthStorage {
    * 認証トークンを保存
    */
   static async save(tokens: AuthTokens): Promise<void> {
+    if (!tokens.accessToken || !tokens.user) {
+      throw new Error("Invalid tokens: accessToken and user are required");
+    }
     if (Platform.OS === "web") {
       localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, tokens.accessToken);
       localStorage.setItem(AUTH_STORAGE_KEYS.USER, JSON.stringify(tokens.user));
@@ -48,7 +51,7 @@ export class AuthStorage {
 
         return {
           accessToken: token,
-          user: JSON.parse(userData),
+          user: JSON.parse(userData) as UserInfo,
         };
       } else {
         const token = await SecureStore.getItemAsync(AUTH_STORAGE_KEYS.TOKEN);
