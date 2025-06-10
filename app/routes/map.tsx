@@ -4,7 +4,7 @@ import { YStack, Text, Button } from "tamagui";
 import { Asset } from "expo-asset";
 import MapView, { Marker } from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
 
 export default function MapScreen() {
