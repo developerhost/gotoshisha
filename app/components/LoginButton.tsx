@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Alert } from "react-native";
+import { Alert } from "react-native";
+import { Button, Spinner } from "tamagui";
 import { useAuth0 } from "react-native-auth0";
 
 interface LoginButtonProps {
@@ -48,8 +49,12 @@ export const LoginButton = ({ onError }: LoginButtonProps = {}) => {
   return (
     <Button
       onPress={onPress}
-      title={isLoading ? "ログイン中..." : "ログイン"}
       disabled={isLoading}
-    />
+      theme="blue"
+      size="$4"
+      icon={isLoading ? () => <Spinner size="small" /> : undefined}
+    >
+      {isLoading ? "ログイン中..." : "ログイン"}
+    </Button>
   );
 };

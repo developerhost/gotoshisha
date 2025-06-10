@@ -1,11 +1,6 @@
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from "react-native";
+import { YStack, Text, Button } from "tamagui";
+import { SafeAreaView } from "react-native";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
 
@@ -24,67 +19,42 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>ようこそ</Text>
-        <Text style={styles.subtitle}>続行するにはログインしてください</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <YStack
+        flex={1}
+        justifyContent="center"
+        alignItems="center"
+        paddingHorizontal="$4"
+        gap="$4"
+        backgroundColor="$background"
+      >
+        <Text fontSize="$9" fontWeight="bold">
+          ようこそ
+        </Text>
+        <Text fontSize="$5" color="$gray10" marginBottom="$6">
+          続行するにはログインしてください
+        </Text>
 
-        <TouchableOpacity
-          style={[styles.button, isLoading && styles.buttonDisabled]}
-          onPress={handleLogin}
+        <Button
+          size="$4"
+          backgroundColor="$blue10"
+          pressStyle={{ opacity: 0.8 }}
           disabled={isLoading}
+          opacity={isLoading ? 0.6 : 1}
+          onPress={handleLogin}
+          minWidth={200}
         >
-          <Text style={styles.buttonText}>
+          <Text color="white" fontSize="$4" fontWeight="600">
             {isLoading ? "ログイン中..." : "Auth0でログイン"}
           </Text>
-        </TouchableOpacity>
+        </Button>
 
-        {error && <Text style={styles.errorText}>エラー: {error.message}</Text>}
-      </View>
+        {error && (
+          <Text color="$red10" marginTop="$4" textAlign="center">
+            エラー: {error.message}
+          </Text>
+        )}
+      </YStack>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: "#666",
-    marginBottom: 40,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 8,
-    minWidth: 200,
-    alignItems: "center",
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  errorText: {
-    color: "#FF3B30",
-    marginTop: 20,
-    textAlign: "center",
-  },
-});

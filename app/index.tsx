@@ -1,10 +1,5 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
+import { YStack, XStack, Text, Button } from "tamagui";
+import { SafeAreaView } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "./contexts/AuthContext.web";
 import { useEffect } from "react";
@@ -21,9 +16,9 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <YStack flex={1} justifyContent="center" alignItems="center">
         <Text>読み込み中...</Text>
-      </View>
+      </YStack>
     );
   }
 
@@ -42,97 +37,67 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Text style={styles.welcomeText}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <XStack
+        justifyContent="space-between"
+        alignItems="center"
+        paddingHorizontal="$4"
+        paddingVertical="$3"
+        backgroundColor="$background"
+        borderBottomWidth={1}
+        borderBottomColor="$borderColor"
+      >
+        <Text fontSize="$4" color="$color">
           ようこそ、{user?.name || user?.email || "ユーザー"}さん
         </Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>ログアウト</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.container}>
-        <Text style={styles.title}>React Native Maps Demo</Text>
-        <Text style={styles.subtitle}>Expo Router を使用したマップアプリ</Text>
+        <Button
+          size="$3"
+          backgroundColor="$red10"
+          onPress={handleLogout}
+          pressStyle={{ opacity: 0.8 }}
+        >
+          <Text color="white" fontSize="$3" fontWeight="600">
+            ログアウト
+          </Text>
+        </Button>
+      </XStack>
+      <YStack
+        flex={1}
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="$backgroundSoft"
+        padding="$4"
+        gap="$4"
+      >
+        <Text fontSize="$7" fontWeight="bold" textAlign="center" color="$color">
+          React Native Maps Demo
+        </Text>
+        <Text
+          fontSize="$4"
+          textAlign="center"
+          color="$gray10"
+          marginBottom="$6"
+        >
+          Expo Router を使用したマップアプリ
+        </Text>
 
         <Link href="/routes/map" asChild>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>マップを表示</Text>
-          </TouchableOpacity>
+          <Button
+            size="$4"
+            backgroundColor="$blue10"
+            pressStyle={{ opacity: 0.8 }}
+            shadowColor="$shadowColor"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.25}
+            shadowRadius={3.84}
+            elevation={2}
+          >
+            <Text color="white" fontSize="$5" fontWeight="600">
+              マップを表示
+            </Text>
+          </Button>
         </Link>
-      </View>
+      </YStack>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  welcomeText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  logoutButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 5,
-    backgroundColor: "#f44336",
-  },
-  logoutText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-    color: "#333",
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 40,
-    textAlign: "center",
-    color: "#666",
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 8,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-});

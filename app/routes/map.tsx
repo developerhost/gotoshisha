@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Image, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Image } from "react-native";
+import { YStack, Text, Button } from "tamagui";
 import { Asset } from "expo-asset";
 import MapView, { Marker } from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
@@ -29,7 +30,7 @@ export default function MapScreen() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <YStack flex={1}>
       <MapView
         style={{ flex: 1 }}
         initialCamera={{
@@ -47,16 +48,35 @@ export default function MapScreen() {
         />
       </MapView>
       {user && (
-        <View style={styles.userInfo}>
-          <Text style={styles.welcomeText}>
+        <YStack
+          position="absolute"
+          top={60}
+          right={20}
+          backgroundColor="$backgroundTransparent"
+          padding="$3"
+          borderRadius="$3"
+          shadowColor="$shadowColor"
+          shadowOffset={{ width: 0, height: 2 }}
+          shadowOpacity={0.25}
+          shadowRadius={3.84}
+          elevation={5}
+        >
+          <Text fontSize="$3" marginBottom="$2">
             ようこそ、{user.name || user.email}!
           </Text>
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-            <Text style={styles.logoutText}>ログアウト</Text>
-          </TouchableOpacity>
-        </View>
+          <Button
+            size="$3"
+            backgroundColor="$red10"
+            onPress={logout}
+            pressStyle={{ opacity: 0.8 }}
+          >
+            <Text color="white" fontSize="$3" fontWeight="500">
+              ログアウト
+            </Text>
+          </Button>
+        </YStack>
       )}
-    </View>
+    </YStack>
   );
 }
 
@@ -73,35 +93,3 @@ function cacheImages() {
     }
   });
 }
-
-const styles = StyleSheet.create({
-  userInfo: {
-    position: "absolute",
-    top: 60,
-    right: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    padding: 15,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  welcomeText: {
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  logoutButton: {
-    backgroundColor: "#FF3B30",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 4,
-    alignItems: "center",
-  },
-  logoutText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-});
