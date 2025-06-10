@@ -17,7 +17,7 @@ module.exports = defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(__dirname, "./app"),
       "~/": path.resolve(__dirname, "./"),
     },
   },
