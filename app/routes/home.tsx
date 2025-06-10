@@ -5,7 +5,7 @@
 import React from "react";
 import { YStack, Text, Button, ScrollView, Card, XStack } from "tamagui";
 import { useRouter } from "expo-router";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext.web";
 
 export default function HomeScreen() {
   const router = useRouter();
