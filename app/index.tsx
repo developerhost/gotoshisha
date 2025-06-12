@@ -5,7 +5,7 @@ import { useAuth } from "./contexts/AuthContext.web";
 import { useEffect } from "react";
 
 export default function HomeScreen() {
-  const { isAuthenticated, isLoading, user, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -16,10 +16,21 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="$backgroundSoft">
-        <Text fontSize="$6" color="$purple11" marginBottom="$2">🚀</Text>
-        <Text fontSize="$5" fontWeight="600" color="$purple11">GoToShisha</Text>
-        <Text fontSize="$3" color="$gray10">読み込み中...</Text>
+      <YStack
+        flex={1}
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="$backgroundSoft"
+      >
+        <Text fontSize="$6" color="$purple11" marginBottom="$2">
+          🚀
+        </Text>
+        <Text fontSize="$5" fontWeight="600" color="$purple11">
+          GoToShisha
+        </Text>
+        <Text fontSize="$3" color="$gray10">
+          読み込み中...
+        </Text>
       </YStack>
     );
   }
@@ -76,7 +87,12 @@ export default function HomeScreen() {
       >
         <YStack alignItems="center" gap="$3">
           <Text fontSize="$8">🚀</Text>
-          <Text fontSize="$8" fontWeight="bold" textAlign="center" color="$purple11">
+          <Text
+            fontSize="$8"
+            fontWeight="bold"
+            textAlign="center"
+            color="$purple11"
+          >
             GoToShisha
           </Text>
           <Text
@@ -119,7 +135,7 @@ export default function HomeScreen() {
               </XStack>
             </Button>
           </Link>
-          
+
           <Link href="/routes/home" asChild>
             <Button
               size="$4"
