@@ -16,8 +16,10 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <YStack flex={1} justifyContent="center" alignItems="center">
-        <Text>読み込み中...</Text>
+      <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="$backgroundSoft">
+        <Text fontSize="$6" color="$purple11" marginBottom="$2">🚀</Text>
+        <Text fontSize="$5" fontWeight="600" color="$purple11">GoToShisha</Text>
+        <Text fontSize="$3" color="$gray10">読み込み中...</Text>
       </YStack>
     );
   }
@@ -47,9 +49,12 @@ export default function HomeScreen() {
         borderBottomWidth={1}
         borderBottomColor="$borderColor"
       >
-        <Text fontSize="$4" color="$color">
-          ようこそ、{user?.name || user?.email || "ユーザー"}さん
-        </Text>
+        <XStack alignItems="center" gap="$2">
+          <Text fontSize="$5">🚀</Text>
+          <Text fontSize="$4" color="$purple11" fontWeight="600">
+            GoToShisha
+          </Text>
+        </XStack>
         <Button
           size="$3"
           backgroundColor="$red10"
@@ -69,34 +74,69 @@ export default function HomeScreen() {
         padding="$4"
         gap="$4"
       >
-        <Text fontSize="$7" fontWeight="bold" textAlign="center" color="$color">
-          React Native Maps Demo
-        </Text>
-        <Text
-          fontSize="$4"
-          textAlign="center"
-          color="$gray10"
-          marginBottom="$6"
-        >
-          Expo Router を使用したマップアプリ
-        </Text>
-
-        <Link href="/routes/map" asChild>
-          <Button
-            size="$4"
-            backgroundColor="$blue10"
-            pressStyle={{ opacity: 0.8 }}
-            shadowColor="$shadowColor"
-            shadowOffset={{ width: 0, height: 2 }}
-            shadowOpacity={0.25}
-            shadowRadius={3.84}
-            elevation={2}
+        <YStack alignItems="center" gap="$3">
+          <Text fontSize="$8">🚀</Text>
+          <Text fontSize="$8" fontWeight="bold" textAlign="center" color="$purple11">
+            GoToShisha
+          </Text>
+          <Text
+            fontSize="$5"
+            textAlign="center"
+            color="$gray11"
+            marginBottom="$2"
+            lineHeight="$2"
           >
-            <Text color="white" fontSize="$5" fontWeight="600">
-              マップを表示
-            </Text>
-          </Button>
-        </Link>
+            あなたの理想のシーシャカフェを見つけよう
+          </Text>
+          <Text
+            fontSize="$3"
+            textAlign="center"
+            color="$gray10"
+            marginBottom="$6"
+          >
+            近くの素敵なシーシャスポットを発見して、最高のひと時を過ごしませんか？
+          </Text>
+        </YStack>
+
+        <YStack gap="$3" width="100%" maxWidth={300}>
+          <Link href="/routes/map" asChild>
+            <Button
+              size="$5"
+              backgroundColor="$purple10"
+              pressStyle={{ opacity: 0.8, scale: 0.98 }}
+              borderRadius="$6"
+              shadowColor="$shadowColor"
+              shadowOffset={{ width: 0, height: 4 }}
+              shadowOpacity={0.3}
+              shadowRadius={8}
+              elevation={4}
+            >
+              <XStack alignItems="center" gap="$2">
+                <Text fontSize="$4">🗺️</Text>
+                <Text color="white" fontSize="$5" fontWeight="600">
+                  シーシャマップを見る
+                </Text>
+              </XStack>
+            </Button>
+          </Link>
+          
+          <Link href="/routes/home" asChild>
+            <Button
+              size="$4"
+              backgroundColor="$blue10"
+              pressStyle={{ opacity: 0.8, scale: 0.98 }}
+              borderRadius="$6"
+              variant="outlined"
+            >
+              <XStack alignItems="center" gap="$2">
+                <Text fontSize="$4">🏠</Text>
+                <Text color="white" fontSize="$4" fontWeight="600">
+                  ホームに戻る
+                </Text>
+              </XStack>
+            </Button>
+          </Link>
+        </YStack>
       </YStack>
     </SafeAreaView>
   );

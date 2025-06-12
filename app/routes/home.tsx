@@ -1,6 +1,6 @@
 /**
- * ホーム画面コンポーネント
- * Tamagui コンポーネントを使用したメイン画面
+ * ゴートゥーシーシャ - ホーム画面コンポーネント
+ * シーシャカフェを見つけるためのメイン画面
  */
 import React from "react";
 import { YStack, Text, Button, ScrollView, Card, XStack } from "tamagui";
@@ -14,13 +14,20 @@ export default function HomeScreen() {
   if (!isAuthenticated) {
     return (
       <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
-        <Text fontSize="$5">ログインしてください</Text>
+        <Text fontSize="$6" fontWeight="bold" textAlign="center" marginBottom="$2">
+          🚀 GoToShisha
+        </Text>
+        <Text fontSize="$4" color="$gray10" textAlign="center" marginBottom="$4">
+          シーシャカフェを見つけよう
+        </Text>
         <Button
           marginTop="$4"
           onPress={() => router.push("/routes/login")}
-          backgroundColor="$blue10"
+          backgroundColor="$purple10"
+          borderRadius="$6"
+          size="$4"
         >
-          <Text color="white">ログイン</Text>
+          <Text color="white" fontWeight="600">ログインして始める</Text>
         </Button>
       </YStack>
     );
@@ -29,66 +36,91 @@ export default function HomeScreen() {
   return (
     <ScrollView flex={1} backgroundColor="$backgroundSoft">
       <YStack padding="$4" gap="$4">
-        <Text fontSize="$8" fontWeight="bold" textAlign="center">
-          ホーム
-        </Text>
+        <YStack alignItems="center" marginBottom="$2">
+          <Text fontSize="$9" fontWeight="bold" textAlign="center" color="$purple11">
+            🚀 GoToShisha
+          </Text>
+          <Text fontSize="$4" color="$gray10" textAlign="center">
+            あなたの理想のシーシャカフェを見つけよう
+          </Text>
+        </YStack>
 
-        <Card elevate bordered padding="$4">
+        <Card elevate bordered padding="$4" backgroundColor="$purple2" borderColor="$purple6">
           <YStack gap="$3">
-            <Text fontSize="$6" fontWeight="600">
-              ようこそ、{user?.name || user?.email || "ゲスト"}さん
+            <Text fontSize="$6" fontWeight="600" color="$purple11">
+              こんにちは、{user?.name || user?.email || "シーシャラバー"}さん ✨
             </Text>
-            <Text fontSize="$4" color="$gray10">
-              Gotoshishaへようこそ。位置情報を共有しましょう。
+            <Text fontSize="$4" color="$gray11">
+              今日はどちらのシーシャカフェに行きますか？
+              お気に入りの場所を見つけて、最高のひと時を過ごしましょう。
             </Text>
           </YStack>
         </Card>
 
         <YStack gap="$3">
-          <Text fontSize="$5" fontWeight="600" marginBottom="$2">
-            クイックアクション
+          <Text fontSize="$6" fontWeight="600" marginBottom="$2" color="$gray12">
+            🎯 今すぐ探す
           </Text>
 
           <Card
             elevate
             bordered
             padding="$4"
-            pressStyle={{ scale: 0.98 }}
+            pressStyle={{ scale: 0.97, backgroundColor: "$purple3" }}
             onPress={() => router.push("/routes/map")}
+            backgroundColor="$purple1"
+            borderColor="$purple6"
           >
             <XStack alignItems="center" gap="$3">
+              <Text fontSize="$6">🗺️</Text>
               <YStack flex={1}>
-                <Text fontSize="$5" fontWeight="600">
-                  マップを見る
+                <Text fontSize="$5" fontWeight="600" color="$purple11">
+                  シーシャマップ
                 </Text>
                 <Text fontSize="$3" color="$gray10" marginTop="$1">
-                  現在の位置情報を確認
+                  近くのシーシャカフェを地図で探す
                 </Text>
               </YStack>
             </XStack>
           </Card>
 
-          <Card elevate bordered padding="$4" pressStyle={{ scale: 0.98 }}>
+          <Card 
+            elevate 
+            bordered 
+            padding="$4" 
+            pressStyle={{ scale: 0.97, backgroundColor: "$blue3" }}
+            backgroundColor="$blue1"
+            borderColor="$blue6"
+          >
             <XStack alignItems="center" gap="$3">
+              <Text fontSize="$6">📍</Text>
               <YStack flex={1}>
-                <Text fontSize="$5" fontWeight="600">
-                  投稿する
+                <Text fontSize="$5" fontWeight="600" color="$blue11">
+                  お気に入り登録
                 </Text>
                 <Text fontSize="$3" color="$gray10" marginTop="$1">
-                  現在地を投稿
+                  行ったカフェをお気に入りに追加
                 </Text>
               </YStack>
             </XStack>
           </Card>
 
-          <Card elevate bordered padding="$4" pressStyle={{ scale: 0.98 }}>
+          <Card 
+            elevate 
+            bordered 
+            padding="$4" 
+            pressStyle={{ scale: 0.97, backgroundColor: "$green3" }}
+            backgroundColor="$green1"
+            borderColor="$green6"
+          >
             <XStack alignItems="center" gap="$3">
+              <Text fontSize="$6">💬</Text>
               <YStack flex={1}>
-                <Text fontSize="$5" fontWeight="600">
-                  フレンド
+                <Text fontSize="$5" fontWeight="600" color="$green11">
+                  レビュー投稿
                 </Text>
                 <Text fontSize="$3" color="$gray10" marginTop="$1">
-                  友達のリストを表示
+                  体験を他の人とシェアしよう
                 </Text>
               </YStack>
             </XStack>
@@ -96,14 +128,20 @@ export default function HomeScreen() {
         </YStack>
 
         <YStack gap="$3" marginTop="$4">
-          <Text fontSize="$5" fontWeight="600" marginBottom="$2">
-            最近のアクティビティ
+          <Text fontSize="$5" fontWeight="600" marginBottom="$2" color="$gray12">
+            🔥 最近の活動
           </Text>
 
-          <Card elevate bordered padding="$3">
-            <Text fontSize="$3" color="$gray10" textAlign="center">
-              まだアクティビティがありません
-            </Text>
+          <Card elevate bordered padding="$4" backgroundColor="$gray2">
+            <YStack alignItems="center" gap="$2">
+              <Text fontSize="$5">🌟</Text>
+              <Text fontSize="$3" color="$gray10" textAlign="center">
+                まだ活動がありません
+              </Text>
+              <Text fontSize="$2" color="$gray9" textAlign="center">
+                シーシャカフェを探して、あなたの冒険を始めましょう！
+              </Text>
+            </YStack>
           </Card>
         </YStack>
       </YStack>

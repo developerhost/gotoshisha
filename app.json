@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-react-native-maps-demo",
-    "slug": "expo-react-native-maps-demo",
+    "name": "GoToShisha",
+    "slug": "gotoshisha",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,14 +14,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.dirtyman69.exporeactnativemapsdemo"
+      "bundleIdentifier": "com.gotoshisha.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.dirtyman69.exporeactnativemapsdemo"
+      "package": "com.gotoshisha.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
