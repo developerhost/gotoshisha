@@ -1,0 +1,18 @@
+# 生成されたファイル
+node_modules/
+dist/
+dist-android/
+.expo/
+.wrangler/
+backend/prisma/migrations/
+
+# データベースファイル
+*.db
+*.db-journal
+
+# ログファイル
+*.log
+
+# ビルド成果物
+ios/
+android/
