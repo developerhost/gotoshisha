@@ -1,0 +1,12 @@
+# 生成されたファイル
+node_modules/
+dist/
+.wrangler/
+prisma/migrations/
+
+# データベースファイル
+*.db
+*.db-journal
+
+# ログファイル
+*.log

@@ -13,58 +13,59 @@ datasource db {
 
 // ユーザーモデル
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid()) // ユーザーID（CUID）
+  email     String   @unique // メールアドレス（ユニーク）
+  name      String? // ユーザー名（任意）
+  avatar    String? // アバター画像URL（任意）
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 
   // リレーション
-  posts    Post[]
-  likes    Like[]
-  comments Comment[]
+  posts    Post[] // 投稿一覧
+  likes    Like[] // いいね一覧
+  comments Comment[] // コメント一覧
+  reviews  Review[] // レビュー一覧
 
   @@map("users")
 }
 
 // 投稿モデル
 model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  imageUrl  String?
-  latitude  Float?
-  longitude Float?
-  address   String?
-  isPublic  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid()) // 投稿ID（CUID）
+  title     String // 投稿タイトル
+  content   String? // 投稿内容（任意）
+  imageUrl  String? // 投稿画像URL（任意）
+  latitude  Float? // 緯度（任意）
+  longitude Float? // 経度（任意）
+  address   String? // 住所（任意）
+  isPublic  Boolean  @default(true) // 公開フラグ（デフォルト: true）
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 
   // 外部キー
-  authorId String
+  authorId String // 投稿者ID
 
   // リレーション
-  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  likes    Like[]
-  comments Comment[]
-  tags     PostTag[]
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade) // 投稿者
+  likes    Like[] // いいね一覧
+  comments Comment[] // コメント一覧
+  tags     PostTag[] // タグ一覧
 
   @@map("posts")
 }
 
 // いいねモデル
 model Like {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+  id        String   @id @default(cuid()) // いいねID（CUID）
+  createdAt DateTime @default(now()) // 作成日時
 
   // 外部キー
-  userId String
-  postId String
+  userId String // ユーザーID
+  postId String // 投稿ID
 
   // リレーション
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // いいねしたユーザー
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade) // いいねされた投稿
 
   // 複合ユニーク制約（同じユーザーが同じ投稿に複数回いいねできない）
   @@unique([userId, postId])
@@ -73,46 +74,235 @@ model Like {
 
 // コメントモデル
 model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid()) // コメントID（CUID）
+  content   String // コメント内容
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 
   // 外部キー
-  userId String
-  postId String
+  userId String // ユーザーID
+  postId String // 投稿ID
 
   // リレーション
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // コメントしたユーザー
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade) // コメントされた投稿
 
   @@map("comments")
 }
 
 // タグモデル
 model Tag {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  color     String? // タグの色（HEXコード）
-  createdAt DateTime @default(now())
+  id        String   @id @default(cuid()) // タグID（CUID）
+  name      String   @unique // タグ名（ユニーク）
+  color     String? // タグの色（HEXコード）（任意）
+  createdAt DateTime @default(now()) // 作成日時
 
   // リレーション
-  posts PostTag[]
+  posts PostTag[] // 投稿タグ中間テーブル
 
   @@map("tags")
 }
 
 // 投稿とタグの中間テーブル
 model PostTag {
-  id     String @id @default(cuid())
-  postId String
-  tagId  String
+  id     String @id @default(cuid()) // 投稿タグID（CUID）
+  postId String // 投稿ID
+  tagId  String // タグID
 
   // リレーション
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade) // 投稿
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade) // タグ
 
-  // 複合ユニーク制約
+  // 複合ユニーク制約（同じ投稿に同じタグは1つまで）
   @@unique([postId, tagId])
   @@map("post_tags")
+}
+
+// =================
+// シーシャ店舗関連のモデル
+// =================
+
+// シーシャ店舗モデル
+model Shop {
+  id              String   @id @default(cuid()) // 店舗ID（CUID）
+  name            String // 店舗名
+  address         String // 住所
+  nearestStation  String? // 最寄り駅（任意）
+  stationWalkTime Int? // 駅から徒歩何分（任意）
+  openingHours    String? // 営業時間（JSON文字列）（任意）
+  holidays        String? // 定休日（任意）
+  budgetMin       Int? // 予算下限（円）（任意）
+  budgetMax       Int? // 予算上限（円）（任意）
+  seatingCount    Int? // 席数（任意）
+  seatingTypes    String? // 座席タイプ（任意）
+  reservation     String? // 予約可否 "REQUIRED" | "RECOMMENDED" | "NOT_REQUIRED"（任意）
+  privateBooking  Boolean  @default(false) // 貸切可否（デフォルト: false）
+  wifi            Boolean  @default(false) // 無料Wi-Fi有無（デフォルト: false）
+  powerOutlet     Boolean  @default(false) // 電源コンセント有無（デフォルト: false）
+  smokingPolicy   String? // 喫煙ポリシー "SMOKING_ALLOWED" | "SEPARATED" | "NON_SMOKING"（任意）
+  parkingInfo     String? // 駐車場情報（任意）
+  timeLimit       String? // 時間制限（任意）
+  hookahBrand     String? // シーシャ機器ブランド（任意）
+  flavorCount     Int? // フレーバー総数（任意）
+  photos          String? // 写真URLリスト（JSON配列）（任意）
+  websiteUrl      String? // ウェブサイトURL（任意）
+  googleMapUrl    String? // Google Maps埋め込みURL（任意）
+  snsLinks        String? // SNSリンク（JSON文字列）（任意）
+  latitude        Float? // 緯度（任意）
+  longitude       Float? // 経度（任意）
+  createdAt       DateTime @default(now()) // 作成日時
+  updatedAt       DateTime @updatedAt // 更新日時
+
+  // リレーション
+  shopFlavors        ShopFlavor[] // 店舗フレーバー中間テーブル
+  shopAtmospheres    ShopAtmosphere[] // 店舗雰囲気中間テーブル
+  shopHobbies        ShopHobby[] // 店舗ホビー中間テーブル
+  shopPaymentMethods ShopPaymentMethod[] // 店舗支払い方法中間テーブル
+  shopEvents         ShopEvent[] // 店舗イベント中間テーブル
+  reviews            Review[] // レビュー一覧
+
+  @@map("shops")
+}
+
+// フレーバーマスタ
+model Flavor {
+  id   String @id @default(cuid()) // フレーバーID（CUID）
+  name String @unique // フレーバー名（ユニーク）
+
+  // リレーション
+  shopFlavors ShopFlavor[] // 店舗フレーバー中間テーブル
+
+  @@map("flavors")
+}
+
+// 雰囲気マスタ
+model Atmosphere {
+  id   String @id @default(cuid()) // 雰囲気ID（CUID）
+  name String @unique // 雰囲気名（ユニーク）
+
+  // リレーション
+  shopAtmospheres ShopAtmosphere[] // 店舗雰囲気中間テーブル
+
+  @@map("atmospheres")
+}
+
+// ホビーマスタ
+model Hobby {
+  id   String @id @default(cuid()) // ホビーID（CUID）
+  name String @unique // ホビー名（ユニーク）
+
+  // リレーション
+  shopHobbies ShopHobby[] // 店舗ホビー中間テーブル
+
+  @@map("hobbies")
+}
+
+// 支払い方法マスタ
+model PaymentMethod {
+  id   String @id @default(cuid()) // 支払い方法ID（CUID）
+  name String @unique // 支払い方法名（ユニーク）
+
+  // リレーション
+  shopPaymentMethods ShopPaymentMethod[] // 店舗支払い方法中間テーブル
+
+  @@map("payment_methods")
+}
+
+// イベントマスタ
+model Event {
+  id          String  @id @default(cuid()) // イベントID（CUID）
+  name        String // イベント名
+  description String? // イベント説明（任意）
+  schedule    String? // 開催スケジュール（例: 毎月第1金曜など）（任意）
+
+  // リレーション
+  shopEvents ShopEvent[] // 店舗イベント中間テーブル
+
+  @@map("events")
+}
+
+// 店舗⇔フレーバー中間テーブル
+model ShopFlavor {
+  shopId   String // 店舗ID
+  flavorId String // フレーバーID
+
+  // リレーション
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade) // 店舗
+  flavor Flavor @relation(fields: [flavorId], references: [id], onDelete: Cascade) // フレーバー
+
+  @@id([shopId, flavorId]) // 複合主キー
+  @@map("shop_flavors")
+}
+
+// 店舗⇔雰囲気中間テーブル
+model ShopAtmosphere {
+  shopId       String // 店舗ID
+  atmosphereId String // 雰囲気ID
+
+  // リレーション
+  shop       Shop       @relation(fields: [shopId], references: [id], onDelete: Cascade) // 店舗
+  atmosphere Atmosphere @relation(fields: [atmosphereId], references: [id], onDelete: Cascade) // 雰囲気
+
+  @@id([shopId, atmosphereId]) // 複合主キー
+  @@map("shop_atmospheres")
+}
+
+// 店舗⇔ホビー中間テーブル
+model ShopHobby {
+  shopId  String // 店舗ID
+  hobbyId String // ホビーID
+
+  // リレーション
+  shop  Shop  @relation(fields: [shopId], references: [id], onDelete: Cascade) // 店舗
+  hobby Hobby @relation(fields: [hobbyId], references: [id], onDelete: Cascade) // ホビー
+
+  @@id([shopId, hobbyId]) // 複合主キー
+  @@map("shop_hobbies")
+}
+
+// 店舗⇔支払い方法中間テーブル
+model ShopPaymentMethod {
+  shopId          String // 店舗ID
+  paymentMethodId String // 支払い方法ID
+
+  // リレーション
+  shop          Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade) // 店舗
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade) // 支払い方法
+
+  @@id([shopId, paymentMethodId]) // 複合主キー
+  @@map("shop_payment_methods")
+}
+
+// 店舗⇔イベント中間テーブル
+model ShopEvent {
+  shopId  String // 店舗ID
+  eventId String // イベントID
+
+  // リレーション
+  shop  Shop  @relation(fields: [shopId], references: [id], onDelete: Cascade) // 店舗
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade) // イベント
+
+  @@id([shopId, eventId]) // 複合主キー
+  @@map("shop_events")
+}
+
+// レビューモデル
+model Review {
+  id               String   @id @default(cuid()) // レビューID（CUID）
+  shopId           String // 店舗ID
+  userId           String? // ユーザーID（匿名レビューも可能にするため任意）
+  ratingTaste      Float? // 味の評価（1.0〜5.0）（任意）
+  ratingAtmosphere Float? // 雰囲気の評価（1.0〜5.0）（任意）
+  ratingService    Float? // サービスの評価（1.0〜5.0）（任意）
+  ratingValue      Float? // コスパの評価（1.0〜5.0）（任意）
+  comment          String? // レビューコメント（任意）
+  tags             String? // レビュータグ（JSON配列として格納）（任意）
+  createdAt        DateTime @default(now()) // 作成日時
+  updatedAt        DateTime @updatedAt // 更新日時
+
+  // リレーション
+  shop Shop  @relation(fields: [shopId], references: [id], onDelete: Cascade) // 店舗
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull) // レビューしたユーザー（任意）
+
+  @@map("reviews")
 }
