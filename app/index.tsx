@@ -1,7 +1,7 @@
 import { YStack, XStack, Text, Button } from "tamagui";
 import { SafeAreaView } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useAuth } from "./contexts/AuthContext.web";
+import { useAuth } from "../src/contexts/AuthContext.web";
 import { useEffect } from "react";
 
 export default function HomeScreen() {
@@ -10,7 +10,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/routes/login");
+      router.replace("/login");
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -42,7 +42,7 @@ export default function HomeScreen() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.replace("/routes/login");
+      router.replace("/login");
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Logout error:", error);
@@ -115,7 +115,7 @@ export default function HomeScreen() {
         </YStack>
 
         <YStack gap="$3" width="100%" maxWidth={300}>
-          <Link href="/routes/map" asChild>
+          <Link href="/map" asChild>
             <Button
               size="$5"
               backgroundColor="$purple10"
@@ -136,7 +136,7 @@ export default function HomeScreen() {
             </Button>
           </Link>
 
-          <Link href="/routes/home" asChild>
+          <Link href="/home" asChild>
             <Button
               size="$4"
               backgroundColor="$blue10"
