@@ -7,7 +7,8 @@ import { createErrorResponse, createSuccessResponse } from "@/lib/utils";
 import type { Env } from "@/types";
 import type { PrismaClient } from "@prisma/client";
 
-// ルーターのインポート（後で作成）
+// ルーターのインポート
+import { shopsRouter } from "@/routes/shops";
 // import { usersRouter } from '@/routes/users';
 // import { postsRouter } from '@/routes/posts';
 // import { commentsRouter } from '@/routes/comments';
@@ -91,6 +92,7 @@ app.get("/api", (c) => {
       environment: c.env.ENVIRONMENT,
       endpoints: {
         health: "/health",
+        shops: "/api/shops",
         users: "/api/users",
         posts: "/api/posts",
         comments: "/api/comments",
@@ -102,8 +104,9 @@ app.get("/api", (c) => {
 });
 
 /**
- * ルーターの登録（後で有効化）
+ * ルーターの登録
  */
+app.route("/api/shops", shopsRouter);
 // app.route('/api/users', usersRouter);
 // app.route('/api/posts', postsRouter);
 // app.route('/api/comments', commentsRouter);
