@@ -8,7 +8,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "build": "wrangler deploy --dry-run",
-    "db:generate": "prisma generate",
+    "db:generate": "prisma generate && prisma generate --generator zod",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
@@ -38,7 +38,8 @@
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^3.1.4",
-    "wrangler": "^3.86.1"
+    "wrangler": "^3.86.1",
+    "zod-prisma-types": "^3.2.4"
   },
   "private": true
 }
