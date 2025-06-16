@@ -22,13 +22,14 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.7.0",
     "@prisma/adapter-d1": "^5.22.0",
     "@prisma/client": "^5.22.0",
     "hono": "^4.6.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241218.0",
+    "@cloudflare/workers-types": "^4.20250614.0",
     "@types/node": "^22.9.0",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
@@ -38,7 +39,7 @@
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^3.1.4",
-    "wrangler": "^3.86.1",
+    "wrangler": "^4.20.0",
     "zod-prisma-types": "^3.2.4"
   },
   "private": true
