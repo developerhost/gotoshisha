@@ -52,8 +52,6 @@ model Post {
   title     String // 投稿タイトル
   content   String? // 投稿内容（任意）
   imageUrl  String? // 投稿画像URL（任意）
-  latitude  Float? // 緯度（任意）
-  longitude Float? // 経度（任意）
   address   String? // 住所（任意）
   isPublic  Boolean  @default(true) // 公開フラグ（デフォルト: true）
   createdAt DateTime @default(now()) // 作成日時
@@ -165,8 +163,6 @@ model Shop {
   websiteUrl      String? // ウェブサイトURL（任意）
   googleMapUrl    String? // Google Maps埋め込みURL（任意）
   snsLinks        String? // SNSリンク（JSON文字列）（任意）
-  latitude        Float? // 緯度（任意）
-  longitude       Float? // 経度（任意）
   createdAt       DateTime @default(now()) // 作成日時
   updatedAt       DateTime @updatedAt // 更新日時
 
