@@ -3,117 +3,306 @@
  */
 import { z } from "zod";
 
-/**
- * 店舗一覧取得のクエリパラメータ
- */
-export const shopListQuerySchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(20),
-  search: z.string().optional(),
-  atmosphereIds: z
-    .string()
-    .transform((val) => (val ? val.split(",") : []))
+// 予約可否のEnum
+export const ReservationStatus = z.enum([
+  "REQUIRED",
+  "RECOMMENDED",
+  "NOT_REQUIRED",
+]);
+
+// 喫煙ポリシーのEnum
+export const SmokingPolicy = z.enum([
+  "SMOKING_ALLOWED",
+  "SEPARATED",
+  "NON_SMOKING",
+]);
+
+// 営業時間のスキーマ
+export const OpeningHoursSchema = z.object({
+  monday: z
+    .object({ open: z.string().optional(), close: z.string().optional() })
     .optional(),
-  flavorIds: z
-    .string()
-    .transform((val) => (val ? val.split(",") : []))
+  tuesday: z
+    .object({ open: z.string().optional(), close: z.string().optional() })
     .optional(),
-  hobbyIds: z
-    .string()
-    .transform((val) => (val ? val.split(",") : []))
+  wednesday: z
+    .object({ open: z.string().optional(), close: z.string().optional() })
     .optional(),
-  budgetMin: z.coerce.number().int().nonnegative().optional(),
-  budgetMax: z.coerce.number().int().positive().optional(),
-  hasWifi: z
-    .string()
-    .transform((val) => val === "true")
+  thursday: z
+    .object({ open: z.string().optional(), close: z.string().optional() })
     .optional(),
-  hasPowerOutlet: z
-    .string()
-    .transform((val) => val === "true")
+  friday: z
+    .object({ open: z.string().optional(), close: z.string().optional() })
     .optional(),
-  orderBy: z.enum(["createdAt", "name", "budgetMin"]).default("createdAt"),
-  order: z.enum(["asc", "desc"]).default("desc"),
+  saturday: z
+    .object({ open: z.string().optional(), close: z.string().optional() })
+    .optional(),
+  sunday: z
+    .object({ open: z.string().optional(), close: z.string().optional() })
+    .optional(),
 });
 
-/**
- * 近くの店舗検索のクエリパラメータ
- */
-export const shopNearbyQuerySchema = z.object({
-  latitude: z.coerce.number().min(-90).max(90),
-  longitude: z.coerce.number().min(-180).max(180),
-  radius: z.coerce.number().positive().max(50).default(5), // 最大50km
+// SNSリンクのスキーマ
+export const SnsLinksSchema = z.object({
+  twitter: z.string().url().optional(),
+  instagram: z.string().url().optional(),
+  facebook: z.string().url().optional(),
+  line: z.string().url().optional(),
+  youtube: z.string().url().optional(),
 });
 
-/**
- * 店舗作成・更新のボディパラメータ
- */
-export const shopBodySchema = z.object({
-  name: z.string().min(1).max(100),
-  address: z.string().min(1).max(200),
-  nearestStation: z.string().max(50).optional(),
-  stationWalkTime: z.number().int().positive().max(60).optional(),
+// 店舗作成のカスタムスキーマ
+export const ShopCreateSchema = z.object({
+  name: z.string().min(1, "店舗名は必須です"),
+  address: z.string().min(1, "住所は必須です"),
+  nearestStation: z.string().optional(),
+  stationWalkTime: z.number().min(1).optional(),
   openingHours: z
-    .record(z.string())
-    .refine(
-      (hours) => {
-        const validDays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-        return Object.keys(hours).every((day) => validDays.includes(day));
-      },
-      { message: "営業時間の曜日が不正です" }
-    )
+    .string()
+    .transform((val, ctx) => {
+      if (!val) return val;
+      try {
+        const parsed = JSON.parse(val);
+        const result = OpeningHoursSchema.parse(parsed);
+        return JSON.stringify(result);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "営業時間の形式が不正です",
+        });
+        return z.NEVER;
+      }
+    })
     .optional(),
-  holidays: z.string().max(100).optional(),
-  budgetMin: z.number().int().nonnegative().optional(),
-  budgetMax: z.number().int().positive().optional(),
-  seatingCount: z.number().int().positive().max(1000).optional(),
-  seatingTypes: z.string().max(100).optional(),
-  reservation: z.enum(["REQUIRED", "RECOMMENDED", "NOT_REQUIRED"]).optional(),
+  holidays: z.string().optional(),
+  budgetMin: z.number().min(0).optional(),
+  budgetMax: z.number().min(0).optional(),
+  seatingCount: z.number().min(1).optional(),
+  seatingTypes: z.string().optional(),
+  reservation: ReservationStatus.optional(),
   privateBooking: z.boolean().optional(),
   wifi: z.boolean().optional(),
   powerOutlet: z.boolean().optional(),
-  smokingPolicy: z
-    .enum(["SMOKING_ALLOWED", "SEPARATED", "NON_SMOKING"])
+  smokingPolicy: SmokingPolicy.optional(),
+  parkingInfo: z.string().optional(),
+  timeLimit: z.string().optional(),
+  hookahBrand: z.string().optional(),
+  flavorCount: z.number().min(0).optional(),
+  photos: z
+    .string()
+    .transform((val, ctx) => {
+      if (!val) return val;
+      try {
+        const parsed = JSON.parse(val);
+        const result = z.array(z.string().url()).parse(parsed);
+        return JSON.stringify(result);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "写真URLリストの形式が不正です",
+        });
+        return z.NEVER;
+      }
+    })
     .optional(),
-  parkingInfo: z.string().max(200).optional(),
-  timeLimit: z.string().max(50).optional(),
-  hookahBrand: z.string().max(50).optional(),
-  flavorCount: z.number().int().positive().max(1000).optional(),
-  photos: z.array(z.string().url()).max(10).optional(),
   websiteUrl: z.string().url().optional(),
   googleMapUrl: z.string().url().optional(),
   snsLinks: z
-    .object({
-      instagram: z.string().optional(),
-      twitter: z.string().optional(),
-      facebook: z.string().optional(),
-      line: z.string().optional(),
+    .string()
+    .transform((val, ctx) => {
+      if (!val) return val;
+      try {
+        const parsed = JSON.parse(val);
+        const result = SnsLinksSchema.parse(parsed);
+        return JSON.stringify(result);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "SNSリンクの形式が不正です",
+        });
+        return z.NEVER;
+      }
     })
     .optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
-  flavorIds: z.array(z.string()).optional(),
-  atmosphereIds: z.array(z.string()).optional(),
-  hobbyIds: z.array(z.string()).optional(),
-  paymentMethodIds: z.array(z.string()).optional(),
-  eventIds: z.array(z.string()).optional(),
 });
 
-/**
- * レビュー作成のボディパラメータ
- */
-export const reviewBodySchema = z.object({
-  shopId: z.string().cuid(),
-  ratingTaste: z.number().min(1).max(5).optional(),
-  ratingAtmosphere: z.number().min(1).max(5).optional(),
-  ratingService: z.number().min(1).max(5).optional(),
-  ratingValue: z.number().min(1).max(5).optional(),
-  comment: z.string().max(1000).optional(),
-  tags: z.array(z.string()).max(10).optional(),
+// 店舗更新のカスタムスキーマ
+export const ShopUpdateSchema = z.object({
+  name: z.string().min(1, "店舗名は必須です").optional(),
+  address: z.string().min(1, "住所は必須です").optional(),
+  nearestStation: z.string().optional(),
+  stationWalkTime: z.number().min(1).optional(),
+  openingHours: z
+    .string()
+    .transform((val, ctx) => {
+      if (!val) return val;
+      try {
+        const parsed = JSON.parse(val);
+        const result = OpeningHoursSchema.parse(parsed);
+        return JSON.stringify(result);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "営業時間の形式が不正です",
+        });
+        return z.NEVER;
+      }
+    })
+    .optional(),
+  holidays: z.string().optional(),
+  budgetMin: z.number().min(0).optional(),
+  budgetMax: z.number().min(0).optional(),
+  seatingCount: z.number().min(1).optional(),
+  seatingTypes: z.string().optional(),
+  reservation: ReservationStatus.optional(),
+  privateBooking: z.boolean().optional(),
+  wifi: z.boolean().optional(),
+  powerOutlet: z.boolean().optional(),
+  smokingPolicy: SmokingPolicy.optional(),
+  parkingInfo: z.string().optional(),
+  timeLimit: z.string().optional(),
+  hookahBrand: z.string().optional(),
+  flavorCount: z.number().min(0).optional(),
+  photos: z
+    .string()
+    .transform((val, ctx) => {
+      if (!val) return val;
+      try {
+        const parsed = JSON.parse(val);
+        const result = z.array(z.string().url()).parse(parsed);
+        return JSON.stringify(result);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "写真URLリストの形式が不正です",
+        });
+        return z.NEVER;
+      }
+    })
+    .optional(),
+  websiteUrl: z.string().url().optional(),
+  googleMapUrl: z.string().url().optional(),
+  snsLinks: z
+    .string()
+    .transform((val, ctx) => {
+      if (!val) return val;
+      try {
+        const parsed = JSON.parse(val);
+        const result = SnsLinksSchema.parse(parsed);
+        return JSON.stringify(result);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "SNSリンクの形式が不正です",
+        });
+        return z.NEVER;
+      }
+    })
+    .optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
 });
 
-// 型のエクスポート
-export type ShopListQuery = z.infer<typeof shopListQuerySchema>;
-export type ShopNearbyQuery = z.infer<typeof shopNearbyQuerySchema>;
-export type ShopBody = z.infer<typeof shopBodySchema>;
-export type ReviewBody = z.infer<typeof reviewBodySchema>;
+// ページネーションスキーマ
+export const PaginationSchema = z.object({
+  page: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().min(1))
+    .optional()
+    .default("1"),
+  limit: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().min(1).max(100))
+    .optional()
+    .default("20"),
+});
+
+// 店舗一覧取得のクエリスキーマ
+export const ShopQuerySchema = z.object({
+  ...PaginationSchema.shape,
+  // 検索条件
+  search: z.string().optional(),
+  // 位置情報検索
+  latitude: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().min(-90).max(90))
+    .optional(),
+  longitude: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().min(-180).max(180))
+    .optional(),
+  radius: z.string().transform(Number).pipe(z.number().min(0)).optional(), // km単位
+  // 予算範囲
+  budgetMin: z.string().transform(Number).pipe(z.number().min(0)).optional(),
+  budgetMax: z.string().transform(Number).pipe(z.number().min(0)).optional(),
+  // 設備フィルター
+  wifi: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
+  powerOutlet: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
+  privateBooking: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
+  // その他フィルター
+  reservation: ReservationStatus.optional(),
+  smokingPolicy: SmokingPolicy.optional(),
+  // ソート
+  sortBy: z
+    .enum(["createdAt", "updatedAt", "name", "budgetMin"])
+    .optional()
+    .default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+});
+
+// 店舗詳細取得のパラメータスキーマ
+export const ShopIdSchema = z.object({
+  id: z.string().min(1),
+});
+
+// 店舗に関連する要素を追加するスキーマ
+export const ShopRelationCreateSchema = z
+  .object({
+    shopId: z.string().min(1),
+    // 以下のいずれか1つ
+    flavorId: z.string().min(1).optional(),
+    atmosphereId: z.string().min(1).optional(),
+    hobbyId: z.string().min(1).optional(),
+    paymentMethodId: z.string().min(1).optional(),
+    eventId: z.string().min(1).optional(),
+  })
+  .refine(
+    (data) => {
+      const relationFields = [
+        data.flavorId,
+        data.atmosphereId,
+        data.hobbyId,
+        data.paymentMethodId,
+        data.eventId,
+      ].filter(Boolean);
+      return relationFields.length === 1;
+    },
+    {
+      message: "関連要素のIDを1つだけ指定してください",
+    }
+  );
+
+// 店舗に関連する要素を削除するスキーマ
+export const ShopRelationDeleteSchema = ShopRelationCreateSchema;
+
+// エクスポート
+export type ShopCreate = z.infer<typeof ShopCreateSchema>;
+export type ShopUpdate = z.infer<typeof ShopUpdateSchema>;
+export type ShopQuery = z.infer<typeof ShopQuerySchema>;
+export type ShopId = z.infer<typeof ShopIdSchema>;
+export type ShopRelationCreate = z.infer<typeof ShopRelationCreateSchema>;
