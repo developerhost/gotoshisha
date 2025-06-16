@@ -8,7 +8,7 @@ import type { Env } from "@/types";
 import type { PrismaClient } from "@prisma/client";
 
 // ルーターのインポート
-import { shopsRouter } from "@/routes/shops";
+import shops from "@/routes/shops";
 // import { usersRouter } from '@/routes/users';
 // import { postsRouter } from '@/routes/posts';
 // import { commentsRouter } from '@/routes/comments';
@@ -106,7 +106,7 @@ app.get("/api", (c) => {
 /**
  * ルーターの登録
  */
-app.route("/api/shops", shopsRouter);
+app.route("/api/shops", shops);
 // app.route('/api/users', usersRouter);
 // app.route('/api/posts', postsRouter);
 // app.route('/api/comments', commentsRouter);
