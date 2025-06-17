@@ -1,4 +1,4 @@
-const { getDefaultConfig } = require('expo/metro-config');
+const { getDefaultConfig } = require("expo/metro-config");
 
 const config = getDefaultConfig(__dirname);
 
@@ -8,15 +8,18 @@ config.resolver.blockList = [
   /.*\.test\.(js|jsx|ts|tsx)$/,
   /.*\.spec\.(js|jsx|ts|tsx)$/,
   /__tests__\/.*/,
-  
+
   // vitestとchaiを除外
   /node_modules[/\\]vitest[/\\].*/,
   /node_modules[/\\]chai[/\\].*/,
   /node_modules[/\\]@vitest[/\\].*/,
-  
+
   // その他のテスト関連ライブラリを除外
   /node_modules[/\\]@testing-library[/\\].*/,
   /node_modules[/\\]jest[/\\].*/,
+
+  // React Query devtoolsをネイティブビルドから除外
+  /node_modules[/\\]@tanstack[/\\]react-query-devtools[/\\].*/,
 ];
 
 module.exports = config;
