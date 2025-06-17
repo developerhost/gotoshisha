@@ -1,254 +1,247 @@
 /**
- * シーシャ店舗のカスタムフック
+ * TanStack Query を使用したシーシャ店舗APIフック
  */
-import { useState, useEffect, useCallback } from "react";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { ShopsApi } from "../utils/api/shopsApi";
+import { queryKeys, invalidateQueries } from "../lib/queryClient";
 import type {
-  Shop,
   ShopsResponse,
   ShopCreateInput,
   ShopUpdateInput,
   ShopQueryParams,
 } from "../types/api";
 
-// 店舗一覧用フック
-export const useShops = (initialParams?: ShopQueryParams) => {
-  const [data, setData] = useState<ShopsResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchShops = useCallback(
-    async (params?: ShopQueryParams) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await ShopsApi.getShops(params || initialParams);
-        setData(response);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [initialParams]
-  );
-
-  useEffect(() => {
-    fetchShops();
-  }, [fetchShops]);
-
-  return {
-    shops: data?.shops || [],
-    pagination: data?.pagination,
-    loading,
-    error,
-    refetch: fetchShops,
-  };
+/**
+ * 店舗一覧取得クエリ
+ */
+export const useShops = (params?: ShopQueryParams) => {
+  return useQuery({
+    queryKey: queryKeys.shops.list(params),
+    queryFn: () => ShopsApi.getShops(params),
+    enabled: true, // 自動実行
+  });
 };
 
-// 店舗詳細用フック
+/**
+ * 店舗詳細取得クエリ
+ */
 export const useShop = (id: string) => {
-  const [shop, setShop] = useState<Shop | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchShop = useCallback(async () => {
-    if (!id) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await ShopsApi.getShop(id);
-      setShop(ShopsApi.formatShop(response));
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    fetchShop();
-  }, [fetchShop]);
-
-  return {
-    shop,
-    loading,
-    error,
-    refetch: fetchShop,
-  };
+  return useQuery({
+    queryKey: queryKeys.shops.detail(id),
+    queryFn: () => ShopsApi.getShop(id),
+    enabled: !!id, // idが存在する場合のみ実行
+  });
 };
 
-// 店舗作成用フック
-export const useCreateShop = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const createShop = useCallback(async (data: ShopCreateInput) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await ShopsApi.createShop(data);
-      return response;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    createShop,
-    loading,
-    error,
-  };
-};
-
-// 店舗更新用フック
-export const useUpdateShop = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const updateShop = useCallback(async (id: string, data: ShopUpdateInput) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await ShopsApi.updateShop(id, data);
-      return response;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    updateShop,
-    loading,
-    error,
-  };
-};
-
-// 店舗削除用フック
-export const useDeleteShop = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const deleteShop = useCallback(async (id: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await ShopsApi.deleteShop(id);
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    deleteShop,
-    loading,
-    error,
-  };
-};
-
-// 近くの店舗検索用フック
+/**
+ * 近くの店舗検索クエリ
+ */
 export const useNearbyShops = (
   latitude?: number,
   longitude?: number,
-  radius: number = 5
+  radius: number = 5,
+  params?: Omit<ShopQueryParams, "latitude" | "longitude" | "radius">
 ) => {
-  const [data, setData] = useState<ShopsResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  return useQuery({
+    queryKey: queryKeys.shops.nearby(latitude || 0, longitude || 0, radius),
+    queryFn: () => {
+      if (!latitude || !longitude) {
+        throw new Error("緯度経度が必要です");
+      }
+      return ShopsApi.searchNearbyShops(latitude, longitude, radius, params);
+    },
+    enabled: !!latitude && !!longitude, // 緯度経度が存在する場合のみ実行
+  });
+};
 
-  const searchNearbyShops = useCallback(async () => {
-    if (!latitude || !longitude) return;
+/**
+ * 店舗作成ミューテーション
+ */
+export const useCreateShop = () => {
+  const queryClient = useQueryClient();
 
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await ShopsApi.searchNearbyShops(
-        latitude,
-        longitude,
-        radius
+  return useMutation({
+    mutationFn: (data: ShopCreateInput) => ShopsApi.createShop(data),
+    onSuccess: (newShop) => {
+      // キャッシュを無効化して最新データを取得
+      invalidateQueries.shops.list();
+
+      // 新しい店舗をキャッシュに追加
+      queryClient.setQueryData(queryKeys.shops.detail(newShop.id), newShop);
+    },
+    onError: (error) => {
+      // eslint-disable-next-line no-console
+      console.error("店舗作成エラー:", error);
+    },
+  });
+};
+
+/**
+ * 店舗更新ミューテーション
+ */
+export const useUpdateShop = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ShopUpdateInput }) =>
+      ShopsApi.updateShop(id, data),
+    onSuccess: (updatedShop) => {
+      // 店舗詳細キャッシュを更新
+      queryClient.setQueryData(
+        queryKeys.shops.detail(updatedShop.id),
+        updatedShop
       );
-      setData(response);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [latitude, longitude, radius]);
 
-  useEffect(() => {
-    searchNearbyShops();
-  }, [searchNearbyShops]);
-
-  return {
-    shops: data?.shops || [],
-    pagination: data?.pagination,
-    loading,
-    error,
-    refetch: searchNearbyShops,
-  };
+      // 一覧キャッシュを無効化
+      invalidateQueries.shops.list();
+    },
+    onError: (error) => {
+      // eslint-disable-next-line no-console
+      console.error("店舗更新エラー:", error);
+    },
+  });
 };
 
-// 店舗関連要素管理用フック
+/**
+ * 店舗削除ミューテーション
+ */
+export const useDeleteShop = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => ShopsApi.deleteShop(id),
+    onSuccess: (_, deletedId) => {
+      // 削除された店舗をキャッシュから削除
+      queryClient.removeQueries({
+        queryKey: queryKeys.shops.detail(deletedId),
+      });
+
+      // 一覧キャッシュを無効化
+      invalidateQueries.shops.list();
+    },
+    onError: (error) => {
+      // eslint-disable-next-line no-console
+      console.error("店舗削除エラー:", error);
+    },
+  });
+};
+
+/**
+ * 店舗関連要素追加ミューテーション
+ */
+export const useAddShopRelation = () => {
+  return useMutation({
+    mutationFn: ({
+      shopId,
+      type,
+      id,
+    }: {
+      shopId: string;
+      type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event";
+      id: string;
+    }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const params: any = { [`${type}Id`]: id };
+      return ShopsApi.addShopRelation(shopId, params);
+    },
+    onSuccess: (_, { shopId }) => {
+      // 店舗詳細キャッシュを無効化（関連データが変更されたため）
+      invalidateQueries.shops.detail(shopId);
+    },
+    onError: (error) => {
+      // eslint-disable-next-line no-console
+      console.error("関連要素追加エラー:", error);
+    },
+  });
+};
+
+/**
+ * 店舗関連要素削除ミューテーション
+ */
+export const useRemoveShopRelation = () => {
+  return useMutation({
+    mutationFn: ({
+      shopId,
+      type,
+      id,
+    }: {
+      shopId: string;
+      type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event";
+      id: string;
+    }) => {
+      const params = { [`${type}Id`]: id };
+      return ShopsApi.removeShopRelation(shopId, params);
+    },
+    onSuccess: (_, { shopId }) => {
+      // 店舗詳細キャッシュを無効化（関連データが変更されたため）
+      invalidateQueries.shops.detail(shopId);
+    },
+    onError: (error) => {
+      // eslint-disable-next-line no-console
+      console.error("関連要素削除エラー:", error);
+    },
+  });
+};
+
+/**
+ * 店舗関連要素管理用統合フック
+ */
 export const useShopRelations = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const addRelation = useCallback(
-    async (
-      shopId: string,
-      type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event",
-      id: string
-    ) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const params = { [`${type}Id`]: id };
-        await ShopsApi.addShopRelation(shopId, params);
-      } catch (err) {
-        setError(err as Error);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
-  const removeRelation = useCallback(
-    async (
-      shopId: string,
-      type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event",
-      id: string
-    ) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const params = { [`${type}Id`]: id };
-        await ShopsApi.removeShopRelation(shopId, params);
-      } catch (err) {
-        setError(err as Error);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  const addRelationMutation = useAddShopRelation();
+  const removeRelationMutation = useRemoveShopRelation();
 
   return {
-    addRelation,
-    removeRelation,
-    loading,
-    error,
+    addRelation: addRelationMutation.mutate,
+    removeRelation: removeRelationMutation.mutate,
+    loading: addRelationMutation.isPending || removeRelationMutation.isPending,
+    error: addRelationMutation.error || removeRelationMutation.error,
+    addAsync: addRelationMutation.mutateAsync,
+    removeAsync: removeRelationMutation.mutateAsync,
   };
 };
+
+/**
+ * 店舗データのプリフェッチ
+ */
+export const usePrefetchShop = () => {
+  const queryClient = useQueryClient();
+
+  return (id: string) => {
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.shops.detail(id),
+      queryFn: () => ShopsApi.getShop(id),
+      staleTime: 1000 * 60 * 5, // 5分間キャッシュ
+    });
+  };
+};
+
+/**
+ * 無限スクロール用の店舗一覧フック
+ */
+export const useInfiniteShops = (
+  baseParams?: Omit<ShopQueryParams, "page">
+) => {
+  return useInfiniteQuery({
+    queryKey: queryKeys.shops.list(baseParams),
+    queryFn: ({ pageParam = 1 }) =>
+      ShopsApi.getShops({ ...baseParams, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: ShopsResponse) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+  });
+};
+
+// 型の再エクスポート
+export type {
+  ShopsResponse,
+  ShopCreateInput,
+  ShopUpdateInput,
+  ShopQueryParams,
+} from "../types/api";
