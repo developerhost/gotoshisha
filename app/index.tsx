@@ -1,7 +1,7 @@
 import { YStack, XStack, Text, Button } from "tamagui";
 import { SafeAreaView } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useAuth } from "../src/contexts/AuthContext.web";
+import { useAuth } from "./contexts/AuthContext.web";
 import { useEffect } from "react";
 
 export default function HomeScreen() {

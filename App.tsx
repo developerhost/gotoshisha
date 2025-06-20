@@ -23,7 +23,7 @@ function MapScreen() {
       >
         <Marker
           coordinate={{ latitude: -33.8688, longitude: 151.2099 }}
-          icon={require("./src/assets/pin.png")}
+          icon={require("./app/assets/images/pin.png")}
           anchor={{ x: 0.5, y: 0.5 }}
         />
       </MapView>
@@ -95,7 +95,7 @@ export default function App() {
  * https://docs.expo.dev/archive/classic-updates/preloading-and-caching-assets/#pre-loading-and-caching-assets
  */
 function cacheImages() {
-  return [require("./src/assets/pin.png")].map((image) => {
+  return [require("./app/assets/images/pin.png")].map((image) => {
     if (typeof image === "string") {
       return Image.prefetch(image);
     } else {

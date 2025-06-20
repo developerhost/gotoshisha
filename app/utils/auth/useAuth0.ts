@@ -6,6 +6,7 @@ import {
   ResponseType,
   AuthSessionResult,
 } from "expo-auth-session";
+import * as AuthSession from "expo-auth-session";
 import { auth0Config } from "../../config/auth0";
 import { AuthStorage } from "./storage";
 import { Auth0Api } from "./auth0Api";
@@ -27,6 +28,7 @@ export function useAuth0(): UseAuth0Result {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [codeVerifier, setCodeVerifier] = useState<string | undefined>();
 
   // リダイレクトURIの設定
   const redirectUri = makeRedirectUri({
@@ -38,7 +40,7 @@ export function useAuth0(): UseAuth0Result {
   const discovery = useAutoDiscovery(`https://${auth0Config.domain}`);
 
   // 認証リクエストの設定
-  const [, response, promptAsync] = useAuthRequest(
+  const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: auth0Config.clientId,
       scopes: ["openid", "profile", "email", "offline_access"],
@@ -47,6 +49,7 @@ export function useAuth0(): UseAuth0Result {
       extraParams: {
         audience: `https://${auth0Config.domain}/api/v2/`,
       },
+      usePKCE: true, // PKCEを明示的に有効化
     },
     discovery
   );
@@ -112,20 +115,43 @@ export function useAuth0(): UseAuth0Result {
         }
 
         try {
-          // Exchange authorization code for tokens
-          const tokenResponse = await Auth0Api.exchangeCodeForToken(
-            authResponse.params.code,
-            redirectUri,
-            authResponse.params.code_verifier || ""
+          // Ensure we have a valid discovery
+          if (!discovery) {
+            throw new Error("Auth0ディスカバリーが完了していません");
+          }
+
+          // Ensure we have a valid request for PKCE
+          if (!request) {
+            throw new Error("認証リクエストが見つかりません");
+          }
+
+          // Use saved codeVerifier
+          const verifier = codeVerifier || request?.codeVerifier;
+
+          if (!verifier) {
+            throw new Error("PKCE code_verifierが利用できません");
+          }
+
+          // Exchange authorization code for tokens using expo-auth-session
+          const tokenResponse = await AuthSession.exchangeCodeAsync(
+            {
+              clientId: auth0Config.clientId,
+              redirectUri,
+              code: authResponse.params.code,
+              extraParams: {
+                code_verifier: verifier,
+              },
+            },
+            discovery
           );
 
-          if (!tokenResponse.access_token) {
+          if (!tokenResponse.accessToken) {
             throw new Error(
               "トークン交換レスポンスにアクセストークンが含まれていません"
             );
           }
 
-          await handleAuthSuccess(tokenResponse.access_token);
+          await handleAuthSuccess(tokenResponse.accessToken);
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error("トークン交換に失敗:", err);
@@ -143,7 +169,14 @@ export function useAuth0(): UseAuth0Result {
     };
 
     handleResponse(response);
-  }, [response, handleAuthSuccess, redirectUri]);
+  }, [
+    response,
+    handleAuthSuccess,
+    redirectUri,
+    request,
+    discovery,
+    codeVerifier,
+  ]);
 
   /**
    * 認証状態の初期化
@@ -153,10 +186,24 @@ export function useAuth0(): UseAuth0Result {
   }, [loadStoredAuth]);
 
   /**
+   * requestが更新されたときにcodeVerifierを保存
+   */
+  useEffect(() => {
+    if (request?.codeVerifier) {
+      setCodeVerifier(request.codeVerifier);
+    }
+  }, [request]);
+
+  /**
    * ログイン関数
    */
   const login = useCallback(async () => {
     try {
+      // リクエストが準備できているか確認
+      if (!request) {
+        throw new Error("認証リクエストが準備できていません");
+      }
+
       setIsLoading(true);
       setError(null);
       await promptAsync();
@@ -167,7 +214,7 @@ export function useAuth0(): UseAuth0Result {
       setIsLoading(false);
       throw err;
     }
-  }, [promptAsync]);
+  }, [promptAsync, request]);
 
   /**
    * ログアウト関数
