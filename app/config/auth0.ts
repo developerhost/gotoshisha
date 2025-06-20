@@ -1,5 +1,17 @@
 export const auth0Config = {
-  domain: 'dev-cz7g2cer3i7mpz25.jp.auth0.com',
-  clientId: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID || '',
-  scheme: 'expo-react-native-maps-demo'
+  domain:
+    process.env.EXPO_PUBLIC_AUTH0_DOMAIN ||
+    (() => {
+      throw new Error(
+        "EXPO_PUBLIC_AUTH0_DOMAIN environment variable is required"
+      );
+    })(),
+  clientId:
+    process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID ||
+    (() => {
+      throw new Error(
+        "EXPO_PUBLIC_AUTH0_CLIENT_ID environment variable is required"
+      );
+    })(),
+  scheme: "gotoshisha",
 };

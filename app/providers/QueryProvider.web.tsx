@@ -1,5 +1,5 @@
 /**
- * TanStack Query プロバイダー
+ * TanStack Query プロバイダー (Web版)
  */
 import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
