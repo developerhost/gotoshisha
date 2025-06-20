@@ -13,4 +13,5 @@ export const auth0Config = {
         "EXPO_PUBLIC_AUTH0_CLIENT_ID environment variable is required"
       );
     })(),
+  scheme: "gotoshisha",
 };
