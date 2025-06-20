@@ -4,7 +4,7 @@
 
 **Gotoshisha**は、位置情報共有機能を持つ SNS アプリケーションです。React Native + Expo でクロスプラットフォーム対応のフロントエンド、Cloudflare Workers + Hono のサーバーレスバックエンドで構築されています。
 
-- **アプリ名**: Gotoshisha (expo-react-native-maps-demo)
+- **アプリ名**: Gotoshisha
 - **プロジェクトタイプ**: モノレポ構成のフルスタックアプリケーション
 - **主要機能**: 位置情報共有、投稿・コメント・いいね機能、Auth0 認証
 
