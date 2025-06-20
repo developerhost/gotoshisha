@@ -6,10 +6,10 @@ import {
   ResponseType,
   AuthSessionResult,
 } from "expo-auth-session";
-import { auth0Config } from "../../config/auth0";
 import { AuthStorage } from "./storage";
 import { Auth0Api } from "./auth0Api";
 import { UserInfo } from "./types";
+import { auth0Config } from "../../../app/config/auth0";
 
 export interface UseAuth0Result {
   user: UserInfo | null;
@@ -129,6 +129,7 @@ export function useAuth0(): UseAuth0Result {
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error("トークン交換に失敗:", err);
+          console.log("code_verifier:", authResponse.params.code_verifier);
           setError(err as Error);
           setIsLoading(false);
         }
