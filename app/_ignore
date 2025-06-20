@@ -1,0 +1,9 @@
+components/**/*
+config/**/*
+constants/**/*
+contexts/**/*
+hooks/**/*
+lib/**/*
+providers/**/*
+types/**/*
+utils/**/*
