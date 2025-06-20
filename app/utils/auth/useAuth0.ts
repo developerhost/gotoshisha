@@ -125,10 +125,6 @@ export function useAuth0(): UseAuth0Result {
             throw new Error("認証リクエストが見つかりません");
           }
 
-          // Debug log
-          console.log("saved codeVerifier:", codeVerifier);
-          console.log("request codeVerifier:", request?.codeVerifier);
-
           // Use saved codeVerifier
           const verifier = codeVerifier || request?.codeVerifier;
 
@@ -195,7 +191,6 @@ export function useAuth0(): UseAuth0Result {
   useEffect(() => {
     if (request?.codeVerifier) {
       setCodeVerifier(request.codeVerifier);
-      console.log("codeVerifier saved:", request.codeVerifier);
     }
   }, [request]);
 

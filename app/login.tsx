@@ -1,7 +1,7 @@
 import React from "react";
 import { YStack, Text, Button } from "tamagui";
 import { SafeAreaView } from "react-native";
-import { useAuth } from "../src/contexts/AuthContext.web";
+import { useAuth } from "./contexts/AuthContext.web";
 import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
