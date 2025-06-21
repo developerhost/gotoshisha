@@ -10,7 +10,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/login");
+      router.replace("/routes/login");
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -42,7 +42,7 @@ export default function HomeScreen() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.replace("/login");
+      router.replace("/routes/login");
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Logout error:", error);
@@ -115,7 +115,7 @@ export default function HomeScreen() {
         </YStack>
 
         <YStack gap="$3" width="100%" maxWidth={300}>
-          <Link href="/map" asChild>
+          <Link href="/routes/map" asChild>
             <Button
               size="$5"
               backgroundColor="$purple10"
@@ -136,7 +136,7 @@ export default function HomeScreen() {
             </Button>
           </Link>
 
-          <Link href="/home" asChild>
+          <Link href="/routes/home" asChild>
             <Button
               size="$4"
               backgroundColor="$blue10"
