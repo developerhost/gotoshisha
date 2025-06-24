@@ -67,11 +67,10 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Install root dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install backend dependencies
-        working-directory: backend
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
+          cd backend
+          pnpm install --frozen-lockfile
 
       - name: Verify Prisma installation
         working-directory: backend
