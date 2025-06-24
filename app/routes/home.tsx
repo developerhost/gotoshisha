@@ -275,6 +275,28 @@ export default function HomeScreen() {
               </YStack>
             </XStack>
           </Card>
+
+          <Card
+            elevate
+            bordered
+            padding="$4"
+            pressStyle={{ scale: 0.97, backgroundColor: "$teal3" }}
+            onPress={() => router.push("/routes/company")}
+            backgroundColor="$teal1"
+            borderColor="$teal6"
+          >
+            <XStack alignItems="center" gap="$3">
+              <Text fontSize="$6">🏢</Text>
+              <YStack flex={1}>
+                <Text fontSize="$5" fontWeight="600" color="$teal11">
+                  運営会社
+                </Text>
+                <Text fontSize="$3" color="$gray10" marginTop="$1">
+                  会社情報・企業理念
+                </Text>
+              </YStack>
+            </XStack>
+          </Card>
         </YStack>
       </YStack>
     </ScrollView>
