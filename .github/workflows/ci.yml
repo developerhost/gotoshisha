@@ -71,6 +71,7 @@ jobs:
           pnpm install --frozen-lockfile
           cd backend
           pnpm install --frozen-lockfile
+          pnpm install -D prisma
 
       - name: Verify Prisma installation
         working-directory: backend
