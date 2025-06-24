@@ -253,6 +253,28 @@ export default function HomeScreen() {
               </YStack>
             </XStack>
           </Card>
+
+          <Card
+            elevate
+            bordered
+            padding="$4"
+            pressStyle={{ scale: 0.97, backgroundColor: "$orange3" }}
+            onPress={() => router.push("/routes/feedback")}
+            backgroundColor="$orange1"
+            borderColor="$orange6"
+          >
+            <XStack alignItems="center" gap="$3">
+              <Text fontSize="$6">💭</Text>
+              <YStack flex={1}>
+                <Text fontSize="$5" fontWeight="600" color="$orange11">
+                  ご意見・ご要望
+                </Text>
+                <Text fontSize="$3" color="$gray10" marginTop="$1">
+                  フィードバックをお聞かせください
+                </Text>
+              </YStack>
+            </XStack>
+          </Card>
         </YStack>
       </YStack>
     </ScrollView>
