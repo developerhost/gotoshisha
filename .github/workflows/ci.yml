@@ -49,7 +49,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: subdir
+        working-directory: backend
 
     steps:
       - name: Checkout code
