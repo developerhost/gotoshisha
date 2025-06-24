@@ -39,7 +39,7 @@ export default function MapScreen() {
           heading: 0,
           pitch: 0,
         }}
-        // provider="google"
+        provider="google"
       >
         <Marker
           coordinate={{ latitude: -33.8688, longitude: 151.2099 }}

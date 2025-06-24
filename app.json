@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gotoshisha.app",
@@ -32,14 +30,8 @@
       "favicon": "./assets/favicon.png"
     },
     "scheme": "gotoshisha",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "plugins": [
-      "expo-router"
-    ],
+    "platforms": ["ios", "android", "web"],
+    
     "extra": {
       "router": {},
       "eas": {

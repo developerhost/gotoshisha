@@ -23,11 +23,12 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.5.0
+          version: 10
 
       - name: Get pnpm store directory
         shell: bash
         run: |
+          pnpm store path --silent
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Install dependencies
@@ -58,31 +59,35 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.5.0
+          version: 10
 
       - name: Get pnpm store directory
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        working-directory: ./backend
-        run: pnpm install --frozen-lockfile
+      - name: Install root dependencies
+        run: |
+          pnpm install --frozen-lockfile
+
+      - name: Verify Prisma installation
+        working-directory: backend
+        run: pnpm exec prisma --version
 
       - name: Generate Prisma client
-        working-directory: ./backend
+        working-directory: backend
         run: pnpm db:generate
 
       - name: Type check
-        working-directory: ./backend
+        working-directory: backend
         run: pnpm type-check
 
       - name: Lint
-        working-directory: ./backend
+        working-directory: backend
         run: pnpm lint
 
       - name: Run tests
-        working-directory: ./backend
+        working-directory: backend
         run: pnpm test:run
 
   build-check:
@@ -102,7 +107,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.5.0
+          version: 10
 
       - name: Get pnpm store directory
         shell: bash
