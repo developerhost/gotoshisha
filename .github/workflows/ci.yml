@@ -47,10 +47,6 @@ jobs:
     name: Backend CI
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: backend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,19 +66,31 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install backend dependencies
+        working-directory: backend
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Prisma installation
+        working-directory: backend
+        run: pnpm exec prisma --version
+
       - name: Generate Prisma client
+        working-directory: backend
         run: pnpm db:generate
 
       - name: Type check
+        working-directory: backend
         run: pnpm type-check
 
       - name: Lint
+        working-directory: backend
         run: pnpm lint
 
       - name: Run tests
+        working-directory: backend
         run: pnpm test:run
 
   build-check:
