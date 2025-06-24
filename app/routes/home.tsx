@@ -14,10 +14,20 @@ export default function HomeScreen() {
   if (!isAuthenticated) {
     return (
       <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
-        <Text fontSize="$6" fontWeight="bold" textAlign="center" marginBottom="$2">
+        <Text
+          fontSize="$6"
+          fontWeight="bold"
+          textAlign="center"
+          marginBottom="$2"
+        >
           🚀 GoToShisha
         </Text>
-        <Text fontSize="$4" color="$gray10" textAlign="center" marginBottom="$4">
+        <Text
+          fontSize="$4"
+          color="$gray10"
+          textAlign="center"
+          marginBottom="$4"
+        >
           シーシャカフェを見つけよう
         </Text>
         <Button
@@ -27,7 +37,9 @@ export default function HomeScreen() {
           borderRadius="$6"
           size="$4"
         >
-          <Text color="white" fontWeight="600">ログインして始める</Text>
+          <Text color="white" fontWeight="600">
+            ログインして始める
+          </Text>
         </Button>
       </YStack>
     );
@@ -37,7 +49,12 @@ export default function HomeScreen() {
     <ScrollView flex={1} backgroundColor="$backgroundSoft">
       <YStack padding="$4" gap="$4">
         <YStack alignItems="center" marginBottom="$2">
-          <Text fontSize="$9" fontWeight="bold" textAlign="center" color="$purple11">
+          <Text
+            fontSize="$9"
+            fontWeight="bold"
+            textAlign="center"
+            color="$purple11"
+          >
             🚀 GoToShisha
           </Text>
           <Text fontSize="$4" color="$gray10" textAlign="center">
@@ -45,7 +62,13 @@ export default function HomeScreen() {
           </Text>
         </YStack>
 
-        <Card elevate bordered padding="$4" backgroundColor="$purple2" borderColor="$purple6">
+        <Card
+          elevate
+          bordered
+          padding="$4"
+          backgroundColor="$purple2"
+          borderColor="$purple6"
+        >
           <YStack gap="$3">
             <Text fontSize="$6" fontWeight="600" color="$purple11">
               こんにちは、{user?.name || user?.email || "シーシャラバー"}さん ✨
@@ -58,7 +81,12 @@ export default function HomeScreen() {
         </Card>
 
         <YStack gap="$3">
-          <Text fontSize="$6" fontWeight="600" marginBottom="$2" color="$gray12">
+          <Text
+            fontSize="$6"
+            fontWeight="600"
+            marginBottom="$2"
+            color="$gray12"
+          >
             🎯 今すぐ探す
           </Text>
 
@@ -84,10 +112,10 @@ export default function HomeScreen() {
             </XStack>
           </Card>
 
-          <Card 
-            elevate 
-            bordered 
-            padding="$4" 
+          <Card
+            elevate
+            bordered
+            padding="$4"
             pressStyle={{ scale: 0.97, backgroundColor: "$blue3" }}
             backgroundColor="$blue1"
             borderColor="$blue6"
@@ -105,10 +133,10 @@ export default function HomeScreen() {
             </XStack>
           </Card>
 
-          <Card 
-            elevate 
-            bordered 
-            padding="$4" 
+          <Card
+            elevate
+            bordered
+            padding="$4"
             pressStyle={{ scale: 0.97, backgroundColor: "$green3" }}
             backgroundColor="$green1"
             borderColor="$green6"
@@ -128,7 +156,12 @@ export default function HomeScreen() {
         </YStack>
 
         <YStack gap="$3" marginTop="$4">
-          <Text fontSize="$5" fontWeight="600" marginBottom="$2" color="$gray12">
+          <Text
+            fontSize="$5"
+            fontWeight="600"
+            marginBottom="$2"
+            color="$gray12"
+          >
             🔥 最近の活動
           </Text>
 
@@ -142,6 +175,39 @@ export default function HomeScreen() {
                 シーシャカフェを探して、あなたの冒険を始めましょう！
               </Text>
             </YStack>
+          </Card>
+        </YStack>
+
+        <YStack gap="$3" marginTop="$4">
+          <Text
+            fontSize="$5"
+            fontWeight="600"
+            marginBottom="$2"
+            color="$gray12"
+          >
+            ℹ️ サービス情報
+          </Text>
+
+          <Card
+            elevate
+            bordered
+            padding="$4"
+            pressStyle={{ scale: 0.97, backgroundColor: "$gray3" }}
+            onPress={() => router.push("/routes/terms")}
+            backgroundColor="$gray1"
+            borderColor="$gray6"
+          >
+            <XStack alignItems="center" gap="$3">
+              <Text fontSize="$6">📋</Text>
+              <YStack flex={1}>
+                <Text fontSize="$5" fontWeight="600" color="$gray11">
+                  利用規約
+                </Text>
+                <Text fontSize="$3" color="$gray10" marginTop="$1">
+                  サービス利用規約をご確認ください
+                </Text>
+              </YStack>
+            </XStack>
           </Card>
         </YStack>
       </YStack>
