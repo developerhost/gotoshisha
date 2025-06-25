@@ -161,12 +161,15 @@ shops.get("/", zValidator("query", ShopQuerySchema), async (c) => {
     }));
 
     return c.json({
-      shops: formattedShops,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
+      success: true,
+      data: {
+        shops: formattedShops,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       },
     });
   } catch (error) {
@@ -280,7 +283,10 @@ shops.get("/:id", zValidator("param", ShopIdSchema), async (c) => {
       _count: undefined,
     };
 
-    return c.json(formattedShop);
+    return c.json({
+      success: true,
+      data: formattedShop,
+    });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     console.error("Error fetching shop:", error);
@@ -316,14 +322,17 @@ shops.post("/", zValidator("json", ShopCreateSchema), async (c) => {
 
     return c.json(
       {
-        ...shop,
-        flavors: [],
-        atmospheres: [],
-        hobbies: [],
-        paymentMethods: [],
-        events: [],
-        reviewCount: shop._count.reviews,
-        _count: undefined,
+        success: true,
+        data: {
+          ...shop,
+          flavors: [],
+          atmospheres: [],
+          hobbies: [],
+          paymentMethods: [],
+          events: [],
+          reviewCount: shop._count.reviews,
+          _count: undefined,
+        },
       },
       201
     );
@@ -417,7 +426,10 @@ shops.put(
         _count: undefined,
       };
 
-      return c.json(formattedShop);
+      return c.json({
+        success: true,
+        data: formattedShop,
+      });
     } catch (error) {
       if (error instanceof HTTPException) throw error;
       console.error("Error updating shop:", error);
@@ -455,7 +467,10 @@ shops.delete("/:id", zValidator("param", ShopIdSchema), async (c) => {
       where: { id },
     });
 
-    return c.json({ message: "店舗を削除しました" });
+    return c.json({
+      success: true,
+      message: "店舗を削除しました",
+    });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     console.error("Error deleting shop:", error);
@@ -535,7 +550,10 @@ shops.post(
         });
       }
 
-      return c.json({ message: "関連要素を追加しました" }, 201);
+      return c.json({
+        success: true,
+        message: "関連要素を追加しました",
+      }, 201);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // 重複エラーの処理
@@ -623,7 +641,10 @@ shops.delete(
         });
       }
 
-      return c.json({ message: "関連要素を削除しました" });
+      return c.json({
+        success: true,
+        message: "関連要素を削除しました",
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // レコードが見つからない場合
