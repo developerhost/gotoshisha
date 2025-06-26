@@ -24,7 +24,7 @@ interface Env {
 const shops = new Hono<Env>();
 
 /**
- * 2点間の距離を計算（ハーバージン公式）
+ * 2点間の距離を計算（ハバーシン公式）
  */
 function calculateDistance(
   lat1: number,
