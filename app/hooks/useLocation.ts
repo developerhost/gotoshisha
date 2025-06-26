@@ -94,7 +94,7 @@ export const useLocation = () => {
           requiredAccuracy: 5000, // 「おおよそ」の場合を考慮して精度を緩和（5km以内）
         });
 
-        console.log('最後に知られた位置:', lastKnownLocation);
+        // console.log('最後に知られた位置:', lastKnownLocation);
 
         if (lastKnownLocation) {
           // 最後に知られた位置をすぐに設定し、ローディングを解除
@@ -122,14 +122,16 @@ export const useLocation = () => {
           distanceInterval: 100, // 100m以内の変化を検知
         });
 
-        console.log('現在位置:', currentLocation);
+        // console.log('現在位置:', currentLocation);
 
-        // より精密な位置で更新（ローディングは既に解除済み）
+        // より精密な位置で更新（ローディングを確実に解除）
         setLocation(prev => ({
           ...prev,
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
           error: null,
+          isLoading: false, // 現在位置取得成功時にローディング確実に解除
+          hasPermission: true,
           isUsingFallback: false,
           canRequestPermission: true,
         }));
@@ -183,7 +185,7 @@ export const useLocation = () => {
             requiredAccuracy: 10000, // 「おおよそ」を考慮して精度を大幅に緩和（10km以内）
           });
 
-          console.log('初期化時の最後に知られた位置:', lastKnownLocation);
+          // console.log('初期化時の最後に知られた位置:', lastKnownLocation);
 
           if (lastKnownLocation) {
             setLocation(prev => ({

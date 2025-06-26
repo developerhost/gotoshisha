@@ -1,110 +1,50 @@
-import { useEffect, useState, useCallback } from "react";
-import { Image } from "react-native";
+import { useEffect, useState } from "react";
 import { YStack, Text, Button, Spinner, Sheet, XStack } from "tamagui";
-import { Asset } from "expo-asset";
-import MapView, { Marker, Region } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
-import { useNearbyShops, useShops, useMapShopsCollection } from "../hooks/useShops";
-import { useLocation } from "../hooks/useLocation";
+import { useMapState } from "../hooks/useMapState";
 import type { Shop } from "../types/api";
 
 export default function MapScreen() {
-  const [isReady, setIsReady] = useState(false);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
-  const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [currentRegion, setCurrentRegion] = useState<Region | null>(null);
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
 
-  // 位置情報を取得
-  const { latitude, longitude, error: locationError, isLoading: locationLoading, requestLocation, openSettings, canRequestPermission } = useLocation();
-
-  // マップ移動による店舗収集フック
-  const { 
-    collectedShops, 
-    collectShopsFromArea, 
-    setInitialShops 
-  } = useMapShopsCollection();
-
-  // 近くの店舗データを取得（常に呼び出し、有効性はenabledで制御）
-  const { data: nearbyShopsData, isLoading: nearbyLoading, error: nearbyError } = useNearbyShops(
-    latitude ?? undefined,
-    longitude ?? undefined,
-    20, // 初期は20km半径で検索
-    { limit: 100 }
-  );
-
-  // フォールバック用：位置情報がない場合の店舗データ（常に呼び出し）
-  const { data: fallbackShopsData, isLoading: fallbackLoading, error: fallbackError } = useShops({
-    limit: 100,
-  });
+  // マップ状態管理フック
+  const {
+    latitude,
+    longitude,
+    locationError,
+    canRequestPermission,
+    retryLocationRequest,
+    openSettings,
+    handleRegionChangeComplete,
+    shops,
+    isReady,
+    isLoading,
+    error,
+    hasLocationPermission,
+    isUsingCollectedShops,
+    // デバッグ用
+    locationLoading,
+    nearbyLoading,
+    fallbackLoading,
+    nearbyShopsCount,
+    fallbackShopsCount,
+    nearbyFetching,
+    nearbySuccess,
+    fallbackFetching,
+    fallbackSuccess,
+    hasRequestedLocation,
+  } = useMapState();
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/routes/login");
     }
   }, [isAuthenticated, router]);
-
-  useEffect(() => {
-    (async () => {
-      await Promise.all([...cacheImages()]);
-      setIsReady(true);
-    })();
-  }, []);
-
-  // 位置情報を自動取得
-  useEffect(() => {
-    if (isReady && !latitude && !longitude && !locationLoading && !hasRequestedLocation) {
-      setHasRequestedLocation(true);
-      requestLocation();
-    }
-  }, [isReady, latitude, longitude, locationLoading, hasRequestedLocation, requestLocation]);
-
-  // 初期店舗データを収集データに設定
-  useEffect(() => {
-    const initialShops = (latitude && longitude) ? nearbyShopsData?.shops : fallbackShopsData?.shops;
-    if (initialShops && initialShops.length > 0) {
-      setInitialShops(initialShops);
-    }
-  }, [nearbyShopsData, fallbackShopsData, latitude, longitude, setInitialShops]);
-
-  // ローディング状態の統合
-  const isLoading = !isReady || locationLoading || nearbyLoading || fallbackLoading;
-  const error = locationError || nearbyError || fallbackError;
-
-  // 店舗データの選択（収集された店舗データを優先）
-  const shops = collectedShops.length > 0 ? collectedShops : 
-    ((latitude && longitude) ? nearbyShopsData?.shops : fallbackShopsData?.shops) || [];
-
-  // ズームレベルに基づいて適切な検索半径を計算
-  const calculateSearchRadius = useCallback((region: Region) => {
-    // latitudeDeltaから半径を推定（1度 ≈ 111km）
-    const viewportKm = region.latitudeDelta * 111;
-    
-    // ビューポートの半分程度を検索範囲とし、最小5km、最大5000kmに制限
-    // 5000kmあれば大陸レベルの検索が可能
-    const radius = Math.max(5, Math.min(5000, viewportKm * 0.6));
-    
-    return Math.round(radius);
-  }, []);
-
-  // マップ領域変更時のコールバック
-  const handleRegionChangeComplete = useCallback(async (region: Region) => {
-    const radius = calculateSearchRadius(region);
-    console.log('Map region changed:', {
-      latitude: region.latitude,
-      longitude: region.longitude,
-      latitudeDelta: region.latitudeDelta,
-      longitudeDelta: region.longitudeDelta,
-      calculatedRadius: radius
-    });
-    setCurrentRegion(region);
-    // ズームレベルに応じた範囲で店舗データを収集
-    await collectShopsFromArea(region.latitude, region.longitude, radius);
-  }, [calculateSearchRadius, collectShopsFromArea]);
 
   // ローディング中またはアセットの準備中
   if (isLoading) {
@@ -113,8 +53,12 @@ export default function MapScreen() {
         <Spinner size="large" color="$blue10" />
         <Text marginTop="$3" fontSize="$4">
           {!isReady ? "地図を準備中..." : 
-           locationLoading ? "位置情報を取得中..." : 
-           "店舗データを読み込み中..."}
+           locationLoading ? `位置情報を取得中... (requested: ${hasRequestedLocation})` :
+           nearbyLoading || nearbyFetching ? `近くの店舗を検索中... (${latitude?.toFixed(4)}, ${longitude?.toFixed(4)})` :
+           fallbackLoading || fallbackFetching ? "店舗データを読み込み中..." :
+           hasLocationPermission && !nearbySuccess ? "位置情報データ待機中..." :
+           !hasLocationPermission && !fallbackSuccess ? "店舗データ待機中..." :
+           `データを処理中... (nearby: ${nearbyShopsCount}, fallback: ${fallbackShopsCount})`}
         </Text>
       </YStack>
     );
@@ -135,10 +79,7 @@ export default function MapScreen() {
           <Button
             backgroundColor="$blue10"
             color="white"
-            onPress={() => {
-              setHasRequestedLocation(false);
-              requestLocation();
-            }}
+            onPress={retryLocationRequest}
           >
             位置情報を再取得
           </Button>
@@ -146,17 +87,6 @@ export default function MapScreen() {
       </YStack>
     );
   }
-
-  // 店舗データの安全性チェック
-  const validShops = shops.filter((shop: Shop) => 
-    shop && 
-    typeof shop === 'object' && 
-    shop.id && 
-    shop.name && 
-    shop.address &&
-    shop.latitude !== null && 
-    shop.longitude !== null
-  );
 
   // マップの初期カメラ位置（現在位置または新宿）
   const initialCamera = {
@@ -179,7 +109,7 @@ export default function MapScreen() {
         onRegionChangeComplete={handleRegionChangeComplete}
       >
         {/* 店舗のピンを表示 */}
-        {validShops.map((shop: Shop) => (
+        {shops.map((shop: Shop) => (
           <Marker
             key={shop.id}
             coordinate={{
@@ -252,10 +182,7 @@ export default function MapScreen() {
                 <Button
                   size="$2"
                   backgroundColor="$orange8"
-                  onPress={() => {
-                    setHasRequestedLocation(false);
-                    requestLocation();
-                  }}
+                  onPress={retryLocationRequest}
                 >
                   <Text color="white" fontSize="$2">
                     再試行
@@ -292,12 +219,12 @@ export default function MapScreen() {
         elevation={5}
       >
         <Text fontSize="$3" color="$gray12">
-          📍 {validShops.length}件の店舗を表示中
-          {latitude && longitude ? (
+          📍 {shops.length}件の店舗を表示中
+          {hasLocationPermission ? (
             <Text fontSize="$2" color="$gray10">
-              {collectedShops.length > 0 
+              {isUsingCollectedShops 
                 ? "\n(マップ移動で収集した店舗を表示)" 
-                : "\n(現在地から10km圏内)"}
+                : "\n(現在地から20km圏内)"}
             </Text>
           ) : (
             <Text fontSize="$2" color="$gray10">
@@ -402,18 +329,4 @@ export default function MapScreen() {
       </Sheet>
     </YStack>
   );
-}
-
-/**
- *
- * https://docs.expo.dev/archive/classic-updates/preloading-and-caching-assets/#pre-loading-and-caching-assets
- */
-function cacheImages() {
-  return [require("../assets/images/pin.png")].map((image) => {
-    if (typeof image === "string") {
-      return Image.prefetch(image);
-    } else {
-      return Asset.fromModule(image).downloadAsync();
-    }
-  });
 }
