@@ -11,7 +11,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "assets/**/*",
+      "app/assets/**/*"
+    ],
+    "updates": {
+      "assetPatternsToBeBundled": [
+        "assets/**/*.png",
+        "app/assets/**/*.png"
+      ]
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gotoshisha.app",
@@ -37,7 +46,7 @@
     },
     "scheme": "gotoshisha",
     "platforms": ["ios", "android", "web"],
-    
+
     "extra": {
       "router": {},
       "eas": {
