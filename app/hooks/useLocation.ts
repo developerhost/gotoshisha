@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import * as Location from 'expo-location';
-import { Linking } from 'react-native';
+import { Linking, AppState } from 'react-native';
 import { SHINJUKU_COORDINATE } from '../constants/location';
 
 export interface LocationState {
@@ -209,7 +209,29 @@ export const useLocation = () => {
 
   useEffect(() => {
     checkPermission();
-  }, []);
+
+    // アプリ状態の変化を監視
+    const handleAppStateChange = async (nextAppState: string) => {
+      if (nextAppState === 'active') {
+        // フォアグラウンドに戻ったときに権限状態をチェック
+        const { status } = await Location.getForegroundPermissionsAsync();
+        
+        // 以前に権限が拒否されていて、現在は許可されている場合は自動再試行
+        if (status === 'granted' && (!location.hasPermission || location.isUsingFallback)) {
+          // 少し遅延を入れてから再試行（設定画面からの復帰を確実にするため）
+          setTimeout(() => {
+            requestLocation();
+          }, 500);
+        }
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription?.remove();
+    };
+  }, [location.hasPermission, location.isUsingFallback, requestLocation]);
 
   return {
     ...location,

@@ -74,6 +74,11 @@ export default function MapScreen() {
         </Text>
         <Text fontSize="$3" color="$gray10" textAlign="center" marginBottom="$4">
           {typeof error === 'string' ? error : error.message}
+          {locationError && !canRequestPermission && (
+            <Text fontSize="$3" color="$gray10">
+              {"\n"}設定で権限を許可してアプリに戻ると、自動的に再試行されます。
+            </Text>
+          )}
         </Text>
         {locationError && (
           <Button
@@ -175,6 +180,11 @@ export default function MapScreen() {
         >
           <Text fontSize="$2" color="$orange11" textAlign="left">
             {typeof error === 'string' ? error : error.message}
+            {locationError && !canRequestPermission && (
+              <Text fontSize="$2" color="$gray10">
+                {"\n"}設定で権限を許可してアプリに戻ると、自動的に再試行されます。
+              </Text>
+            )}
           </Text>
           {locationError && (
             <XStack gap="$2" marginTop="$2">
@@ -195,7 +205,7 @@ export default function MapScreen() {
                   onPress={openSettings}
                 >
                   <Text color="white" fontSize="$2">
-                    設定を開く
+                    設定で許可
                   </Text>
                 </Button>
               )}

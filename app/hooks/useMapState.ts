@@ -91,6 +91,16 @@ export function useMapState() {
     }
   }, [latitude, longitude, locationLoading]);
 
+  // 権限が許可されてエラー状態から回復した場合の自動再取得
+  useEffect(() => {
+    if (isReady && !locationLoading && !hasRequestedLocation && 
+        !latitude && !longitude && !locationError) {
+      // エラーが解消されて位置情報がまだない場合は自動再取得
+      setHasRequestedLocation(true);
+      requestLocation();
+    }
+  }, [isReady, locationLoading, hasRequestedLocation, latitude, longitude, locationError, requestLocation]);
+
   // 初期店舗データを収集データに設定
   useEffect(() => {
     const initialShops = (latitude && longitude) ? nearbyShopsData?.shops : fallbackShopsData?.shops;
