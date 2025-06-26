@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { YStack, Text, Button, Spinner, Sheet, XStack } from "tamagui";
+import { YStack, Text, Button, Spinner, XStack } from "tamagui";
 import MapView, { Marker } from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
 import { useMapState } from "../hooks/useMapState";
+import { ShopDetailSheet } from "../components/ShopDetailSheet";
 import type { Shop } from "../types/api";
 
 export default function MapScreen() {
@@ -245,98 +246,11 @@ export default function MapScreen() {
       </YStack>
 
       {/* 店舗詳細ボトムシート */}
-      <Sheet
-        modal
-        open={!!selectedShop}
-        onOpenChange={(open: boolean) => {
-          if (!open) setSelectedShop(null);
-        }}
-        snapPoints={[40, 60]}
-        dismissOnSnapToBottom
-      >
-        <Sheet.Overlay />
-        <Sheet.Frame padding="$4" backgroundColor="$background">
-          <Sheet.Handle />
-          {selectedShop && (
-            <YStack gap="$4">
-              <YStack gap="$2">
-                <Text fontSize="$6" fontWeight="bold">
-                  {selectedShop.name}
-                </Text>
-                <Text fontSize="$4" color="$gray10">
-                  {selectedShop.address}
-                </Text>
-              </YStack>
-
-              {selectedShop.nearestStation && (
-                <XStack alignItems="center" gap="$2">
-                  <Text fontSize="$4" color="$blue10">
-                    📍 {selectedShop.nearestStation}
-                  </Text>
-                  {selectedShop.stationWalkTime && (
-                    <Text fontSize="$4" color="$gray10">
-                      徒歩{selectedShop.stationWalkTime}分
-                    </Text>
-                  )}
-                </XStack>
-              )}
-
-              {selectedShop.budgetMin && selectedShop.budgetMax && (
-                <XStack alignItems="center" gap="$2">
-                  <Text fontSize="$4" color="$green10">
-                    💰 ¥{selectedShop.budgetMin.toLocaleString()} - ¥{selectedShop.budgetMax.toLocaleString()}
-                  </Text>
-                </XStack>
-              )}
-
-              <XStack gap="$3">
-                {selectedShop.wifi && (
-                  <Text fontSize="$3" color="$blue10" backgroundColor="$blue3" paddingHorizontal="$2" paddingVertical="$1" borderRadius="$2">
-                    📶 WiFi
-                  </Text>
-                )}
-                {selectedShop.powerOutlet && (
-                  <Text fontSize="$3" color="$orange10" backgroundColor="$orange3" paddingHorizontal="$2" paddingVertical="$1" borderRadius="$2">
-                    🔌 電源
-                  </Text>
-                )}
-                {selectedShop.privateBooking && (
-                  <Text fontSize="$3" color="$purple10" backgroundColor="$purple3" paddingHorizontal="$2" paddingVertical="$1" borderRadius="$2">
-                    🏠 貸切可
-                  </Text>
-                )}
-              </XStack>
-
-              {selectedShop.reservation && (
-                <Text fontSize="$3" color="$gray10">
-                  予約: {
-                    selectedShop.reservation === 'REQUIRED' ? '必須' :
-                    selectedShop.reservation === 'RECOMMENDED' ? '推奨' : '不要'
-                  }
-                </Text>
-              )}
-
-              {selectedShop.reviewCount !== undefined && selectedShop.reviewCount > 0 && (
-                <Text fontSize="$4" color="$orange10">
-                  ⭐ レビュー{selectedShop.reviewCount}件
-                </Text>
-              )}
-
-              <Button
-                backgroundColor="$blue10"
-                color="white"
-                onPress={() => {
-                  // TODO: 将来的に店舗詳細画面に遷移
-                  // router.push(`/shop/${selectedShop.id}`);
-                  alert(`${selectedShop.name}の詳細画面に遷移予定`);
-                }}
-              >
-                詳細を見る
-              </Button>
-            </YStack>
-          )}
-        </Sheet.Frame>
-      </Sheet>
+      <ShopDetailSheet
+        shop={selectedShop}
+        isOpen={!!selectedShop}
+        onClose={() => setSelectedShop(null)}
+      />
     </YStack>
   );
 }
