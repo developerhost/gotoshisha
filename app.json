@@ -16,7 +16,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.gotoshisha.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "この位置情報は近くのシーシャ店を検索するために使用されます。",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "この位置情報は近くのシーシャ店を検索するために使用されます。"
       }
     },
     "android": {
@@ -24,7 +26,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.gotoshisha.app"
+      "package": "com.gotoshisha.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

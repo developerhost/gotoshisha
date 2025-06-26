@@ -69,21 +69,24 @@ describe("Shops API", () => {
 
       const data = await res.json();
       expect(data).toEqual({
-        shops: expect.arrayContaining([
-          expect.objectContaining({
-            id: "test-shop-id",
-            name: "テストシーシャ店",
-            flavors: expect.arrayContaining([
-              expect.objectContaining({ name: "ミント" }),
-            ]),
-            reviewCount: 1,
-          }),
-        ]),
-        pagination: {
-          page: 1,
-          limit: 20,
-          total: 1,
-          totalPages: 1,
+        success: true,
+        data: {
+          shops: expect.arrayContaining([
+            expect.objectContaining({
+              id: "test-shop-id",
+              name: "テストシーシャ店",
+              flavors: expect.arrayContaining([
+                expect.objectContaining({ name: "ミント" }),
+              ]),
+              reviewCount: 1,
+            }),
+          ]),
+          pagination: {
+            page: 1,
+            limit: 20,
+            total: 1,
+            totalPages: 1,
+          },
         },
       });
     });
@@ -274,6 +277,7 @@ describe("Shops API", () => {
 
       const data = await res.json();
       expect(data).toEqual({
+        success: true,
         message: "店舗を削除しました",
       });
     });
@@ -308,6 +312,7 @@ describe("Shops API", () => {
 
       const data = await res.json();
       expect(data).toEqual({
+        success: true,
         message: "関連要素を追加しました",
       });
     });
@@ -343,6 +348,7 @@ describe("Shops API", () => {
 
       const data = await res.json();
       expect(data).toEqual({
+        success: true,
         message: "関連要素を削除しました",
       });
     });

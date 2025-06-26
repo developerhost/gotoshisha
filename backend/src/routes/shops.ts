@@ -24,6 +24,28 @@ interface Env {
 const shops = new Hono<Env>();
 
 /**
+ * 2点間の距離を計算（ハバーシン公式）
+ */
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // 地球の半径（km）
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
  * 店舗一覧取得
  * GET /shops
  */
@@ -51,10 +73,16 @@ shops.get("/", zValidator("query", ShopQuerySchema), async (c) => {
 
   // 位置情報による検索
   if (query.latitude && query.longitude && query.radius) {
-    // 簡易的な距離計算（実際の実装では適切な地理的計算を使用）
+    console.log(`位置情報検索: lat=${query.latitude}, lng=${query.longitude}, radius=${query.radius}km`);
+    
+    // radiusはkm単位なので、1度 ≈ 111kmで計算
     const latRange = query.radius / 111; // 1度 ≈ 111km
     const lonRange =
       query.radius / (111 * Math.cos((query.latitude * Math.PI) / 180));
+
+    console.log(`検索範囲: latRange=${latRange}度, lonRange=${lonRange}度`);
+    console.log(`緯度範囲: ${query.latitude - latRange} 〜 ${query.latitude + latRange}`);
+    console.log(`経度範囲: ${query.longitude - lonRange} 〜 ${query.longitude + lonRange}`);
 
     where.latitude = {
       gte: query.latitude - latRange,
@@ -99,7 +127,110 @@ shops.get("/", zValidator("query", ShopQuerySchema), async (c) => {
   orderBy[query.sortBy] = query.sortOrder;
 
   try {
-    // 店舗データの取得
+    console.log(`検索条件:`, JSON.stringify(where, null, 2));
+    
+    // 位置情報がある場合は距離計算を含む特別な処理
+    if (query.latitude && query.longitude && query.radius) {
+      // 店舗データの取得（位置情報フィルター適用）
+      const allShops = await prisma.shop.findMany({
+        where,
+        include: {
+          shopFlavors: {
+            include: {
+              flavor: true,
+            },
+          },
+          shopAtmospheres: {
+            include: {
+              atmosphere: true,
+            },
+          },
+          shopHobbies: {
+            include: {
+              hobby: true,
+            },
+          },
+          shopPaymentMethods: {
+            include: {
+              paymentMethod: true,
+            },
+          },
+          shopEvents: {
+            include: {
+              event: true,
+            },
+          },
+          _count: {
+            select: {
+              reviews: true,
+            },
+          },
+        },
+      });
+
+      console.log(`データベース検索結果: ${allShops.length}件の店舗が見つかりました`);
+      allShops.forEach(shop => {
+        console.log(`- ${shop.name}: (${shop.latitude}, ${shop.longitude})`);
+      });
+
+      // 各店舗の距離を計算し、距離順でソート
+      const shopsWithDistance = allShops
+        .map((shop) => {
+          if (shop.latitude === null || shop.longitude === null) {
+            return null;
+          }
+          const distance = calculateDistance(
+            query.latitude as number,
+            query.longitude as number,
+            shop.latitude,
+            shop.longitude
+          );
+          return {
+            ...shop,
+            distance,
+          };
+        })
+        .filter((shop): shop is NonNullable<typeof shop> => shop !== null)
+        .filter((shop) => shop.distance <= (query.radius as number))
+        .sort((a, b) => a.distance - b.distance);
+
+      // ページネーション適用
+      const total = shopsWithDistance.length;
+      const shops = shopsWithDistance.slice(skip, skip + limit);
+
+      // レスポンスの整形
+      const formattedShops = shops.map((shop) => ({
+        ...shop,
+        flavors: shop.shopFlavors.map((sf) => sf.flavor),
+        atmospheres: shop.shopAtmospheres.map((sa) => sa.atmosphere),
+        hobbies: shop.shopHobbies.map((sh) => sh.hobby),
+        paymentMethods: shop.shopPaymentMethods.map((spm) => spm.paymentMethod),
+        events: shop.shopEvents.map((se) => se.event),
+        reviewCount: shop._count.reviews,
+        // 不要なフィールドを削除
+        shopFlavors: undefined,
+        shopAtmospheres: undefined,
+        shopHobbies: undefined,
+        shopPaymentMethods: undefined,
+        shopEvents: undefined,
+        _count: undefined,
+      }));
+
+      return c.json({
+        success: true,
+        data: {
+          shops: formattedShops,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+          },
+        },
+      });
+    }
+
+    // 位置情報がない場合の通常の処理
     const [shops, total] = await Promise.all([
       prisma.shop.findMany({
         where,
@@ -161,12 +292,15 @@ shops.get("/", zValidator("query", ShopQuerySchema), async (c) => {
     }));
 
     return c.json({
-      shops: formattedShops,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
+      success: true,
+      data: {
+        shops: formattedShops,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       },
     });
   } catch (error) {
@@ -280,7 +414,10 @@ shops.get("/:id", zValidator("param", ShopIdSchema), async (c) => {
       _count: undefined,
     };
 
-    return c.json(formattedShop);
+    return c.json({
+      success: true,
+      data: formattedShop,
+    });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     console.error("Error fetching shop:", error);
@@ -316,14 +453,17 @@ shops.post("/", zValidator("json", ShopCreateSchema), async (c) => {
 
     return c.json(
       {
-        ...shop,
-        flavors: [],
-        atmospheres: [],
-        hobbies: [],
-        paymentMethods: [],
-        events: [],
-        reviewCount: shop._count.reviews,
-        _count: undefined,
+        success: true,
+        data: {
+          ...shop,
+          flavors: [],
+          atmospheres: [],
+          hobbies: [],
+          paymentMethods: [],
+          events: [],
+          reviewCount: shop._count.reviews,
+          _count: undefined,
+        },
       },
       201
     );
@@ -417,7 +557,10 @@ shops.put(
         _count: undefined,
       };
 
-      return c.json(formattedShop);
+      return c.json({
+        success: true,
+        data: formattedShop,
+      });
     } catch (error) {
       if (error instanceof HTTPException) throw error;
       console.error("Error updating shop:", error);
@@ -455,7 +598,10 @@ shops.delete("/:id", zValidator("param", ShopIdSchema), async (c) => {
       where: { id },
     });
 
-    return c.json({ message: "店舗を削除しました" });
+    return c.json({
+      success: true,
+      message: "店舗を削除しました",
+    });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     console.error("Error deleting shop:", error);
@@ -535,7 +681,10 @@ shops.post(
         });
       }
 
-      return c.json({ message: "関連要素を追加しました" }, 201);
+      return c.json({
+        success: true,
+        message: "関連要素を追加しました",
+      }, 201);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // 重複エラーの処理
@@ -623,7 +772,10 @@ shops.delete(
         });
       }
 
-      return c.json({ message: "関連要素を削除しました" });
+      return c.json({
+        success: true,
+        message: "関連要素を削除しました",
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // レコードが見つからない場合
