@@ -65,6 +65,7 @@ export interface Shop {
   snsLinks?: string;
   latitude?: number;
   longitude?: number;
+  distance?: number; // 検索地点からの距離（km）
   createdAt: string;
   updatedAt: string;
   // リレーション
