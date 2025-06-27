@@ -4,7 +4,7 @@ import MapView, { Marker } from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
-import { useMapState } from "../hooks/useMapState";
+import { useMapState } from "../_hooks/useMapState";
 import { ShopDetailSheet } from "../components/ShopDetailSheet";
 import type { Shop } from "../types/api";
 
