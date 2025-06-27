@@ -14,7 +14,7 @@ const AuthContext = createContext<AuthContextData | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, authorize, clearSession, error, isLoading } = useAuth0Native();
+  const { user, authorize, clearSession, error, isLoading, getCredentials } = useAuth0Native();
 
   // Convert react-native-auth0 user to our UserInfo type
   const convertedUser: UserInfo | null = user
@@ -64,6 +64,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // eslint-disable-next-line no-console
         console.error("ログアウトエラー:", err);
         throw err;
+      }
+    },
+    getAccessToken: async () => {
+      try {
+        if (!user) {
+          return null;
+        }
+        const credentials = await getCredentials();
+        return credentials?.accessToken || null;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("アクセストークン取得エラー:", err);
+        return null;
       }
     },
   };
