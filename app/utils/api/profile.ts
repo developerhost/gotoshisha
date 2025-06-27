@@ -44,7 +44,17 @@ export async function getUserProfile(
   if (!response.ok) {
     const errorData = await response.json();
     console.error('API error:', errorData);
-    throw new Error(errorData.error || 'プロフィールの取得に失敗しました');
+    
+    // 具体的なエラーメッセージを提供
+    if (response.status === 401) {
+      throw new Error('認証が必要です。ログインしてから再試行してください。');
+    } else if (response.status === 400) {
+      throw new Error(errorData.error || 'ユーザー情報の取得に失敗しました。有効なメールアドレスが必要です。');
+    } else if (response.status === 409) {
+      throw new Error('このメールアドレスは既に使用されています。');
+    } else {
+      throw new Error(errorData.error || 'プロフィールの取得に失敗しました');
+    }
   }
   
   const data = await response.json();
