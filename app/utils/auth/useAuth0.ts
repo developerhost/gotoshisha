@@ -19,6 +19,7 @@ export interface UseAuth0Result {
   error: Error | null;
   login: () => Promise<void>;
   logout: () => Promise<void>;
+  getAccessToken: () => Promise<string | null>;
 }
 
 /**
@@ -235,6 +236,19 @@ export function useAuth0(): UseAuth0Result {
     }
   }, []);
 
+  /**
+   * アクセストークンを取得
+   */
+  const getAccessToken = useCallback(async (): Promise<string | null> => {
+    try {
+      const tokens = await AuthStorage.load();
+      return tokens?.accessToken || null;
+    } catch (err) {
+      console.error("アクセストークン取得エラー:", err);
+      return null;
+    }
+  }, []);
+
   return {
     user,
     isLoading,
@@ -242,5 +256,6 @@ export function useAuth0(): UseAuth0Result {
     error,
     login,
     logout,
+    getAccessToken,
   };
 }

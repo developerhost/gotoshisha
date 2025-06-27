@@ -1,48 +1,28 @@
 /**
- * ホーム画面コンポーネント
- * 認証状態を管理し、適切な画面を表示する
+ * メインエントリーポイント
+ * 認証状態を確認してホームページにリダイレクト
  */
-import { SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "./contexts/AuthContext.web";
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { LoadingScreen } from "./components/LoadingScreen";
-import { AppHeader } from "./components/AppHeader";
-import { MainContent } from "./components/MainContent";
-import type { LogoutHandler } from "./types/auth";
 
-export default function HomeScreen() {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+export default function IndexScreen() {
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/routes/login");
+    if (!isLoading) {
+      if (isAuthenticated) {
+        // 認証済みの場合はホームページに遷移
+        router.replace("/routes/home");
+      } else {
+        // 未認証の場合はログインページに遷移
+        router.replace("/routes/login");
+      }
     }
   }, [isAuthenticated, isLoading, router]);
 
-  const handleLogout: LogoutHandler = useCallback(async () => {
-    try {
-      await logout();
-      router.replace("/routes/login");
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Logout error:", error);
-    }
-  }, [logout, router]);
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <AppHeader onLogout={handleLogout} />
-      <MainContent />
-    </SafeAreaView>
-  );
+  // 認証状態確認中はローディング画面を表示
+  return <LoadingScreen />;
 }

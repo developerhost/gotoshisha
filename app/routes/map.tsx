@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
 import { useMapState } from "../hooks/useMapState";
 import { ShopDetailSheet } from "../components/ShopDetailSheet";
+import { TabBar } from "../components/TabBar";
 import type { Shop } from "../types/api";
 
 export default function MapScreen() {
@@ -218,7 +219,7 @@ export default function MapScreen() {
       {/* 店舗数表示 */}
       <YStack
         position="absolute"
-        bottom={30}
+        top={60}
         left={20}
         backgroundColor="$backgroundTransparent"
         padding="$3"
@@ -244,6 +245,9 @@ export default function MapScreen() {
           )}
         </Text>
       </YStack>
+
+      {/* タブバー */}
+      <TabBar user={user} />
 
       {/* 店舗詳細ボトムシート */}
       <ShopDetailSheet

@@ -6,6 +6,7 @@ import React from "react";
 import { YStack, Text, Button, ScrollView, Card, XStack } from "tamagui";
 import { useRouter } from "expo-router";
 import { useAuth } from "../contexts/AuthContext.web";
+import { TabBar } from "../components/TabBar";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -13,41 +14,47 @@ export default function HomeScreen() {
 
   if (!isAuthenticated) {
     return (
-      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
-        <Text
-          fontSize="$6"
-          fontWeight="bold"
-          textAlign="center"
-          marginBottom="$2"
-        >
-          🚀 GoToShisha
-        </Text>
-        <Text
-          fontSize="$4"
-          color="$gray10"
-          textAlign="center"
-          marginBottom="$4"
-        >
-          シーシャカフェを見つけよう
-        </Text>
-        <Button
-          marginTop="$4"
-          onPress={() => router.push("/routes/login")}
-          backgroundColor="$purple10"
-          borderRadius="$6"
-          size="$4"
-        >
-          <Text color="white" fontWeight="600">
-            ログインして始める
+      <YStack flex={1} backgroundColor="$backgroundSoft">
+        <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
+          <Text
+            fontSize="$6"
+            fontWeight="bold"
+            textAlign="center"
+            marginBottom="$2"
+          >
+            🚀 GoToShisha
           </Text>
-        </Button>
+          <Text
+            fontSize="$4"
+            color="$gray10"
+            textAlign="center"
+            marginBottom="$4"
+          >
+            シーシャカフェを見つけよう
+          </Text>
+          <Button
+            marginTop="$4"
+            onPress={() => router.push("/routes/login")}
+            backgroundColor="$purple10"
+            borderRadius="$6"
+            size="$4"
+          >
+            <Text color="white" fontWeight="600">
+              ログインして始める
+            </Text>
+          </Button>
+        </YStack>
+        
+        {/* タブバー */}
+        <TabBar user={user} />
       </YStack>
     );
   }
 
   return (
-    <ScrollView flex={1} backgroundColor="$backgroundSoft">
-      <YStack padding="$4" gap="$4">
+    <YStack flex={1} backgroundColor="$backgroundSoft">
+      <ScrollView flex={1}>
+        <YStack padding="$4" gap="$4" paddingBottom="$20">
         <YStack alignItems="center" marginBottom="$2">
           <Text
             fontSize="$9"
@@ -299,6 +306,10 @@ export default function HomeScreen() {
           </Card>
         </YStack>
       </YStack>
-    </ScrollView>
+      </ScrollView>
+      
+      {/* タブバー */}
+      <TabBar user={user} />
+    </YStack>
   );
 }

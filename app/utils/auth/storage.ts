@@ -4,6 +4,7 @@ import { UserInfo } from "./types";
 
 export interface AuthTokens {
   accessToken: string;
+  idToken?: string; // IDトークンを追加
   user: UserInfo;
 }
 
