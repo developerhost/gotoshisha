@@ -1,41 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import { YStack, Text, Button, ScrollView, Card, XStack, Avatar } from "tamagui";
 import { useRouter } from "expo-router";
-import { useAuth } from "../contexts/AuthContext.web";
 import { TabBar } from "../components/TabBar";
 import { ProfileEditSheet } from "../components/ProfileEditSheet";
-import { useProfile } from "../hooks/useProfile";
-import { UpdateProfileRequest } from "../utils/api/profile";
+import { useProfileManager } from "../hooks/useProfileManager";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, logout, isAuthenticated, getAccessToken } = useAuth();
-  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
-  
-  // ユーザーIDを取得（Auth0のsubフィールドから）
-  const userId = user?.sub;
-  
-  // プロフィール情報を取得・管理
-  const { profile, isLoading: isProfileLoading, updateProfile } = useProfile(
-    userId, 
-    getAccessToken, 
-    user ? {
-      email: user.email,
-      name: user.name,
-      picture: user.picture,
-    } : undefined
-  );
-
-  const handleProfileUpdate = async (updateData: UpdateProfileRequest) => {
-    await updateProfile(updateData);
-  };
-
-  const handleEditButtonClick = () => {
-    if (profile) {
-      setIsEditSheetOpen(true);
-    }
-    // プロフィール情報がまだ読み込まれていない場合は何もしない（ボタンがdisabledになる）
-  };
+  const {
+    user,
+    logout,
+    isAuthenticated,
+    profile,
+    isProfileLoading,
+    isEditSheetOpen,
+    handleProfileUpdate,
+    handleEditButtonClick,
+    handleEditSheetClose,
+  } = useProfileManager();
 
   if (!isAuthenticated) {
     return (
@@ -240,7 +222,7 @@ export default function ProfileScreen() {
       {profile && (
         <ProfileEditSheet
           isOpen={isEditSheetOpen}
-          onClose={() => setIsEditSheetOpen(false)}
+          onClose={handleEditSheetClose}
           userProfile={profile}
           onSave={handleProfileUpdate}
         />
