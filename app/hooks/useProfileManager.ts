@@ -1,8 +1,16 @@
+/**
+ * プロフィール管理カスタムフック
+ * 
+ * ユーザー認証状態とプロフィールデータの管理を一元化します。
+ * - 認証状態の取得（Auth0連携）
+ * - プロフィール情報の取得・更新
+ * - プロフィール編集シートの状態管理
+ * - プロフィール更新のハンドリング
+ */
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useProfile } from "./useProfile";
 import { UpdateProfileRequest } from "../utils/api/profile";
-
 /**
  * プロフィール管理のカスタムフック
  * プロフィールの取得、更新、編集シートの状態管理を一元化する
