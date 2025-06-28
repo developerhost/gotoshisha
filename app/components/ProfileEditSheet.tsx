@@ -99,13 +99,6 @@ export function ProfileEditSheet({
     }
   }, [isOpen, userProfile]);
 
-  // モーダルが閉じられた時に初期化フラグをリセット
-  useEffect(() => {
-    if (!isOpen) {
-      initializedRef.current = false;
-    }
-  }, [isOpen]);
-
   /**
    * プロフィールの保存処理
    * 
