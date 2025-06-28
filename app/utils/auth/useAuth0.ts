@@ -84,10 +84,10 @@ export function useAuth0(): UseAuth0Result {
   /**
    * 認証成功時の処理
    */
-  const handleAuthSuccess = useCallback(async (accessToken: string) => {
+  const handleAuthSuccess = useCallback(async (accessToken: string, idToken?: string) => {
     try {
       const userInfo = await Auth0Api.getUserInfo(accessToken);
-      await AuthStorage.save({ accessToken, user: userInfo });
+      await AuthStorage.save({ accessToken, idToken, user: userInfo });
       setUser(userInfo);
       setError(null);
     } catch (err) {
@@ -152,7 +152,7 @@ export function useAuth0(): UseAuth0Result {
             );
           }
 
-          await handleAuthSuccess(tokenResponse.accessToken);
+          await handleAuthSuccess(tokenResponse.accessToken, tokenResponse.idToken);
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error("トークン交換に失敗:", err);
@@ -244,6 +244,7 @@ export function useAuth0(): UseAuth0Result {
       const tokens = await AuthStorage.load();
       return tokens?.accessToken || null;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("アクセストークン取得エラー:", err);
       return null;
     }

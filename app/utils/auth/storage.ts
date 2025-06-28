@@ -10,6 +10,7 @@ export interface AuthTokens {
 
 export const AUTH_STORAGE_KEYS = {
   TOKEN: "auth0_token",
+  ID_TOKEN: "auth0_id_token",
   USER: "auth0_user",
 } as const;
 
@@ -26,12 +27,18 @@ export class AuthStorage {
     }
     if (Platform.OS === "web") {
       localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, tokens.accessToken);
+      if (tokens.idToken) {
+        localStorage.setItem(AUTH_STORAGE_KEYS.ID_TOKEN, tokens.idToken);
+      }
       localStorage.setItem(AUTH_STORAGE_KEYS.USER, JSON.stringify(tokens.user));
     } else {
       await SecureStore.setItemAsync(
         AUTH_STORAGE_KEYS.TOKEN,
         tokens.accessToken
       );
+      if (tokens.idToken) {
+        await SecureStore.setItemAsync(AUTH_STORAGE_KEYS.ID_TOKEN, tokens.idToken);
+      }
       await SecureStore.setItemAsync(
         AUTH_STORAGE_KEYS.USER,
         JSON.stringify(tokens.user)
@@ -46,22 +53,26 @@ export class AuthStorage {
     try {
       if (Platform.OS === "web") {
         const token = localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN);
+        const idToken = localStorage.getItem(AUTH_STORAGE_KEYS.ID_TOKEN);
         const userData = localStorage.getItem(AUTH_STORAGE_KEYS.USER);
 
         if (!token || !userData) return null;
 
         return {
           accessToken: token,
+          idToken: idToken || undefined,
           user: JSON.parse(userData) as UserInfo,
         };
       } else {
         const token = await SecureStore.getItemAsync(AUTH_STORAGE_KEYS.TOKEN);
+        const idToken = await SecureStore.getItemAsync(AUTH_STORAGE_KEYS.ID_TOKEN);
         const userData = await SecureStore.getItemAsync(AUTH_STORAGE_KEYS.USER);
 
         if (!token || !userData) return null;
 
         return {
           accessToken: token,
+          idToken: idToken || undefined,
           user: JSON.parse(userData),
         };
       }
@@ -79,9 +90,11 @@ export class AuthStorage {
     try {
       if (Platform.OS === "web") {
         localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(AUTH_STORAGE_KEYS.ID_TOKEN);
         localStorage.removeItem(AUTH_STORAGE_KEYS.USER);
       } else {
         await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.TOKEN);
+        await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.ID_TOKEN);
         await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.USER);
       }
     } catch (error) {
