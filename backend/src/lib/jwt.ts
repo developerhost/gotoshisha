@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import type { Env } from '@/types';
+import { getAudienceForEnvironment } from './auth-config';
 
 export interface Auth0User {
   sub: string;
@@ -13,15 +15,21 @@ export interface Auth0User {
  * Auth0 JWTトークンを検証してユーザー情報を取得
  * 本番環境用：適切な署名検証を実行
  */
-export async function verifyAuth0Token(token: string, auth0Domain?: string): Promise<Auth0User | null> {
+export async function verifyAuth0Token(
+  token: string, 
+  env?: Env,
+  auth0Domain?: string, 
+  audience?: string
+): Promise<Auth0User | null> {
   try {
-    const domain = auth0Domain || process.env.EXPO_PUBLIC_AUTH0_DOMAIN || 'dev-cz7g2cer3i7mpz25.jp.auth0.com';
+    const domain = auth0Domain || env?.EXPO_PUBLIC_AUTH0_DOMAIN || process.env.EXPO_PUBLIC_AUTH0_DOMAIN || 'dev-cz7g2cer3i7mpz25.jp.auth0.com';
+    const apiAudience = audience || (env ? getAudienceForEnvironment(env) : process.env.AUTH0_AUDIENCE || process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8787');
     const jwksUri = `https://${domain}/.well-known/jwks.json`;
     const jwks = createRemoteJWKSet(new URL(jwksUri));
     
     const { payload } = await jwtVerify(token, jwks, {
       issuer: `https://${domain}/`,
-      audience: 'http://localhost:8787', // あなたのAPI識別子に変更してください
+      audience: apiAudience,
     });
     
     return {

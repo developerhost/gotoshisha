@@ -294,7 +294,7 @@ app.put(
       // JWTからユーザー情報を取得（本番環境では verifyAuth0Token を使用）
       const decodedUser = decodeAuth0Token(token);
       // 本番環境では以下を使用:
-      // const decodedUser = await verifyAuth0Token(token, c.env.EXPO_PUBLIC_AUTH0_DOMAIN);
+      // const decodedUser = await verifyAuth0Token(token, c.env);
       if (!decodedUser || !decodedUser.sub) {
         return c.json({ 
           error: "無効な認証トークンです。" 
