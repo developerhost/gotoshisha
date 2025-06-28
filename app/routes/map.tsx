@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
+import { Platform } from "react-native";
 import { YStack, Text, Button, Spinner, XStack } from "tamagui";
-import MapView, { Marker } from "react-native-maps";
+import MapView, {
+  Marker,
+  PROVIDER_DEFAULT,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
@@ -123,7 +128,7 @@ export default function MapScreen() {
       <MapView
         style={{ flex: 1 }}
         initialCamera={initialCamera}
-        provider="google"
+        provider={Platform.OS === "ios" ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
         showsUserLocation={true}
         showsMyLocationButton={true}
         onRegionChangeComplete={handleRegionChangeComplete}
