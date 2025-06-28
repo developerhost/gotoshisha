@@ -7,7 +7,7 @@
  * @param onSave - プロフィール保存時のコールバック  
  */  
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React from "react";
 import { TextInput } from "react-native";
 import {
   YStack,
@@ -19,6 +19,7 @@ import {
   Sheet,
 } from "tamagui";
 import { UserProfile, UpdateProfileRequest } from "../utils/api/profile";
+import { useProfileEditForm } from "../hooks/useProfileEditForm";
 
 interface ProfileEditSheetProps {
   isOpen: boolean;
@@ -64,97 +65,21 @@ export function ProfileEditSheet({
   userProfile,
   onSave,
 }: ProfileEditSheetProps) {
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const initializedRef = useRef(false);
-
-  // 安定したハンドラー関数
-  /**
-   * 自己紹介テキストの変更ハンドラー
-   * 
-   * @param text - 新しい自己紹介テキスト
-   */
-  const handleBioChange = useCallback((text: string) => {
-    setBio(text);
-  }, []);
-
-  /**
-   * 名前の変更ハンドラー
-   * 
-   * @param text - 新しい名前
-   */
-  const handleNameChange = useCallback((text: string) => {
-    setName(text);
-  }, []);
-
-  // モーダルが開かれた時のみ初期値を設定
-  useEffect(() => {
-    if (isOpen && userProfile && !initializedRef.current) {
-      setName(userProfile.name || "");
-      setBio(userProfile.bio || "");
-      setError(null);
-      initializedRef.current = true;
-    }
-  }, [isOpen, userProfile]);
-
-  /**
-   * プロフィールの保存処理
-   * 
-   * 変更されたフィールドのみを抽出してサーバーに送信する。
-   * 変更がない場合は更新処理をスキップする。
-   */
-  const handleSave = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const updateData: UpdateProfileRequest = {};
-      
-      // 変更があった場合のみ更新データに含める
-      if (name !== userProfile.name) {
-        updateData.name = name;
-      }
-      if (bio !== userProfile.bio) {
-        updateData.bio = bio;
-      }
-
-      // 何も変更がない場合は更新をスキップ
-      if (Object.keys(updateData).length === 0) {
-        onClose();
-        return;
-      }
-
-      await onSave(updateData);
-      initializedRef.current = false;
-      onClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "更新に失敗しました");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * キャンセル処理
-   * 
-   * 編集内容を破棄して初期値にリセットし、シートを閉じる。
-   * 初期化フラグもリセットして次回開く際に正しく初期化されるようにする。
-   */
-  const handleCancel = () => {
-    // 変更を破棄してリセット
-    if (userProfile) {
-      setName(userProfile.name || "");
-      setBio(userProfile.bio || "");
-    } else {
-      setName("");
-      setBio("");
-    }
-    setError(null);
-    initializedRef.current = false;
-    onClose();
-  };
+  const {
+    name,
+    bio,
+    isLoading,
+    error,
+    handleNameChange,
+    handleBioChange,
+    handleSave,
+    handleCancel,
+  } = useProfileEditForm({
+    isOpen,
+    userProfile,
+    onSave,
+    onClose,
+  });
 
   return (
     <Sheet
