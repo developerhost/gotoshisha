@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
+import { Platform } from "react-native";
 import { YStack, Text, Button, Spinner, XStack } from "tamagui";
-import MapView, { Marker } from "react-native-maps";
+import MapView, {
+  Marker,
+  PROVIDER_DEFAULT,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
@@ -53,13 +58,21 @@ export default function MapScreen() {
       <YStack flex={1} justifyContent="center" alignItems="center">
         <Spinner size="large" color="$blue10" />
         <Text marginTop="$3" fontSize="$4">
-          {!isReady ? "地図を準備中..." : 
-           locationLoading ? `位置情報を取得中... (requested: ${hasRequestedLocation})` :
-           nearbyLoading || nearbyFetching ? `近くの店舗を検索中... (${latitude?.toFixed(4)}, ${longitude?.toFixed(4)})` :
-           fallbackLoading || fallbackFetching ? "店舗データを読み込み中..." :
-           hasLocationPermission && !nearbySuccess ? "位置情報データ待機中..." :
-           !hasLocationPermission && !fallbackSuccess ? "店舗データ待機中..." :
-           `データを処理中... (nearby: ${nearbyShopsCount}, fallback: ${fallbackShopsCount})`}
+          {!isReady
+            ? "地図を準備中..."
+            : locationLoading
+            ? `位置情報を取得中... (requested: ${hasRequestedLocation})`
+            : nearbyLoading || nearbyFetching
+            ? `近くの店舗を検索中... (${latitude?.toFixed(
+                4
+              )}, ${longitude?.toFixed(4)})`
+            : fallbackLoading || fallbackFetching
+            ? "店舗データを読み込み中..."
+            : hasLocationPermission && !nearbySuccess
+            ? "位置情報データ待機中..."
+            : !hasLocationPermission && !fallbackSuccess
+            ? "店舗データ待機中..."
+            : `データを処理中... (nearby: ${nearbyShopsCount}, fallback: ${fallbackShopsCount})`}
         </Text>
       </YStack>
     );
@@ -71,10 +84,17 @@ export default function MapScreen() {
     return (
       <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
         <Text fontSize="$5" color="$red10" textAlign="center" marginBottom="$3">
-          {locationError ? "位置情報の取得に失敗しました" : "店舗データの取得に失敗しました"}
+          {locationError
+            ? "位置情報の取得に失敗しました"
+            : "店舗データの取得に失敗しました"}
         </Text>
-        <Text fontSize="$3" color="$gray10" textAlign="center" marginBottom="$4">
-          {typeof error === 'string' ? error : error.message}
+        <Text
+          fontSize="$3"
+          color="$gray10"
+          textAlign="center"
+          marginBottom="$4"
+        >
+          {typeof error === "string" ? error : error.message}
           {locationError && !canRequestPermission && (
             <Text fontSize="$3" color="$gray10">
               {"\n"}設定で権限を許可してアプリに戻ると、自動的に再試行されます。
@@ -96,9 +116,8 @@ export default function MapScreen() {
 
   // マップの初期カメラ位置（現在位置または新宿）
   const initialCamera = {
-    center: latitude && longitude 
-      ? { latitude, longitude }
-      : SHINJUKU_COORDINATE,
+    center:
+      latitude && longitude ? { latitude, longitude } : SHINJUKU_COORDINATE,
     zoom: 13,
     heading: 0,
     pitch: 0,
@@ -109,7 +128,7 @@ export default function MapScreen() {
       <MapView
         style={{ flex: 1 }}
         initialCamera={initialCamera}
-        provider="google"
+        provider={Platform.OS === "ios" ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
         showsUserLocation={true}
         showsMyLocationButton={true}
         onRegionChangeComplete={handleRegionChangeComplete}
@@ -180,10 +199,11 @@ export default function MapScreen() {
           maxWidth="70%"
         >
           <Text fontSize="$2" color="$orange11" textAlign="left">
-            {typeof error === 'string' ? error : error.message}
+            {typeof error === "string" ? error : error.message}
             {locationError && !canRequestPermission && (
               <Text fontSize="$2" color="$gray10">
-                {"\n"}設定で権限を許可してアプリに戻ると、自動的に再試行されます。
+                {"\n"}
+                設定で権限を許可してアプリに戻ると、自動的に再試行されます。
               </Text>
             )}
           </Text>
@@ -233,8 +253,8 @@ export default function MapScreen() {
           📍 {shops.length}件の店舗を表示中
           {hasLocationPermission ? (
             <Text fontSize="$2" color="$gray10">
-              {isUsingCollectedShops 
-                ? "\n(マップ移動で収集した店舗を表示)" 
+              {isUsingCollectedShops
+                ? "\n(マップ移動で収集した店舗を表示)"
                 : "\n(現在地から20km圏内)"}
             </Text>
           ) : (
