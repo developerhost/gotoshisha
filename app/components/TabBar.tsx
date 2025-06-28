@@ -1,3 +1,8 @@
+/**
+ * タブバーコンポーネント
+ * ホーム、マップ、プロフィールページ間のナビゲーションを提供する
+ * 現在のルートに基づいてアクティブタブをハイライト表示する
+ */
 import { XStack, YStack, Button, Text } from "tamagui";
 import { useRouter, usePathname } from "expo-router";
 
@@ -8,10 +13,31 @@ interface TabBarProps {
   } | null;
 }
 
+/**
+ * タブバーコンポーネント
+ * 
+ * アプリの下部に固定表示されるナビゲーションバー。
+ * ホーム、マップ、プロフィールの3つのタブを提供する。
+ * 
+ * @param props - タブバーのプロパティ
+ * @param props.user - ユーザー情報（将来の拡張用、現在未使用）
+ * @returns タブバーのJSXエレメント
+ * 
+ * @example
+ * ```tsx
+ * <TabBar user={user} />
+ * ```
+ */
 export function TabBar({ user: _ }: TabBarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
+  /**
+   * 指定されたルートが現在アクティブかどうかを判定
+   * 
+   * @param route - チェックするルートパス
+   * @returns 現在のパスと一致する場合はtrue
+   */
   const isActive = (route: string) => pathname === route;
 
   return (

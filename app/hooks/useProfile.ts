@@ -1,3 +1,15 @@
+/**
+ * ユーザープロフィールの取得・更新・キャッシュ管理を行うReact Queryベースのカスタムフック。
+ * 認証情報とユーザー情報を組み合わせて、効率的にプロフィール操作を実現する。
+ * 
+ * 主な機能:
+ * - プロフィール情報の取得（React Query自動キャッシュ）
+ * - プロフィール更新（楽観的更新対応）
+ * - 認証トークンの自動取得・送信
+ * - エラーハンドリング
+ * - リアルタイムキャッシュ更新
+ */
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getUserProfile,
@@ -7,6 +19,26 @@ import {
 
 /**
  * プロフィール管理用のカスタムフック
+ * 
+ * ユーザープロフィールの取得と更新機能を提供する。
+ * React Queryを使用してキャッシュ管理と楽観的更新を実現する。
+ * 
+ * @param userId - 取得・更新対象のユーザーID
+ * @param getAccessToken - アクセストークン取得関数（認証用）
+ * @param userInfo - 初回作成時のユーザー情報（Auth0から取得）
+ * @returns プロフィール操作のためのクエリとミューテーション関数
+ * 
+ * @example
+ * ```tsx
+ * const { profile, isLoading, updateProfile } = useProfile(
+ *   user?.sub,
+ *   getAccessTokenSilently,
+ *   user
+ * );
+ * 
+ * // プロフィール更新
+ * await updateProfile({ name: '新しい名前', bio: '新しい自己紹介' });
+ * ```
  */
 export function useProfile(
   userId: string | undefined, 

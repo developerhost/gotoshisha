@@ -1,3 +1,12 @@
+/**  
+ * プロフィール編集用のシートコンポーネント  
+ * ユーザーの名前と自己紹介を編集するモーダルシートを提供する  
+ * @param isOpen - シートの表示状態  
+ * @param onClose - シートを閉じる際のコールバック  
+ * @param userProfile - 編集対象のユーザープロフィール  
+ * @param onSave - プロフィール保存時のコールバック  
+ */  
+
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { TextInput } from "react-native";
 import {
@@ -22,9 +31,33 @@ interface ProfileEditSheetProps {
     createdAt: string;
     avatar?: string;
   };
+  /** プロフィール保存時のコールバック関数 */
   onSave: (profile: UpdateProfileRequest) => Promise<void>;
 }
 
+/**
+ * プロフィール編集シートコンポーネント
+ * 
+ * ボトムシート形式でプロフィール編集フォームを表示する。
+ * 名前と自己紹介を編集でき、適切なバリデーションとエラーハンドリングを提供する。
+ * 
+ * @param props - プロフィール編集シートのプロパティ
+ * @param props.isOpen - シートの表示状態
+ * @param props.onClose - シートを閉じる際のコールバック
+ * @param props.userProfile - 編集対象のプロフィール情報
+ * @param props.onSave - 保存時のコールバック関数
+ * @returns プロフィール編集シートのJSXエレメント
+ * 
+ * @example
+ * ```tsx
+ * <ProfileEditSheet
+ *   isOpen={isEditSheetOpen}
+ *   onClose={() => setIsEditSheetOpen(false)}
+ *   userProfile={profile}
+ *   onSave={handleProfileUpdate}
+ * />
+ * ```
+ */
 export function ProfileEditSheet({
   isOpen,
   onClose,
@@ -38,10 +71,20 @@ export function ProfileEditSheet({
   const initializedRef = useRef(false);
 
   // 安定したハンドラー関数
+  /**
+   * 自己紹介テキストの変更ハンドラー
+   * 
+   * @param text - 新しい自己紹介テキスト
+   */
   const handleBioChange = useCallback((text: string) => {
     setBio(text);
   }, []);
 
+  /**
+   * 名前の変更ハンドラー
+   * 
+   * @param text - 新しい名前
+   */
   const handleNameChange = useCallback((text: string) => {
     setName(text);
   }, []);
@@ -63,6 +106,12 @@ export function ProfileEditSheet({
     }
   }, [isOpen]);
 
+  /**
+   * プロフィールの保存処理
+   * 
+   * 変更されたフィールドのみを抽出してサーバーに送信する。
+   * 変更がない場合は更新処理をスキップする。
+   */
   const handleSave = async () => {
     try {
       setIsLoading(true);
@@ -94,6 +143,12 @@ export function ProfileEditSheet({
     }
   };
 
+  /**
+   * キャンセル処理
+   * 
+   * 編集内容を破棄して初期値にリセットし、シートを閉じる。
+   * 初期化フラグもリセットして次回開く際に正しく初期化されるようにする。
+   */
   const handleCancel = () => {
     // 変更を破棄してリセット
     if (userProfile) {
