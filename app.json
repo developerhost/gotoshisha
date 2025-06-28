@@ -11,15 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "assets/**/*",
-      "app/assets/**/*"
-    ],
+    "assetBundlePatterns": ["assets/**/*", "app/assets/**/*"],
     "updates": {
-      "assetPatternsToBeBundled": [
-        "assets/**/*.png",
-        "app/assets/**/*.png"
-      ]
+      "assetPatternsToBeBundled": ["assets/**/*.png", "app/assets/**/*.png"]
     },
     "ios": {
       "supportsTablet": true,
@@ -36,10 +30,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.gotoshisha.app",
-      "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
-      ]
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -47,6 +38,7 @@
     "scheme": "gotoshisha",
     "platforms": ["ios", "android", "web"],
 
+    "plugins": ["expo-dev-client"],
     "extra": {
       "router": {
         "origin": false
