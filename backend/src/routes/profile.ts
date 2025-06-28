@@ -1,3 +1,12 @@
+/**
+ * プロフィールAPI ルート
+ * 
+ * ユーザープロフィールの取得・更新を行うAPIエンドポイントを提供します。
+ * - POST /:userId/get - プロフィール取得（ユーザー情報付き）
+ * - GET /:userId - プロフィール取得（後方互換性）
+ * - PUT /:userId - プロフィール更新（要認証）
+ */
+
 import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client";
 import { PrismaD1 } from "@prisma/adapter-d1";
