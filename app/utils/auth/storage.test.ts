@@ -145,6 +145,7 @@ describe("AuthStorage", () => {
       it("SecureStoreからトークンを読み込める", async () => {
         vi.mocked(SecureStore.getItemAsync)
           .mockResolvedValueOnce(mockTokens.accessToken)
+          .mockResolvedValueOnce(null) // ID_TOKEN
           .mockResolvedValueOnce(JSON.stringify(mockTokens.user));
 
         const result = await AuthStorage.load();
@@ -152,6 +153,9 @@ describe("AuthStorage", () => {
         expect(result).toEqual(mockTokens);
         expect(SecureStore.getItemAsync).toHaveBeenCalledWith(
           AUTH_STORAGE_KEYS.TOKEN
+        );
+        expect(SecureStore.getItemAsync).toHaveBeenCalledWith(
+          AUTH_STORAGE_KEYS.ID_TOKEN
         );
         expect(SecureStore.getItemAsync).toHaveBeenCalledWith(
           AUTH_STORAGE_KEYS.USER
