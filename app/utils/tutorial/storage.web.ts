@@ -2,18 +2,19 @@
  * チュートリアル表示履歴の管理 (Web専用)
  */
 
-const TUTORIAL_COMPLETED_KEY = 'tutorial_completed';
+const TUTORIAL_COMPLETED_KEY = "tutorial_completed";
 
 /**
  * チュートリアルが完了済みかどうかを確認する
+ * @returns {Promise<boolean>} チュートリアル完了状態
  */
 export const isTutorialCompleted = async (): Promise<boolean> => {
   try {
     const value = localStorage.getItem(TUTORIAL_COMPLETED_KEY);
-    return value === 'true';
+    return value === "true";
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Failed to check tutorial status:', error);
+    console.error("Failed to check tutorial status:", error);
     return false;
   }
 };
@@ -23,10 +24,10 @@ export const isTutorialCompleted = async (): Promise<boolean> => {
  */
 export const setTutorialCompleted = async (): Promise<void> => {
   try {
-    localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+    localStorage.setItem(TUTORIAL_COMPLETED_KEY, "true");
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Failed to save tutorial status:', error);
+    console.error("Failed to save tutorial status:", error);
   }
 };
 
@@ -38,6 +39,6 @@ export const resetTutorialStatus = async (): Promise<void> => {
     localStorage.removeItem(TUTORIAL_COMPLETED_KEY);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Failed to reset tutorial status:', error);
+    console.error("Failed to reset tutorial status:", error);
   }
 };
