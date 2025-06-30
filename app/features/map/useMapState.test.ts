@@ -1,7 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Region } from "react-native-maps";
 import type { Shop } from "../../types/api";
-import { validateShop, filterValidShops } from "./useMapState";
+import {
+  validateShop,
+  filterValidShops,
+  calculateSearchRadius,
+  combineLoadingState,
+  selectShops,
+  hasLocationPermission,
+} from "./useMapState";
 
 /**
  * useMapStateのロジック関数のテスト
@@ -84,15 +91,6 @@ describe("useMapState ロジック関数", () => {
      * 検索半径計算ロジックのテスト
      * latitudeDelta から適切な半径を計算する
      */
-    const calculateSearchRadius = (region: Region) => {
-      // latitudeDeltaから半径を推定（1度 ≈ 111km）
-      const viewportKm = region.latitudeDelta * 111;
-
-      // ビューポートの半分程度を検索範囲とし、最小5km、最大5000kmに制限
-      const radius = Math.max(5, Math.min(5000, viewportKm * 0.6));
-
-      return Math.round(radius);
-    };
 
     it("小さなlatitudeDeltaで最小値に制限される", () => {
       const region: Region = {
@@ -313,14 +311,6 @@ describe("useMapState ロジック関数", () => {
     /**
      * ローディング状態統合ロジックのテスト
      */
-    const combineLoadingState = (
-      isReady: boolean,
-      locationLoading: boolean,
-      nearbyLoading: boolean,
-      fallbackLoading: boolean
-    ): boolean => {
-      return !isReady || locationLoading || nearbyLoading || fallbackLoading;
-    };
 
     it("準備完了前はローディング中", () => {
       expect(combineLoadingState(false, false, false, false)).toBe(true);
@@ -347,23 +337,6 @@ describe("useMapState ロジック関数", () => {
     /**
      * 店舗データ優先順位ロジックのテスト
      */
-    const selectShops = (
-      collectedShops: Shop[],
-      latitude: number | null,
-      longitude: number | null,
-      nearbyShops: Shop[] | undefined,
-      fallbackShops: Shop[] | undefined
-    ): Shop[] => {
-      if (collectedShops.length > 0) {
-        return collectedShops;
-      }
-
-      if (latitude && longitude && nearbyShops) {
-        return nearbyShops;
-      }
-
-      return fallbackShops || [];
-    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const createMockShop = (overrides: any = {}): Shop => ({
@@ -430,12 +403,6 @@ describe("useMapState ロジック関数", () => {
     /**
      * 位置情報権限状態判定ロジックのテスト
      */
-    const hasLocationPermission = (
-      latitude: number | null,
-      longitude: number | null
-    ): boolean => {
-      return latitude !== null && longitude !== null;
-    };
 
     it("緯度経度両方あれば権限ありと判定", () => {
       expect(hasLocationPermission(35.681236, 139.767125)).toBe(true);

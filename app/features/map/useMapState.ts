@@ -39,6 +39,63 @@ export const filterValidShops = (shops: unknown[]): Shop[] => {
 };
 
 /**
+ * ズームレベルに基づいて適切な検索半径を計算
+ */
+export const calculateSearchRadius = (region: Region) => {
+  // latitudeDeltaから半径を推定（1度 ≈ 111km）
+  const viewportKm = region.latitudeDelta * 111;
+
+  // ビューポートの半分程度を検索範囲とし、最小5km、最大5000kmに制限
+  // 5000kmあれば大陸レベルの検索が可能
+  const radius = Math.max(5, Math.min(5000, viewportKm * 0.6));
+
+  return Math.round(radius);
+};
+
+/**
+ * ローディング状態の統合
+ */
+export const combineLoadingState = (
+  isReady: boolean,
+  locationLoading: boolean,
+  nearbyLoading: boolean,
+  fallbackLoading: boolean
+): boolean => {
+  return !isReady || locationLoading || nearbyLoading || fallbackLoading;
+};
+
+/**
+ * 店舗データの選択（収集された店舗データを優先）
+ */
+export const selectShops = (
+  collectedShops: Shop[],
+  latitude: number | null,
+  longitude: number | null,
+  nearbyShops: Shop[] | undefined,
+  fallbackShops: Shop[] | undefined
+): Shop[] => {
+  if (collectedShops.length > 0) {
+    return collectedShops;
+  }
+
+  if (latitude && longitude && nearbyShops) {
+    return nearbyShops;
+  }
+
+  return fallbackShops || [];
+};
+
+/**
+ * 位置情報権限の有無を判定
+ */
+export const hasLocationPermission = (
+  latitude: number | null,
+  longitude: number | null
+): boolean => {
+  return latitude !== null && longitude !== null;
+};
+
+/**
  * アセットのプリロードとキャッシュ
  * https://docs.expo.dev/archive/classic-updates/preloading-and-caching-assets/#pre-loading-and-caching-assets
  */
@@ -173,26 +230,19 @@ export function useMapState() {
   ]);
 
   // ズームレベルに基づいて適切な検索半径を計算
-  const calculateSearchRadius = useCallback((region: Region) => {
-    // latitudeDeltaから半径を推定（1度 ≈ 111km）
-    const viewportKm = region.latitudeDelta * 111;
-
-    // ビューポートの半分程度を検索範囲とし、最小5km、最大5000kmに制限
-    // 5000kmあれば大陸レベルの検索が可能
-    const radius = Math.max(5, Math.min(5000, viewportKm * 0.6));
-
-    return Math.round(radius);
+  const calculateRadius = useCallback((region: Region) => {
+    return calculateSearchRadius(region);
   }, []);
 
   // マップ領域変更時のコールバック
   const handleRegionChangeComplete = useCallback(
     async (region: Region) => {
-      const radius = calculateSearchRadius(region);
+      const radius = calculateRadius(region);
       setCurrentRegion(region);
       // ズームレベルに応じた範囲で店舗データを収集
       await collectShopsFromArea(region.latitude, region.longitude, radius);
     },
-    [calculateSearchRadius, collectShopsFromArea]
+    [calculateRadius, collectShopsFromArea]
   );
 
   // 位置情報再取得用の関数
@@ -202,17 +252,22 @@ export function useMapState() {
   }, [requestLocation]);
 
   // ローディング状態の統合
-  const isLoading =
-    !isReady || locationLoading || nearbyLoading || fallbackLoading;
+  const isLoading = combineLoadingState(
+    isReady,
+    locationLoading,
+    nearbyLoading,
+    fallbackLoading
+  );
   const error = locationError || nearbyError || fallbackError;
 
   // 店舗データの選択（収集された店舗データを優先）
-  const shops =
-    collectedShops.length > 0
-      ? collectedShops
-      : (latitude && longitude
-          ? nearbyShopsData?.shops
-          : fallbackShopsData?.shops) || [];
+  const shops = selectShops(
+    collectedShops,
+    latitude,
+    longitude,
+    nearbyShopsData?.shops,
+    fallbackShopsData?.shops
+  );
 
   // 店舗データの安全性チェック
   const validShops = filterValidShops(shops);
@@ -252,7 +307,7 @@ export function useMapState() {
     hasRequestedLocation,
 
     // メタ情報
-    hasLocationPermission: !!(latitude && longitude),
+    hasLocationPermission: hasLocationPermission(latitude, longitude),
     isUsingCollectedShops: collectedShops.length > 0,
   };
 }
