@@ -22,7 +22,7 @@ import type {
  * Shop型の型ガード関数
  * オブジェクトが有効なShop型であるかチェックする
  */
-function isValidShop(shop: unknown): shop is Shop {
+export function isValidShop(shop: unknown): shop is Shop {
   return !!(
     shop &&
     typeof shop === "object" &&

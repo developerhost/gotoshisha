@@ -4,31 +4,7 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Shop } from "../../types/api";
-
-// useShops.tsから関数をインポート（内部実装をテスト用にエクスポートする必要がある）
-// 実際のフックのテストはReact環境が必要なため、ここではロジック関数のテストを実施
-
-/**
- * isValidShop関数のテスト用実装
- * 実際の関数と同じロジックをテスト
- */
-function isValidShop(shop: unknown): shop is Shop {
-  return !!(
-    shop &&
-    typeof shop === "object" &&
-    shop !== null &&
-    "id" in shop &&
-    "name" in shop &&
-    "latitude" in shop &&
-    "longitude" in shop &&
-    typeof (shop as Shop).id === "string" &&
-    typeof (shop as Shop).name === "string" &&
-    (typeof (shop as Shop).latitude === "number" ||
-      (shop as Shop).latitude === null) &&
-    (typeof (shop as Shop).longitude === "number" ||
-      (shop as Shop).longitude === null)
-  );
-}
+import { isValidShop } from "./useShops";
 
 // テスト用のダミーデータ
 const mockShop: Shop = {
