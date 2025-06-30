@@ -1,10 +1,10 @@
 /**
  * 位置情報取得のカスタムフック
  */
-import { useState, useEffect, useCallback } from 'react';
-import * as Location from 'expo-location';
-import { Linking, AppState } from 'react-native';
-import { SHINJUKU_COORDINATE } from '../constants/location';
+import { useState, useEffect, useCallback } from "react";
+import * as Location from "expo-location";
+import { Linking, AppState } from "react-native";
+import { SHINJUKU_COORDINATE } from "../constants/location";
 
 export interface LocationState {
   latitude: number | null;
@@ -33,20 +33,23 @@ export const useLocation = () => {
       await Linking.openSettings();
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('設定画面を開けませんでした:', error);
+      console.error("設定画面を開けませんでした:", error);
     }
   }, []);
 
   const requestLocation = useCallback(async () => {
-    setLocation(prev => ({ ...prev, isLoading: true, error: null }));
+    setLocation((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       // まず現在の権限状態をチェック
       const currentPermissions = await Location.getForegroundPermissionsAsync();
-      
-      if (currentPermissions.status === 'denied' && !currentPermissions.canAskAgain) {
+
+      if (
+        currentPermissions.status === "denied" &&
+        !currentPermissions.canAskAgain
+      ) {
         // 権限が永続的に拒否されている場合は、設定画面への誘導メッセージを表示
-        setLocation(prev => ({
+        setLocation((prev) => ({
           ...prev,
           latitude: SHINJUKU_COORDINATE.latitude,
           longitude: SHINJUKU_COORDINATE.longitude,
@@ -54,7 +57,8 @@ export const useLocation = () => {
           hasPermission: false,
           isUsingFallback: true,
           canRequestPermission: false,
-          error: '位置情報の権限が拒否されています。設定から権限を有効にしてください。新宿駅周辺を表示しています。',
+          error:
+            "位置情報の権限が拒否されています。設定から権限を有効にしてください。新宿駅周辺を表示しています。",
         }));
         return;
       }
@@ -63,11 +67,11 @@ export const useLocation = () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
 
       // eslint-disable-next-line no-console
-      console.log('位置情報の権限ステータス:', status);
+      console.log("位置情報の権限ステータス:", status);
 
       // 権限が完全に拒否された場合のみフォールバック
-      if (status === 'denied') {
-        setLocation(prev => ({
+      if (status === "denied") {
+        setLocation((prev) => ({
           ...prev,
           latitude: SHINJUKU_COORDINATE.latitude,
           longitude: SHINJUKU_COORDINATE.longitude,
@@ -75,9 +79,9 @@ export const useLocation = () => {
           hasPermission: false,
           isUsingFallback: true,
           canRequestPermission: currentPermissions.canAskAgain,
-          error: currentPermissions.canAskAgain 
-            ? '位置情報の権限が拒否されました。新宿駅周辺を表示しています。'
-            : '位置情報の権限が拒否されています。設定から権限を有効にしてください。新宿駅周辺を表示しています。',
+          error: currentPermissions.canAskAgain
+            ? "位置情報の権限が拒否されました。新宿駅周辺を表示しています。"
+            : "位置情報の権限が拒否されています。設定から権限を有効にしてください。新宿駅周辺を表示しています。",
         }));
         return;
       }
@@ -111,7 +115,7 @@ export const useLocation = () => {
         }
       } catch (lastKnownError) {
         // eslint-disable-next-line no-console
-        console.log('最後に知られた位置の取得に失敗:', lastKnownError);
+        console.log("最後に知られた位置の取得に失敗:", lastKnownError);
       }
 
       // バックグラウンドでより精密な現在位置を取得
@@ -125,7 +129,7 @@ export const useLocation = () => {
         // console.log('現在位置:', currentLocation);
 
         // より精密な位置で更新（ローディングを確実に解除）
-        setLocation(prev => ({
+        setLocation((prev) => ({
           ...prev,
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
@@ -138,29 +142,31 @@ export const useLocation = () => {
       } catch (currentLocationError) {
         // 精密な位置取得に失敗した場合、大まかな位置があればエラーにしない
         if (!hasQuickLocation) {
-          setLocation(prev => ({
+          setLocation((prev) => ({
             ...prev,
             latitude: SHINJUKU_COORDINATE.latitude,
             longitude: SHINJUKU_COORDINATE.longitude,
             isLoading: false,
             isUsingFallback: true,
             canRequestPermission: true,
-            error: '位置情報の取得に失敗しました。新宿駅周辺を表示しています。',
+            error: "位置情報の取得に失敗しました。新宿駅周辺を表示しています。",
           }));
         }
         // eslint-disable-next-line no-console
-        console.log('精密な位置の取得に失敗:', currentLocationError);
+        console.log("精密な位置の取得に失敗:", currentLocationError);
       }
-
     } catch (error) {
-      setLocation(prev => ({
+      setLocation((prev) => ({
         ...prev,
         latitude: SHINJUKU_COORDINATE.latitude,
         longitude: SHINJUKU_COORDINATE.longitude,
         isLoading: false,
         isUsingFallback: true,
         canRequestPermission: true,
-        error: error instanceof Error ? error.message : '位置情報の取得に失敗しました。新宿駅周辺を表示しています。',
+        error:
+          error instanceof Error
+            ? error.message
+            : "位置情報の取得に失敗しました。新宿駅周辺を表示しています。",
       }));
     }
   }, []);
@@ -170,9 +176,9 @@ export const useLocation = () => {
     try {
       const { status } = await Location.getForegroundPermissionsAsync();
       // granted または undetermined の場合は権限ありとして扱う
-      const hasPermission = status === 'granted' || status === 'undetermined';
-      
-      setLocation(prev => ({
+      const hasPermission = status === "granted" || status === "undetermined";
+
+      setLocation((prev) => ({
         ...prev,
         hasPermission,
       }));
@@ -188,7 +194,7 @@ export const useLocation = () => {
           // console.log('初期化時の最後に知られた位置:', lastKnownLocation);
 
           if (lastKnownLocation) {
-            setLocation(prev => ({
+            setLocation((prev) => ({
               ...prev,
               latitude: lastKnownLocation.coords.latitude,
               longitude: lastKnownLocation.coords.longitude,
@@ -198,12 +204,15 @@ export const useLocation = () => {
           }
         } catch (lastKnownError) {
           // eslint-disable-next-line no-console
-          console.log('初期化時の最後に知られた位置の取得に失敗:', lastKnownError);
+          console.log(
+            "初期化時の最後に知られた位置の取得に失敗:",
+            lastKnownError
+          );
         }
       }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('位置情報権限の確認に失敗:', error);
+      console.error("位置情報権限の確認に失敗:", error);
     }
   };
 
@@ -212,12 +221,15 @@ export const useLocation = () => {
 
     // アプリ状態の変化を監視
     const handleAppStateChange = async (nextAppState: string) => {
-      if (nextAppState === 'active') {
+      if (nextAppState === "active") {
         // フォアグラウンドに戻ったときに権限状態をチェック
         const { status } = await Location.getForegroundPermissionsAsync();
-        
+
         // 以前に権限が拒否されていて、現在は許可されている場合は自動再試行
-        if (status === 'granted' && (!location.hasPermission || location.isUsingFallback)) {
+        if (
+          status === "granted" &&
+          (!location.hasPermission || location.isUsingFallback)
+        ) {
           // 少し遅延を入れてから再試行（設定画面からの復帰を確実にするため）
           setTimeout(() => {
             requestLocation();
@@ -226,7 +238,10 @@ export const useLocation = () => {
       }
     };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
 
     return () => {
       subscription?.remove();
