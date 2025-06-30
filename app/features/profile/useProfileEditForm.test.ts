@@ -21,6 +21,30 @@ const mockUserProfileMinimal = {
   createdAt: "2023-01-01T00:00:00Z",
 };
 
+// 共通のフォーム初期化ロジック
+const getInitialFormValues = (
+  userProfile:
+    | UserProfile
+    | {
+        id: string;
+        email: string;
+        name?: string;
+        bio?: string;
+        createdAt: string;
+        avatar?: string;
+      }
+    | null
+) => {
+  if (!userProfile) {
+    return { name: "", bio: "" };
+  }
+
+  return {
+    name: userProfile.name || "",
+    bio: userProfile.bio || "",
+  };
+};
+
 describe("useProfileEditForm ロジック関数", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -30,28 +54,7 @@ describe("useProfileEditForm ロジック関数", () => {
     /**
      * プロフィールデータから初期値を生成するロジック
      */
-    const initializeFormData = (
-      userProfile:
-        | UserProfile
-        | {
-            id: string;
-            email: string;
-            name?: string;
-            bio?: string;
-            createdAt: string;
-            avatar?: string;
-          }
-        | null
-    ) => {
-      if (!userProfile) {
-        return { name: "", bio: "" };
-      }
-
-      return {
-        name: userProfile.name || "",
-        bio: userProfile.bio || "",
-      };
-    };
+    const initializeFormData = getInitialFormValues;
 
     it("完全なユーザープロフィールから正しい初期値を生成する", () => {
       const result = initializeFormData(mockUserProfile);
@@ -281,58 +284,6 @@ describe("useProfileEditForm ロジック関数", () => {
 
     it("undefinedエラーの場合はデフォルトメッセージを返す", () => {
       expect(extractErrorMessage(undefined)).toBe("更新に失敗しました");
-    });
-  });
-
-  describe("フォームリセットロジック", () => {
-    /**
-     * フォームを初期値にリセットするロジック
-     */
-    const resetFormToInitialValues = (
-      userProfile:
-        | UserProfile
-        | {
-            id: string;
-            email: string;
-            name?: string;
-            bio?: string;
-            createdAt: string;
-            avatar?: string;
-          }
-        | null
-    ) => {
-      if (!userProfile) {
-        return { name: "", bio: "" };
-      }
-
-      return {
-        name: userProfile.name || "",
-        bio: userProfile.bio || "",
-      };
-    };
-
-    it("完全なプロフィールから正しい初期値を生成する", () => {
-      const result = resetFormToInitialValues(mockUserProfile);
-      expect(result).toEqual({
-        name: "Test User",
-        bio: "テストユーザーの自己紹介",
-      });
-    });
-
-    it("部分的なプロフィールを正しく処理する", () => {
-      const result = resetFormToInitialValues(mockUserProfileMinimal);
-      expect(result).toEqual({
-        name: "",
-        bio: "",
-      });
-    });
-
-    it("nullプロフィールは空文字で初期化する", () => {
-      const result = resetFormToInitialValues(null);
-      expect(result).toEqual({
-        name: "",
-        bio: "",
-      });
     });
   });
 
