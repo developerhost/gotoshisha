@@ -81,22 +81,22 @@ describe("useShops ロジック関数", () => {
     it("必須フィールドが欠けている場合はfalseを返す", () => {
       const invalidShop = { ...mockShop };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (invalidShop as any).id;
+      (invalidShop as any).id = undefined;
       expect(isValidShop(invalidShop)).toBe(false);
 
       const noName = { ...mockShop };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (noName as any).name;
+      (noName as any).name = undefined;
       expect(isValidShop(noName)).toBe(false);
 
       const noLatitude = { ...mockShop };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (noLatitude as any).latitude;
+      (noLatitude as any).latitude = undefined;
       expect(isValidShop(noLatitude)).toBe(false);
 
       const noLongitude = { ...mockShop };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (noLongitude as any).longitude;
+      (noLongitude as any).longitude = undefined;
       expect(isValidShop(noLongitude)).toBe(false);
     });
 
