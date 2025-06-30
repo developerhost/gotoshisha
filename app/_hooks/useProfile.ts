@@ -1,7 +1,7 @@
 /**
  * ユーザープロフィールの取得・更新・キャッシュ管理を行うReact Queryベースのカスタムフック。
  * 認証情報とユーザー情報を組み合わせて、効率的にプロフィール操作を実現する。
- * 
+ *
  * 主な機能:
  * - プロフィール情報の取得（React Query自動キャッシュ）
  * - プロフィール更新（楽観的更新対応）
@@ -19,15 +19,15 @@ import {
 
 /**
  * プロフィール管理用のカスタムフック
- * 
+ *
  * ユーザープロフィールの取得と更新機能を提供する。
  * React Queryを使用してキャッシュ管理と楽観的更新を実現する。
- * 
+ *
  * @param userId - 取得・更新対象のユーザーID
  * @param getAccessToken - アクセストークン取得関数（認証用）
  * @param userInfo - 初回作成時のユーザー情報（Auth0から取得）
  * @returns プロフィール操作のためのクエリとミューテーション関数
- * 
+ *
  * @example
  * ```tsx
  * const { profile, isLoading, updateProfile } = useProfile(
@@ -35,18 +35,18 @@ import {
  *   getAccessTokenSilently,
  *   user
  * );
- * 
+ *
  * // プロフィール更新
  * await updateProfile({ name: '新しい名前', bio: '新しい自己紹介' });
  * ```
  */
 export function useProfile(
-  userId: string | undefined, 
+  userId: string | undefined,
   getAccessToken?: () => Promise<string | null>,
   userInfo?: { email?: string; name?: string; picture?: string }
 ) {
   const queryClient = useQueryClient();
-  
+
   // プロフィール取得
   const {
     data: profile,
@@ -63,7 +63,10 @@ export function useProfile(
     staleTime: 5 * 60 * 1000, // 5分間キャッシュ
     retry: (failureCount, error) => {
       // 404エラー（ユーザーが見つからない）の場合はリトライしない
-      if (error instanceof Error && error.message.includes('ユーザーが見つかりません')) {
+      if (
+        error instanceof Error &&
+        error.message.includes("ユーザーが見つかりません")
+      ) {
         return false;
       }
       return failureCount < 3;
@@ -72,7 +75,13 @@ export function useProfile(
 
   // プロフィール更新
   const updateMutation = useMutation({
-    mutationFn: async ({ userId, profile }: { userId: string; profile: UpdateProfileRequest }) => {
+    mutationFn: async ({
+      userId,
+      profile,
+    }: {
+      userId: string;
+      profile: UpdateProfileRequest;
+    }) => {
       const token = getAccessToken ? await getAccessToken() : undefined;
       return updateUserProfile(userId, profile, token || undefined);
     },

@@ -1,12 +1,12 @@
 /**
  * プロフィール編集フォーム管理カスタムフック
- * 
+ *
  * プロフィール編集シートのフォーム状態とロジックを管理するカスタムフックです。
  * - フォーム入力値の状態管理（名前、自己紹介）
  * - 編集状態の管理（ローディング、エラー、初期化フラグ）
  * - 保存・キャンセル処理の実装
  * - フォームの初期化とバリデーション
- * 
+ *
  * @param isOpen - シートの表示状態
  * @param userProfile - 編集対象のユーザープロフィール
  * @param onSave - プロフィール保存コールバック
@@ -19,14 +19,17 @@ import { UpdateProfileRequest, UserProfile } from "../utils/api/profile";
 
 interface UseProfileEditFormParams {
   isOpen: boolean;
-  userProfile: UserProfile | {
-    id: string;
-    email: string;
-    name?: string;
-    bio?: string;
-    createdAt: string;
-    avatar?: string;
-  } | null;
+  userProfile:
+    | UserProfile
+    | {
+        id: string;
+        email: string;
+        name?: string;
+        bio?: string;
+        createdAt: string;
+        avatar?: string;
+      }
+    | null;
   onSave: (profile: UpdateProfileRequest) => Promise<void>;
   onClose: () => void;
 }
@@ -45,7 +48,7 @@ export const useProfileEditForm = ({
 
   /**
    * 自己紹介テキストの変更ハンドラー
-   * 
+   *
    * @param text - 新しい自己紹介テキスト
    */
   const handleBioChange = useCallback((text: string) => {
@@ -54,7 +57,7 @@ export const useProfileEditForm = ({
 
   /**
    * 名前の変更ハンドラー
-   * 
+   *
    * @param text - 新しい名前
    */
   const handleNameChange = useCallback((text: string) => {
@@ -73,7 +76,7 @@ export const useProfileEditForm = ({
 
   /**
    * プロフィールの保存処理
-   * 
+   *
    * 変更されたフィールドのみを抽出してサーバーに送信する。
    * 変更がない場合は更新処理をスキップする。
    */
@@ -112,7 +115,7 @@ export const useProfileEditForm = ({
 
   /**
    * キャンセル処理
-   * 
+   *
    * 編集内容を破棄して初期値にリセットし、シートを閉じる。
    * 初期化フラグもリセットして次回開く際に正しく初期化されるようにする。
    */
@@ -136,7 +139,7 @@ export const useProfileEditForm = ({
     bio,
     isLoading,
     error,
-    
+
     // ハンドラー関数
     handleNameChange,
     handleBioChange,

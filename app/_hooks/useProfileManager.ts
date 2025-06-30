@@ -1,6 +1,6 @@
 /**
  * プロフィール管理カスタムフック
- * 
+ *
  * ユーザー認証状態とプロフィールデータの管理を一元化します。
  * - 認証状態の取得（Auth0連携）
  * - プロフィール情報の取得・更新
@@ -23,14 +23,20 @@ export const useProfileManager = () => {
   const userId = user?.sub;
 
   // プロフィール情報を取得・管理
-  const { profile, isLoading: isProfileLoading, updateProfile } = useProfile(
+  const {
+    profile,
+    isLoading: isProfileLoading,
+    updateProfile,
+  } = useProfile(
     userId,
     getAccessToken,
-    user ? {
-      email: user.email,
-      name: user.name,
-      picture: user.picture,
-    } : undefined
+    user
+      ? {
+          email: user.email,
+          name: user.name,
+          picture: user.picture,
+        }
+      : undefined
   );
 
   const handleProfileUpdate = async (updateData: UpdateProfileRequest) => {
@@ -54,15 +60,15 @@ export const useProfileManager = () => {
     logout,
     isAuthenticated,
     userId,
-    
+
     // プロフィール情報
     profile,
     isProfileLoading,
-    
+
     // 編集シート状態
     isEditSheetOpen,
     setIsEditSheetOpen,
-    
+
     // ハンドラー関数
     handleProfileUpdate,
     handleEditButtonClick,
