@@ -6,16 +6,11 @@ import { vi } from "vitest";
 import * as tutorialStorage from "./storage";
 
 // チュートリアルストレージをモック化
-vi.mock("../utils/tutorial/storage", () => ({
+vi.mock("./storage", () => ({
   setTutorialCompleted: vi.fn(),
 }));
 
-// React Nativeコンポーネントのモック
-vi.mock("react-native", () => ({
-  Dimensions: {
-    get: () => ({ width: 375, height: 812 }),
-  },
-}));
+// React Nativeコンポーネントは全体のセットアップでモック済み
 
 // Tamaguiコンポーネントのモック
 vi.mock("tamagui", () => ({

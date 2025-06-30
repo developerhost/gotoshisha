@@ -301,7 +301,7 @@ export const useMapShopsCollection = () => {
 
         // eslint-disable-next-line no-console
         console.log(`API response: ${response.shops.length} shops found`);
-        response.shops.forEach((shop) => {
+        response.shops.forEach((shop: Shop) => {
           // eslint-disable-next-line no-console
           console.log(`- ${shop.name}: (${shop.latitude}, ${shop.longitude})`);
         });
@@ -309,7 +309,7 @@ export const useMapShopsCollection = () => {
         // 新しい店舗データを既存のマップに追加
         setCollectedShops((prev) => {
           const newMap = new Map(prev);
-          response.shops.forEach((shop) => {
+          response.shops.forEach((shop: Shop) => {
             newMap.set(shop.id, shop);
           });
           // eslint-disable-next-line no-console

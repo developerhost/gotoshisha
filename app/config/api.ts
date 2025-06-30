@@ -35,61 +35,69 @@ export const API_RETRY_DELAY = 1000;
 export const apiClient = {
   async get(endpoint: string, options: { token?: string } = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
-    console.log('API GET request to:', url);
+    // eslint-disable-next-line no-console
+    console.log("API GET request to:", url);
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
-    
+
     if (options.token) {
       headers.Authorization = `Bearer ${options.token}`;
     }
-    
+
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers,
     });
-    console.log('API GET response status:', response.status);
+    // eslint-disable-next-line no-console
+    console.log("API GET response status:", response.status);
     return response;
   },
 
   async post(endpoint: string, options: { json?: unknown } = {}) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: options.json ? JSON.stringify(options.json) : undefined,
     });
     return response;
   },
 
-  async put(endpoint: string, options: { json?: unknown; token?: string } = {}) {
+  async put(
+    endpoint: string,
+    options: { json?: unknown; token?: string } = {}
+  ) {
     const url = `${API_BASE_URL}${endpoint}`;
-    console.log('API PUT request to:', url);
-    console.log('PUT body:', options.json);
-    
+    // eslint-disable-next-line no-console
+    console.log("API PUT request to:", url);
+    // eslint-disable-next-line no-console
+    console.log("PUT body:", options.json);
+
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
-    
+
     if (options.token) {
       headers.Authorization = `Bearer ${options.token}`;
     }
-    
+
     const response = await fetch(url, {
-      method: 'PUT',
+      method: "PUT",
       headers,
       body: options.json ? JSON.stringify(options.json) : undefined,
     });
-    console.log('API PUT response status:', response.status);
+    // eslint-disable-next-line no-console
+    console.log("API PUT response status:", response.status);
     return response;
   },
 
   async delete(endpoint: string) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     return response;

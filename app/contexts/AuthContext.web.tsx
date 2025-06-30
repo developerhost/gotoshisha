@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { useAuth0, UseAuth0Result } from "../utils/auth/useAuth0";
+import { useAuth0, UseAuth0Result } from "../features/auth/useAuth0";
 
 interface AuthContextData extends UseAuth0Result {}
 

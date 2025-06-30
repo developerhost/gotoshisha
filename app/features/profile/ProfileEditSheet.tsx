@@ -1,54 +1,48 @@
-/**  
- * プロフィール編集用のシートコンポーネント  
- * ユーザーの名前と自己紹介を編集するモーダルシートを提供する  
- * @param isOpen - シートの表示状態  
- * @param onClose - シートを閉じる際のコールバック  
- * @param userProfile - 編集対象のユーザープロフィール  
- * @param onSave - プロフィール保存時のコールバック  
- */  
+/**
+ * プロフィール編集用のシートコンポーネント
+ * ユーザーの名前と自己紹介を編集するモーダルシートを提供する
+ * @param isOpen - シートの表示状態
+ * @param onClose - シートを閉じる際のコールバック
+ * @param userProfile - 編集対象のユーザープロフィール
+ * @param onSave - プロフィール保存時のコールバック
+ */
 
 import React from "react";
 import { TextInput } from "react-native";
-import {
-  YStack,
-  XStack,
-  Text,
-  Button,
-  Input,
-  Card,
-  Sheet,
-} from "tamagui";
-import { UserProfile, UpdateProfileRequest } from "../utils/api/profile";
-import { useProfileEditForm } from "../hooks/useProfileEditForm";
+import { YStack, XStack, Text, Button, Input, Card, Sheet } from "tamagui";
+import { UserProfile, UpdateProfileRequest } from "../../api/profile";
+import { useProfileEditForm } from "./useProfileEditForm";
 
 interface ProfileEditSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  userProfile: UserProfile | {
-    id: string;
-    email: string;
-    name?: string;
-    bio?: string;
-    createdAt: string;
-    avatar?: string;
-  };
+  userProfile:
+    | UserProfile
+    | {
+        id: string;
+        email: string;
+        name?: string;
+        bio?: string;
+        createdAt: string;
+        avatar?: string;
+      };
   /** プロフィール保存時のコールバック関数 */
   onSave: (profile: UpdateProfileRequest) => Promise<void>;
 }
 
 /**
  * プロフィール編集シートコンポーネント
- * 
+ *
  * ボトムシート形式でプロフィール編集フォームを表示する。
  * 名前と自己紹介を編集でき、適切なバリデーションとエラーハンドリングを提供する。
- * 
+ *
  * @param props - プロフィール編集シートのプロパティ
  * @param props.isOpen - シートの表示状態
  * @param props.onClose - シートを閉じる際のコールバック
  * @param props.userProfile - 編集対象のプロフィール情報
  * @param props.onSave - 保存時のコールバック関数
  * @returns プロフィール編集シートのJSXエレメント
- * 
+ *
  * @example
  * ```tsx
  * <ProfileEditSheet
@@ -131,16 +125,16 @@ export function ProfileEditSheet({
                 onChangeText={handleBioChange}
                 placeholder="自己紹介を入力（最大500文字）"
                 style={{
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: "#f8f9fa",
                   borderRadius: 8,
                   padding: 16,
                   minHeight: 120,
-                  textAlignVertical: 'top',
+                  textAlignVertical: "top",
                   fontSize: 16,
                   lineHeight: 22,
-                  fontFamily: 'System',
+                  fontFamily: "System",
                   borderWidth: 1,
-                  borderColor: '#e9ecef',
+                  borderColor: "#e9ecef",
                 }}
                 maxLength={500}
                 multiline

@@ -6,8 +6,8 @@ import {
   API_TIMEOUT,
   API_RETRY_COUNT,
   API_RETRY_DELAY,
-} from "../../config/api";
-import type { ApiResponse } from "../../types/api";
+} from "../config/api";
+import type { ApiResponse } from "../types/api";
 import { AuthStorage } from "../features/auth/storage";
 
 // APIエラークラス
