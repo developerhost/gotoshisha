@@ -12,10 +12,9 @@ import { Tutorial } from "./features/tutorial/Tutorial";
 import { isTutorialCompleted } from "./features/tutorial/storage";
 import type { LogoutHandler } from "./types/auth";
 import { SafeAreaView } from "react-native";
-const { logout } = useAuth();
 
 export default function IndexScreen() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [showTutorial, setShowTutorial] = useState(false);
 
