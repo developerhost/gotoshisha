@@ -19,6 +19,28 @@ import type {
 } from "../../types/api";
 
 /**
+ * Shop型の型ガード関数
+ * オブジェクトが有効なShop型であるかチェックする
+ */
+function isValidShop(shop: unknown): shop is Shop {
+  return !!(
+    shop &&
+    typeof shop === "object" &&
+    shop !== null &&
+    "id" in shop &&
+    "name" in shop &&
+    "latitude" in shop &&
+    "longitude" in shop &&
+    typeof (shop as Shop).id === "string" &&
+    typeof (shop as Shop).name === "string" &&
+    (typeof (shop as Shop).latitude === "number" ||
+      (shop as Shop).latitude === null) &&
+    (typeof (shop as Shop).longitude === "number" ||
+      (shop as Shop).longitude === null)
+  );
+}
+
+/**
  * 店舗一覧取得クエリ
  */
 export const useShops = (params?: ShopQueryParams) => {
@@ -301,16 +323,22 @@ export const useMapShopsCollection = () => {
 
         // eslint-disable-next-line no-console
         console.log(`API response: ${response.shops.length} shops found`);
-        response.shops.forEach((shop: Shop) => {
-          // eslint-disable-next-line no-console
-          console.log(`- ${shop.name}: (${shop.latitude}, ${shop.longitude})`);
+        response.shops.forEach((shop) => {
+          if (isValidShop(shop)) {
+            // eslint-disable-next-line no-console
+            console.log(
+              `- ${shop.name}: (${shop.latitude}, ${shop.longitude})`
+            );
+          }
         });
 
         // 新しい店舗データを既存のマップに追加
         setCollectedShops((prev) => {
           const newMap = new Map(prev);
-          response.shops.forEach((shop: Shop) => {
-            newMap.set(shop.id, shop);
+          response.shops.forEach((shop) => {
+            if (isValidShop(shop)) {
+              newMap.set(shop.id, shop);
+            }
           });
           // eslint-disable-next-line no-console
           console.log(`Total collected shops: ${newMap.size}`);
@@ -340,7 +368,9 @@ export const useMapShopsCollection = () => {
   const setInitialShops = useCallback((shops: Shop[]) => {
     const shopMap = new Map();
     shops.forEach((shop) => {
-      shopMap.set(shop.id, shop);
+      if (isValidShop(shop)) {
+        shopMap.set(shop.id, shop);
+      }
     });
     setCollectedShops(shopMap);
   }, []);
