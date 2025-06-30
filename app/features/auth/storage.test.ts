@@ -81,8 +81,22 @@ describe("AuthStorage", () => {
         localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, mockTokens.accessToken);
         localStorage.setItem(AUTH_STORAGE_KEYS.USER, "invalid-json");
 
+        // console.errorをモック化してログ出力を抑制
+        const consoleSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+
         const result = await AuthStorage.load();
         expect(result).toBeNull();
+
+        // console.errorが呼ばれたことを確認
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "認証トークンの読み込みに失敗:",
+          expect.any(SyntaxError)
+        );
+
+        // モックを復元
+        consoleSpy.mockRestore();
       });
     });
 

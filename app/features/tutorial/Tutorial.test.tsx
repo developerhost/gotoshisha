@@ -140,13 +140,18 @@ describe("チュートリアルコンポーネント", () => {
       const mockError = new Error("Storage error");
       mockSetTutorialCompleted.mockRejectedValue(mockError);
 
+      // console.errorをモック化してログ出力を抑制
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
       const handleComplete = async () => {
         try {
           await tutorialStorage.setTutorialCompleted();
         } catch (error) {
           // エラーを無視
           // eslint-disable-next-line no-console
-          console.log("Error during tutorial completion:", error);
+          console.error("Error during tutorial completion:", error);
         }
         mockOnComplete();
       };
@@ -155,6 +160,15 @@ describe("チュートリアルコンポーネント", () => {
 
       expect(mockSetTutorialCompleted).toHaveBeenCalled();
       expect(mockOnComplete).toHaveBeenCalled();
+
+      // console.errorが呼ばれたことを確認
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Error during tutorial completion:",
+        mockError
+      );
+
+      // モックを復元
+      consoleSpy.mockRestore();
     });
   });
 
