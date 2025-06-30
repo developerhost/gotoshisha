@@ -8,15 +8,15 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
-import { ShopsApi } from "../utils/api/shopsApi";
-import { queryKeys, invalidateQueries } from "../lib/queryClient";
+import { ShopsApi } from "../../api/shopsApi";
+import { queryKeys, invalidateQueries } from "../../lib/queryClient";
 import type {
   Shop,
   ShopsResponse,
   ShopCreateInput,
   ShopUpdateInput,
   ShopQueryParams,
-} from "../types/api";
+} from "../../types/api";
 
 /**
  * 店舗一覧取得クエリ
@@ -244,77 +244,91 @@ export const useInfiniteShops = (
  * マップ移動による店舗収集フック
  */
 export const useMapShopsCollection = () => {
-  const [collectedShops, setCollectedShops] = useState<Map<string, Shop>>(new Map());
-  const [searchedAreas, setSearchedAreas] = useState<Array<{
-    latitude: number;
-    longitude: number;
-    radius: number;
-  }>>([]);
+  const [collectedShops, setCollectedShops] = useState<Map<string, Shop>>(
+    new Map()
+  );
+  const [searchedAreas, setSearchedAreas] = useState<
+    Array<{
+      latitude: number;
+      longitude: number;
+      radius: number;
+    }>
+  >([]);
 
   // 指定エリアが既に検索済みかチェック
-  const isAreaSearched = useCallback((lat: number, lng: number, radius: number) => {
-    return searchedAreas.some(area => {
-      const distance = Math.sqrt(
-        Math.pow(area.latitude - lat, 2) + Math.pow(area.longitude - lng, 2)
-      ) * 111; // 大まかな距離計算（km）
-      
-      // 検索済みエリアの半径と現在の検索半径の小さい方を基準にする
-      const minRadius = Math.min(area.radius, radius);
-      return distance < minRadius * 0.5; // 半径の半分以内なら重複とみなす
-    });
-  }, [searchedAreas]);
+  const isAreaSearched = useCallback(
+    (lat: number, lng: number, radius: number) => {
+      return searchedAreas.some((area) => {
+        const distance =
+          Math.sqrt(
+            Math.pow(area.latitude - lat, 2) + Math.pow(area.longitude - lng, 2)
+          ) * 111; // 大まかな距離計算（km）
+
+        // 検索済みエリアの半径と現在の検索半径の小さい方を基準にする
+        const minRadius = Math.min(area.radius, radius);
+        return distance < minRadius * 0.5; // 半径の半分以内なら重複とみなす
+      });
+    },
+    [searchedAreas]
+  );
 
   // 新しいエリアの店舗を取得・追加
-  const collectShopsFromArea = useCallback(async (
-    latitude: number,
-    longitude: number,
-    radius: number = 5
-  ) => {
-    // eslint-disable-next-line no-console
-    console.log(`Collecting shops from area: lat=${latitude}, lng=${longitude}, radius=${radius}km`);
-    
-    // 既に検索済みのエリアなら何もしない
-    if (isAreaSearched(latitude, longitude, radius)) {
+  const collectShopsFromArea = useCallback(
+    async (latitude: number, longitude: number, radius: number = 5) => {
       // eslint-disable-next-line no-console
-      console.log('Area already searched, skipping...');
-      return Array.from(collectedShops.values());
-    }
+      console.log(
+        `Collecting shops from area: lat=${latitude}, lng=${longitude}, radius=${radius}km`
+      );
 
-    try {
-      // eslint-disable-next-line no-console
-      console.log('Fetching shops from API...');
-      const response = await ShopsApi.searchNearbyShops(latitude, longitude, radius, {
-        limit: 100
-      });
-
-      // eslint-disable-next-line no-console
-      console.log(`API response: ${response.shops.length} shops found`);
-      response.shops.forEach(shop => {
+      // 既に検索済みのエリアなら何もしない
+      if (isAreaSearched(latitude, longitude, radius)) {
         // eslint-disable-next-line no-console
-        console.log(`- ${shop.name}: (${shop.latitude}, ${shop.longitude})`);
-      });
+        console.log("Area already searched, skipping...");
+        return Array.from(collectedShops.values());
+      }
 
-      // 新しい店舗データを既存のマップに追加
-      setCollectedShops(prev => {
-        const newMap = new Map(prev);
-        response.shops.forEach(shop => {
-          newMap.set(shop.id, shop);
+      try {
+        // eslint-disable-next-line no-console
+        console.log("Fetching shops from API...");
+        const response = await ShopsApi.searchNearbyShops(
+          latitude,
+          longitude,
+          radius,
+          {
+            limit: 100,
+          }
+        );
+
+        // eslint-disable-next-line no-console
+        console.log(`API response: ${response.shops.length} shops found`);
+        response.shops.forEach((shop) => {
+          // eslint-disable-next-line no-console
+          console.log(`- ${shop.name}: (${shop.latitude}, ${shop.longitude})`);
         });
+
+        // 新しい店舗データを既存のマップに追加
+        setCollectedShops((prev) => {
+          const newMap = new Map(prev);
+          response.shops.forEach((shop) => {
+            newMap.set(shop.id, shop);
+          });
+          // eslint-disable-next-line no-console
+          console.log(`Total collected shops: ${newMap.size}`);
+          return newMap;
+        });
+
+        // 検索済みエリアに追加
+        setSearchedAreas((prev) => [...prev, { latitude, longitude, radius }]);
+
+        return Array.from(collectedShops.values());
+      } catch (error) {
         // eslint-disable-next-line no-console
-        console.log(`Total collected shops: ${newMap.size}`);
-        return newMap;
-      });
-
-      // 検索済みエリアに追加
-      setSearchedAreas(prev => [...prev, { latitude, longitude, radius }]);
-
-      return Array.from(collectedShops.values());
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('店舗データの収集に失敗:', error);
-      return Array.from(collectedShops.values());
-    }
-  }, [collectedShops, isAreaSearched]);
+        console.error("店舗データの収集に失敗:", error);
+        return Array.from(collectedShops.values());
+      }
+    },
+    [collectedShops, isAreaSearched]
+  );
 
   // 収集した店舗データをクリア
   const clearCollectedShops = useCallback(() => {
@@ -325,7 +339,7 @@ export const useMapShopsCollection = () => {
   // 初期データの設定
   const setInitialShops = useCallback((shops: Shop[]) => {
     const shopMap = new Map();
-    shops.forEach(shop => {
+    shops.forEach((shop) => {
       shopMap.set(shop.id, shop);
     });
     setCollectedShops(shopMap);
@@ -346,4 +360,4 @@ export type {
   ShopCreateInput,
   ShopUpdateInput,
   ShopQueryParams,
-} from "../types/api";
+} from "../../types/api";

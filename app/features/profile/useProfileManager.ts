@@ -8,9 +8,9 @@
  * - プロフィール更新のハンドリング
  */
 import { useState } from "react";
-import { useAuth } from "../contexts/AuthContext.web";
+import { useAuth } from "../../contexts/AuthContext.web";
 import { useProfile } from "./useProfile";
-import { UpdateProfileRequest } from "../utils/api/profile";
+import { UpdateProfileRequest } from "../../api/profile";
 /**
  * プロフィール管理のカスタムフック
  * プロフィールの取得、更新、編集シートの状態管理を一元化する

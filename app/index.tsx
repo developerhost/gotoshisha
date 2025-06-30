@@ -5,11 +5,11 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "./contexts/AuthContext.web";
 import { useEffect, useCallback, useState } from "react";
-import { LoadingScreen } from "./components/LoadingScreen";
+import { LoadingScreen } from "./features/login/LoadingScreen";
 import { AppHeader } from "./components/AppHeader";
 import { MainContent } from "./components/MainContent";
-import { Tutorial } from "./components/Tutorial";
-import { isTutorialCompleted } from "./utils/tutorial/storage";
+import { Tutorial } from "./features/tutorial/Tutorial";
+import { isTutorialCompleted } from "./features/tutorial/storage";
 import type { LogoutHandler } from "./types/auth";
 import { SafeAreaView } from "react-native";
 const { logout } = useAuth();

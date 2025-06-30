@@ -9,8 +9,8 @@ import MapView, {
 import { SHINJUKU_COORDINATE } from "../constants/location";
 import { useAuth } from "../contexts/AuthContext.web";
 import { useRouter } from "expo-router";
-import { useMapState } from "../_hooks/useMapState";
-import { ShopDetailSheet } from "../components/ShopDetailSheet";
+import { useMapState } from "../features/map/useMapState";
+import { ShopDetailSheet } from "../features/shop/ShopDetailSheet";
 import { TabBar } from "../components/TabBar";
 import type { Shop } from "../types/api";
 

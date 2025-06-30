@@ -2,7 +2,7 @@ import React from "react";
 import { YStack, Text, Button, ScrollView, Card, XStack, Avatar } from "tamagui";
 import { useRouter } from "expo-router";
 import { TabBar } from "../components/TabBar";
-import { ProfileEditSheet } from "../components/ProfileEditSheet";
+import { ProfileEditSheet } from "../features/profile/ProfileEditSheet";
 import { useProfileManager } from "../hooks/useProfileManager";
 
 export default function ProfileScreen() {

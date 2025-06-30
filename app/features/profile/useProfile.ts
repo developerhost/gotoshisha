@@ -15,7 +15,7 @@ import {
   getUserProfile,
   updateUserProfile,
   UpdateProfileRequest,
-} from "../utils/api/profile";
+} from "../../api/profile";
 
 /**
  * プロフィール管理用のカスタムフック

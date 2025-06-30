@@ -8,7 +8,7 @@ import {
   API_RETRY_DELAY,
 } from "../../config/api";
 import type { ApiResponse } from "../../types/api";
-import { AuthStorage } from "../auth/storage";
+import { AuthStorage } from "../features/auth/storage";
 
 // APIエラークラス
 export class ApiError extends Error {

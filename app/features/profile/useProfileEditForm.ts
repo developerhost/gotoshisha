@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { UpdateProfileRequest, UserProfile } from "../utils/api/profile";
+import { UpdateProfileRequest, UserProfile } from "../../api/profile";
 
 interface UseProfileEditFormParams {
   isOpen: boolean;

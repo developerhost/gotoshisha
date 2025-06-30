@@ -3,7 +3,7 @@
  * React Testing Libraryの代わりに、コンポーネントのロジックを直接テスト
  */
 import { vi } from "vitest";
-import * as tutorialStorage from "../utils/tutorial/storage";
+import * as tutorialStorage from "./storage";
 
 // チュートリアルストレージをモック化
 vi.mock("../utils/tutorial/storage", () => ({
