@@ -4,6 +4,7 @@
  */
 import { useState } from "react";
 import { Dimensions } from "react-native";
+import type { ImageSourcePropType } from "react-native";
 import {
   YStack,
   XStack,
@@ -21,8 +22,7 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 interface TutorialStep {
   title: string;
   description: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  image?: any;
+  image?: ImageSourcePropType;
 }
 
 const tutorialSteps: TutorialStep[] = [
