@@ -15,14 +15,14 @@ interface TabBarProps {
 
 /**
  * タブバーコンポーネント
- * 
+ *
  * アプリの下部に固定表示されるナビゲーションバー。
  * ホーム、マップ、プロフィールの3つのタブを提供する。
- * 
+ *
  * @param props - タブバーのプロパティ
  * @param props.user - ユーザー情報（将来の拡張用、現在未使用）
  * @returns タブバーのJSXエレメント
- * 
+ *
  * @example
  * ```tsx
  * <TabBar user={user} />
@@ -34,7 +34,7 @@ export function TabBar({ user: _ }: TabBarProps) {
 
   /**
    * 指定されたルートが現在アクティブかどうかを判定
-   * 
+   *
    * @param route - チェックするルートパス
    * @returns 現在のパスと一致する場合はtrue
    */
@@ -77,13 +77,15 @@ export function TabBar({ user: _ }: TabBarProps) {
           height={60}
           alignItems="center"
           justifyContent="center"
-          pressStyle={{ 
+          pressStyle={{
             backgroundColor: "$blue6",
-            scale: 0.95 
+            scale: 0.95,
           }}
           onPress={() => router.push("/routes/home")}
         >
-          <Text fontSize="$8" lineHeight="$8" textAlign="center">{isActive("/routes/home") ? "🏠" : "🏡"}</Text>
+          <Text fontSize="$8" lineHeight="$8" textAlign="center">
+            {isActive("/routes/home") ? "🏠" : "🏡"}
+          </Text>
         </Button>
 
         {/* マップボタン（中央、丸い円で目立たせる） */}
@@ -95,9 +97,9 @@ export function TabBar({ user: _ }: TabBarProps) {
           height={80}
           alignItems="center"
           justifyContent="center"
-          pressStyle={{ 
+          pressStyle={{
             backgroundColor: "$blue10",
-            scale: 0.9 
+            scale: 0.9,
           }}
           shadowColor="$blue8"
           shadowOffset={{ width: 0, height: 3 }}
@@ -107,13 +109,22 @@ export function TabBar({ user: _ }: TabBarProps) {
           onPress={() => router.push("/routes/map")}
           marginTop={-2} // 少し上に浮かせる
         >
-          <Text fontSize="$10" color="white" lineHeight="$10" textAlign="center">🗺️</Text>
+          <Text
+            fontSize="$10"
+            color="white"
+            lineHeight="$10"
+            textAlign="center"
+          >
+            🗺️
+          </Text>
         </Button>
 
         {/* ユーザーボタン */}
         <Button
           size="$5"
-          backgroundColor={isActive("/routes/profile") ? "$blue8" : "transparent"}
+          backgroundColor={
+            isActive("/routes/profile") ? "$blue8" : "transparent"
+          }
           borderRadius="$6"
           paddingHorizontal="$3"
           paddingVertical="$3"
@@ -121,13 +132,15 @@ export function TabBar({ user: _ }: TabBarProps) {
           height={60}
           alignItems="center"
           justifyContent="center"
-          pressStyle={{ 
+          pressStyle={{
             backgroundColor: "$blue6",
-            scale: 0.95 
+            scale: 0.95,
           }}
           onPress={() => router.push("/routes/profile")}
         >
-          <Text fontSize="$8" lineHeight="$8" textAlign="center">👤</Text>
+          <Text fontSize="$8" lineHeight="$8" textAlign="center">
+            👤
+          </Text>
         </Button>
       </XStack>
     </YStack>

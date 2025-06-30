@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Region } from "react-native-maps";
 import type { Shop } from "../../types/api";
+import { validateShop, filterValidShops } from "./useMapState";
 
 /**
  * useMapStateのロジック関数のテスト
@@ -12,6 +13,10 @@ vi.mock("react-native", () => ({
   Image: {
     prefetch: vi.fn(() => Promise.resolve()),
   },
+  Platform: {
+    OS: "ios",
+    select: vi.fn((obj) => obj.ios || obj.default),
+  },
 }));
 
 // Expo Assetのモック
@@ -21,6 +26,52 @@ vi.mock("expo-asset", () => ({
       downloadAsync: vi.fn(() => Promise.resolve()),
     })),
   },
+}));
+
+// Expo Locationのモック
+vi.mock("expo-location", () => ({
+  requestForegroundPermissionsAsync: vi.fn(),
+  getCurrentPositionAsync: vi.fn(),
+  PermissionStatus: {
+    GRANTED: "granted",
+    DENIED: "denied",
+  },
+}));
+
+// useLocationのモック
+vi.mock("../../hooks/useLocation", () => ({
+  useLocation: vi.fn(() => ({
+    latitude: null,
+    longitude: null,
+    error: null,
+    isLoading: false,
+    requestLocation: vi.fn(),
+    openSettings: vi.fn(),
+    canRequestPermission: true,
+  })),
+}));
+
+// useShopsのモック
+vi.mock("../shop/useShops", () => ({
+  useNearbyShops: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+    isFetching: false,
+    isSuccess: false,
+  })),
+  useShops: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+    isFetching: false,
+    isSuccess: false,
+  })),
+  useMapShopsCollection: vi.fn(() => ({
+    collectedShops: [],
+    collectShopsFromArea: vi.fn(),
+    setInitialShops: vi.fn(),
+  })),
 }));
 
 describe("useMapState ロジック関数", () => {
@@ -104,23 +155,6 @@ describe("useMapState ロジック関数", () => {
      * 店舗データの検証ロジックのテスト
      * 不正なデータをフィルタリングする
      */
-    const validateShop = (shop: unknown): shop is Shop => {
-      return !!(
-        shop &&
-        typeof shop === "object" &&
-        shop !== null &&
-        "id" in shop &&
-        "name" in shop &&
-        "address" in shop &&
-        "latitude" in shop &&
-        "longitude" in shop &&
-        (shop as Shop).id &&
-        (shop as Shop).name &&
-        (shop as Shop).address &&
-        (shop as Shop).latitude !== null &&
-        (shop as Shop).longitude !== null
-      );
-    };
 
     it("正常な店舗データを通す", () => {
       const validShop = {
@@ -207,25 +241,6 @@ describe("useMapState ロジック関数", () => {
     /**
      * 店舗データ配列のフィルタリングテスト
      */
-    const filterValidShops = (shops: unknown[]): Shop[] => {
-      return shops.filter((shop): shop is Shop => {
-        return !!(
-          shop &&
-          typeof shop === "object" &&
-          shop !== null &&
-          "id" in shop &&
-          "name" in shop &&
-          "address" in shop &&
-          "latitude" in shop &&
-          "longitude" in shop &&
-          (shop as Shop).id &&
-          (shop as Shop).name &&
-          (shop as Shop).address &&
-          (shop as Shop).latitude !== null &&
-          (shop as Shop).longitude !== null
-        );
-      });
-    };
 
     it("混在データから正常な店舗のみ抽出する", () => {
       const mixedShops = [

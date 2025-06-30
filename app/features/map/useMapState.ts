@@ -11,6 +11,34 @@ import {
 import type { Shop } from "../../types/api";
 
 /**
+ * 店舗データの検証
+ */
+export const validateShop = (shop: unknown): shop is Shop => {
+  return !!(
+    shop &&
+    typeof shop === "object" &&
+    shop !== null &&
+    "id" in shop &&
+    "name" in shop &&
+    "address" in shop &&
+    "latitude" in shop &&
+    "longitude" in shop &&
+    (shop as Shop).id &&
+    (shop as Shop).name &&
+    (shop as Shop).address &&
+    (shop as Shop).latitude !== null &&
+    (shop as Shop).longitude !== null
+  );
+};
+
+/**
+ * 店舗データ配列のフィルタリング
+ */
+export const filterValidShops = (shops: unknown[]): Shop[] => {
+  return shops.filter((shop): shop is Shop => validateShop(shop));
+};
+
+/**
  * アセットのプリロードとキャッシュ
  * https://docs.expo.dev/archive/classic-updates/preloading-and-caching-assets/#pre-loading-and-caching-assets
  */
@@ -187,16 +215,7 @@ export function useMapState() {
           : fallbackShopsData?.shops) || [];
 
   // 店舗データの安全性チェック
-  const validShops = shops.filter(
-    (shop: Shop) =>
-      shop &&
-      typeof shop === "object" &&
-      shop.id &&
-      shop.name &&
-      shop.address &&
-      shop.latitude !== null &&
-      shop.longitude !== null
-  );
+  const validShops = filterValidShops(shops);
 
   return {
     // 位置情報関連
