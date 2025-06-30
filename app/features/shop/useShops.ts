@@ -19,6 +19,26 @@ import type {
 } from "../../types/api";
 
 /**
+ * 関連要素タイプをAPIパラメータに変換する
+ */
+export const convertRelationTypeToParam = (
+  type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event",
+  id: string
+) => {
+  return { [`${type}Id`]: id };
+};
+
+/**
+ * ページネーション用の次ページパラメータを取得
+ */
+export const getNextPageParam = (lastPage: {
+  pagination: { page: number; totalPages: number };
+}) => {
+  const { page, totalPages } = lastPage.pagination;
+  return page < totalPages ? page + 1 : undefined;
+};
+
+/**
  * Shop型の型ガード関数
  * オブジェクトが有効なShop型であるかチェックする
  */
@@ -169,8 +189,7 @@ export const useAddShopRelation = () => {
       type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event";
       id: string;
     }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const params: any = { [`${type}Id`]: id };
+      const params = convertRelationTypeToParam(type, id);
       return ShopsApi.addShopRelation(shopId, params);
     },
     onSuccess: (_, { shopId }) => {
@@ -198,7 +217,7 @@ export const useRemoveShopRelation = () => {
       type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event";
       id: string;
     }) => {
-      const params = { [`${type}Id`]: id };
+      const params = convertRelationTypeToParam(type, id);
       return ShopsApi.removeShopRelation(shopId, params);
     },
     onSuccess: (_, { shopId }) => {
@@ -255,10 +274,7 @@ export const useInfiniteShops = (
     queryFn: ({ pageParam = 1 }) =>
       ShopsApi.getShops({ ...baseParams, page: pageParam }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage: ShopsResponse) => {
-      const { page, totalPages } = lastPage.pagination;
-      return page < totalPages ? page + 1 : undefined;
-    },
+    getNextPageParam: (lastPage: ShopsResponse) => getNextPageParam(lastPage),
   });
 };
 

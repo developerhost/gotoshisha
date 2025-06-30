@@ -4,7 +4,11 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Shop } from "../../types/api";
-import { isValidShop } from "./useShops";
+import {
+  isValidShop,
+  convertRelationTypeToParam,
+  getNextPageParam,
+} from "./useShops";
 
 // テスト用のダミーデータ
 const mockShop: Shop = {
@@ -218,16 +222,6 @@ describe("useShops ロジック関数", () => {
   });
 
   describe("関連要素パラメータ変換", () => {
-    /**
-     * 関連要素タイプをAPIパラメータに変換するロジックのテスト
-     */
-    const convertRelationTypeToParam = (
-      type: "flavor" | "atmosphere" | "hobby" | "paymentMethod" | "event",
-      id: string
-    ) => {
-      return { [`${type}Id`]: id };
-    };
-
     it("各タイプを正しくパラメータに変換する", () => {
       expect(convertRelationTypeToParam("flavor", "123")).toEqual({
         flavorId: "123",
@@ -252,16 +246,6 @@ describe("useShops ロジック関数", () => {
   });
 
   describe("ページネーション処理", () => {
-    /**
-     * getNextPageParamロジックのテスト
-     */
-    const getNextPageParam = (lastPage: {
-      pagination: { page: number; totalPages: number };
-    }) => {
-      const { page, totalPages } = lastPage.pagination;
-      return page < totalPages ? page + 1 : undefined;
-    };
-
     it("次のページが存在する場合は次のページ番号を返す", () => {
       expect(
         getNextPageParam({
