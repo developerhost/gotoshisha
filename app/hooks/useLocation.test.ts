@@ -4,12 +4,7 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { LocationState } from "./useLocation";
-
-// 新宿の座標定数
-const SHINJUKU_COORDINATE = {
-  latitude: 35.6938,
-  longitude: 139.7034,
-} as const;
+import { SHINJUKU_COORDINATE } from "../constants/location";
 
 // モジュールのモック
 vi.mock("expo-location");
