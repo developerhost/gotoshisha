@@ -413,7 +413,6 @@ describe("useLocation ロジック関数", () => {
           return "位置情報の権限が拒否されました。新宿駅周辺を表示しています。";
         case "location":
           return "位置情報の取得に失敗しました。新宿駅周辺を表示しています。";
-        case "general":
         default:
           return "位置情報の取得に失敗しました。新宿駅周辺を表示しています。";
       }
