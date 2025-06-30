@@ -54,14 +54,30 @@ export const apiClient = {
     return response;
   },
 
-  async post(endpoint: string, options: { json?: unknown } = {}) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  async post(
+    endpoint: string,
+    options: { json?: unknown; token?: string } = {}
+  ) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    // eslint-disable-next-line no-console
+    console.log("API POST request to:", url);
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (options.token) {
+      headers.Authorization = `Bearer ${options.token}`;
+    }
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: options.json ? JSON.stringify(options.json) : undefined,
     });
+
+    // eslint-disable-next-line no-console
+    console.log("API POST response status:", response.status);
     return response;
   },
 

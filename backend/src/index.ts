@@ -90,16 +90,17 @@ app.get("/api", (c) => {
     createSuccessResponse({
       message: "Gotoshisha API",
       version: "1.0.0",
-      environment: c.env.ENVIRONMENT,        endpoints: {
-          health: "/health",
-          shops: "/api/shops",
-          profile: "/api/profile",
-          users: "/api/users",
-          posts: "/api/posts",
-          comments: "/api/comments",
-          tags: "/api/tags",
-          likes: "/api/likes",
-        },
+      environment: c.env.ENVIRONMENT,
+      endpoints: {
+        health: "/health",
+        shops: "/api/shops",
+        profile: "/api/profile",
+        users: "/api/users",
+        posts: "/api/posts",
+        comments: "/api/comments",
+        tags: "/api/tags",
+        likes: "/api/likes",
+      },
     })
   );
 });

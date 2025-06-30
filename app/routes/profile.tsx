@@ -1,3 +1,13 @@
+/**
+ * プロフィール画面
+ *
+ * ユーザーのプロフィール情報の表示・編集機能を提供します。
+ * - プロフィール情報（名前、メールアドレス、自己紹介）の表示
+ * - プロフィール編集モーダルの表示
+ * - お気に入り、レビュー履歴、設定画面への導線
+ * - ログアウト機能
+ */
+
 import React from "react";
 import {
   YStack,
@@ -13,6 +23,11 @@ import { TabBar } from "../components/TabBar";
 import { ProfileEditSheet } from "../features/profile/ProfileEditSheet";
 import { useProfileManager } from "../features/profile/useProfileManager";
 
+/**
+ * プロフィール画面コンポーネント
+ * 認証状態に応じてログイン画面またはプロフィール詳細を表示
+ * @returns {JSX.Element} プロフィール画面
+ */
 export default function ProfileScreen() {
   const router = useRouter();
   const {

@@ -9,4 +9,9 @@ Set-Location (Split-Path $PSScriptRoot)
 Write-Host "📝 wrangler dev で開発サーバーを起動中..." -ForegroundColor Blue
 
 # Wrangler開発サーバーを起動（D1ローカルデータベース付き）
-npx wrangler dev --local --persist
+try {
+    npx wrangler dev --local --persist
+} catch {
+    Write-Host "❌ wrangler dev の起動に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}

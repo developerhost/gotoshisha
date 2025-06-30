@@ -16,16 +16,7 @@ import { useProfileEditForm } from "./useProfileEditForm";
 interface ProfileEditSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  userProfile:
-    | UserProfile
-    | {
-        id: string;
-        email: string;
-        name?: string;
-        bio?: string;
-        createdAt: string;
-        avatar?: string;
-      };
+  userProfile: UserProfile;
   /** プロフィール保存時のコールバック関数 */
   onSave: (profile: UpdateProfileRequest) => Promise<void>;
 }

@@ -62,10 +62,12 @@ export function useProfile(
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5分間キャッシュ
     retry: (failureCount, error) => {
-      // 404エラー（ユーザーが見つからない）の場合はリトライしない
+      // 404エラーまたは特定のエラータイプの場合はリトライしない
       if (
         error instanceof Error &&
-        error.message.includes("ユーザーが見つかりません")
+        (error.message.includes("404") ||
+          error.message.includes("not found") ||
+          error.message.includes("ユーザーが見つかりません"))
       ) {
         return false;
       }
