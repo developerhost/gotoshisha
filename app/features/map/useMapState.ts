@@ -15,7 +15,7 @@ import type { Shop } from "../../types/api";
  * https://docs.expo.dev/archive/classic-updates/preloading-and-caching-assets/#pre-loading-and-caching-assets
  */
 function cacheImages() {
-  return [require("../assets/images/pin.png")].map((image) => {
+  return [require("../../../assets/icon.png")].map((image) => {
     if (typeof image === "string") {
       return Image.prefetch(image);
     } else {
