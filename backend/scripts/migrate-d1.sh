@@ -34,7 +34,11 @@ fi
 echo "📝 マイグレーションファイルを実行中..."
 
 # Cloudflare D1にマイグレーションを実行
+echo "🔄 初期マイグレーション (0001_initial.sql) を実行中..."
 npx wrangler d1 execute gotoshisha-db --file=migrations/0001_initial.sql
+
+echo "🔄 bioフィールド追加マイグレーション (0002_add_user_bio.sql) を実行中..."
+npx wrangler d1 execute gotoshisha-db --file=migrations/0002_add_user_bio.sql
 
 echo "✅ マイグレーションが完了しました！"
 

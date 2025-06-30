@@ -81,8 +81,22 @@ describe("AuthStorage", () => {
         localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, mockTokens.accessToken);
         localStorage.setItem(AUTH_STORAGE_KEYS.USER, "invalid-json");
 
+        // console.errorをモック化してログ出力を抑制
+        const consoleSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+
         const result = await AuthStorage.load();
         expect(result).toBeNull();
+
+        // console.errorが呼ばれたことを確認
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "認証トークンの読み込みに失敗:",
+          expect.any(SyntaxError)
+        );
+
+        // モックを復元
+        consoleSpy.mockRestore();
       });
     });
 
@@ -145,6 +159,7 @@ describe("AuthStorage", () => {
       it("SecureStoreからトークンを読み込める", async () => {
         vi.mocked(SecureStore.getItemAsync)
           .mockResolvedValueOnce(mockTokens.accessToken)
+          .mockResolvedValueOnce(null) // ID_TOKEN
           .mockResolvedValueOnce(JSON.stringify(mockTokens.user));
 
         const result = await AuthStorage.load();
@@ -152,6 +167,9 @@ describe("AuthStorage", () => {
         expect(result).toEqual(mockTokens);
         expect(SecureStore.getItemAsync).toHaveBeenCalledWith(
           AUTH_STORAGE_KEYS.TOKEN
+        );
+        expect(SecureStore.getItemAsync).toHaveBeenCalledWith(
+          AUTH_STORAGE_KEYS.ID_TOKEN
         );
         expect(SecureStore.getItemAsync).toHaveBeenCalledWith(
           AUTH_STORAGE_KEYS.USER

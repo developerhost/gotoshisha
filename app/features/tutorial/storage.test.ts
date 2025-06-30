@@ -60,6 +60,7 @@ describe("チュートリアルストレージ機能", () => {
       const result = await isTutorialCompleted();
 
       expect(result).toBe(false);
+      // eslint-disable-next-line no-console
       expect(console.error).toHaveBeenCalledWith(
         "Failed to check tutorial status:",
         mockError
@@ -85,6 +86,7 @@ describe("チュートリアルストレージ機能", () => {
 
       await setTutorialCompleted();
 
+      // eslint-disable-next-line no-console
       expect(console.error).toHaveBeenCalledWith(
         "Failed to save tutorial status:",
         mockError
@@ -107,6 +109,7 @@ describe("チュートリアルストレージ機能", () => {
 
       await resetTutorialStatus();
 
+      // eslint-disable-next-line no-console
       expect(console.error).toHaveBeenCalledWith(
         "Failed to reset tutorial status:",
         mockError

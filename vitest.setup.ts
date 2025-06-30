@@ -6,6 +6,15 @@ import { beforeEach, vi } from "vitest";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).jest = vi;
 
+// Define process.env for Expo
+process.env.EXPO_OS = "ios";
+
+// Mock globalThis.expo for Expo modules
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis as any).expo = {
+  NativeModule: {},
+};
+
 // Mock React Native modules
 vi.mock("react-native", () => ({
   Platform: {
@@ -22,6 +31,7 @@ vi.mock("react-native", () => ({
   Text: "Text",
   TouchableOpacity: "TouchableOpacity",
   ScrollView: "ScrollView",
+  NativeModules: {},
 }));
 
 // Mock Expo modules
@@ -48,6 +58,12 @@ vi.mock("react-native-maps", () => ({
   default: "MapView",
   Marker: "Marker",
   PROVIDER_GOOGLE: "google",
+}));
+
+vi.mock("expo-secure-store", () => ({
+  setItemAsync: vi.fn(),
+  getItemAsync: vi.fn(),
+  deleteItemAsync: vi.fn(),
 }));
 
 // Clear all mocks before each test

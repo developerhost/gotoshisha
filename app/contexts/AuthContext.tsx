@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useAuth0 as useAuth0Native } from "react-native-auth0";
-import { UseAuth0Result } from "../utils/auth/useAuth0";
-import { UserInfo } from "../utils/auth/types";
+import { UseAuth0Result } from "../features/auth/useAuth0";
+import { UserInfo } from "../features/auth/types";
 
 interface AuthContextData extends UseAuth0Result {}
 
@@ -14,7 +14,8 @@ const AuthContext = createContext<AuthContextData | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, authorize, clearSession, error, isLoading } = useAuth0Native();
+  const { user, authorize, clearSession, error, isLoading, getCredentials } =
+    useAuth0Native();
 
   // Convert react-native-auth0 user to our UserInfo type
   const convertedUser: UserInfo | null = user
@@ -64,6 +65,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // eslint-disable-next-line no-console
         console.error("ログアウトエラー:", err);
         throw err;
+      }
+    },
+    getAccessToken: async () => {
+      try {
+        if (!user) {
+          return null;
+        }
+        const credentials = await getCredentials();
+        return credentials?.accessToken || null;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("アクセストークン取得エラー:", err);
+        return null;
       }
     },
   };

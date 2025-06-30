@@ -2,7 +2,7 @@
  * シーシャ店舗APIクライアント
  */
 import { BaseApi } from "./baseApi";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS } from "../config/api";
 import type {
   Shop,
   ShopsResponse,
@@ -10,7 +10,7 @@ import type {
   ShopUpdateInput,
   ShopQueryParams,
   ShopRelationParams,
-} from "../../types/api";
+} from "../types/api";
 
 /**
  * シーシャ店舗APIクラス

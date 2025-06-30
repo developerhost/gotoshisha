@@ -108,6 +108,7 @@ prisma/migrations/
 
 # Local database files
 *.db
+*.db-journal
 *.sqlite
 *.sqlite3
 

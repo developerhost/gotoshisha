@@ -1,26 +1,32 @@
 /**
- * ホーム画面コンポーネント
- * 認証状態を管理し、適切な画面を表示する
+ * メインエントリーポイント
+ * 認証状態を確認してホームページにリダイレクト
  */
-import { SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "./contexts/AuthContext.web";
 import { useEffect, useCallback, useState } from "react";
-import { LoadingScreen } from "./components/LoadingScreen";
+import { LoadingScreen } from "./features/login/LoadingScreen";
 import { AppHeader } from "./components/AppHeader";
 import { MainContent } from "./components/MainContent";
-import { Tutorial } from "./components/Tutorial";
-import { isTutorialCompleted } from "./utils/tutorial/storage";
+import { Tutorial } from "./features/tutorial/Tutorial";
+import { isTutorialCompleted } from "./features/tutorial/storage";
 import type { LogoutHandler } from "./types/auth";
+import { SafeAreaView } from "react-native";
 
-export default function HomeScreen() {
+export default function IndexScreen() {
   const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/routes/login");
+    if (!isLoading) {
+      if (isAuthenticated) {
+        // 認証済みの場合はホームページに遷移
+        router.replace("/routes/home");
+      } else {
+        // 未認証の場合はログインページに遷移
+        router.replace("/routes/login");
+      }
     }
   }, [isAuthenticated, isLoading, router]);
 

@@ -15,7 +15,7 @@ import {
   Image,
   Sheet,
 } from "tamagui";
-import { setTutorialCompleted } from "../utils/tutorial/storage";
+import { setTutorialCompleted } from "./storage";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 

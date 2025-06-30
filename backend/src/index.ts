@@ -9,6 +9,7 @@ import type { PrismaClient } from "@prisma/client";
 
 // ルーターのインポート
 import shops from "@/routes/shops";
+import profile from "@/routes/profile";
 // import { usersRouter } from '@/routes/users';
 // import { postsRouter } from '@/routes/posts';
 // import { commentsRouter } from '@/routes/comments';
@@ -89,16 +90,16 @@ app.get("/api", (c) => {
     createSuccessResponse({
       message: "Gotoshisha API",
       version: "1.0.0",
-      environment: c.env.ENVIRONMENT,
-      endpoints: {
-        health: "/health",
-        shops: "/api/shops",
-        users: "/api/users",
-        posts: "/api/posts",
-        comments: "/api/comments",
-        tags: "/api/tags",
-        likes: "/api/likes",
-      },
+      environment: c.env.ENVIRONMENT,        endpoints: {
+          health: "/health",
+          shops: "/api/shops",
+          profile: "/api/profile",
+          users: "/api/users",
+          posts: "/api/posts",
+          comments: "/api/comments",
+          tags: "/api/tags",
+          likes: "/api/likes",
+        },
     })
   );
 });
@@ -107,6 +108,7 @@ app.get("/api", (c) => {
  * ルーターの登録
  */
 app.route("/api/shops", shops);
+app.route("/api/profile", profile);
 // app.route('/api/users', usersRouter);
 // app.route('/api/posts', postsRouter);
 // app.route('/api/comments', commentsRouter);

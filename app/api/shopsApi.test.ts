@@ -254,9 +254,23 @@ describe("ShopsApi", () => {
     });
 
     it("無効なJSON文字列の場合undefinedを返すこと", () => {
+      // console.errorをモック化してログ出力を抑制
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
       const invalidJson = "not json";
       const result = ShopsApi.parseJsonField(invalidJson);
+
       expect(result).toBeUndefined();
+      // console.errorが呼ばれたことを確認
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to parse JSON field:",
+        expect.any(SyntaxError)
+      );
+
+      // モックを復元
+      consoleSpy.mockRestore();
     });
 
     it("undefinedの場合undefinedを返すこと", () => {
