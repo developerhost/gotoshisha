@@ -117,7 +117,15 @@ app.post(
         } | null = null;
 
         if (token) {
-          tokenUser = decodeAuth0Token(token);
+          // JWTからユーザー情報を取得（環境に応じて署名検証を実行）
+          tokenUser =
+            c.env.ENVIRONMENT === "development"
+              ? decodeAuth0Token(token)
+              : await verifyAuth0Token(
+                  token,
+                  c.env,
+                  c.env.EXPO_PUBLIC_AUTH0_DOMAIN
+                );
           console.log("Decoded user from JWT:", tokenUser);
         }
 
@@ -269,7 +277,15 @@ app.get("/:userId", zValidator("param", GetProfileSchema), async (c) => {
         );
       }
 
-      const decodedUser = decodeAuth0Token(token);
+      // JWTからユーザー情報を取得（環境に応じて署名検証を実行）
+      const decodedUser =
+        c.env.ENVIRONMENT === "development"
+          ? decodeAuth0Token(token)
+          : await verifyAuth0Token(
+              token,
+              c.env,
+              c.env.EXPO_PUBLIC_AUTH0_DOMAIN
+            );
       console.log("Decoded user from JWT:", decodedUser);
 
       if (decodedUser) {
