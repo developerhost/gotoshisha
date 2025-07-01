@@ -90,7 +90,7 @@ describe("utils", () => {
       });
     });
 
-    it("空の詳細配列を渡してもdetailsは含まれない", () => {
+    it("空の詳細配列を渡してもdetailsは含まれる", () => {
       const error = "Error message";
       const details: ValidationError[] = [];
       const result = createErrorResponse(error, details);
