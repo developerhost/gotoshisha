@@ -25,8 +25,13 @@ export async function verifyAuth0Token(
     const domain =
       auth0Domain ||
       env?.EXPO_PUBLIC_AUTH0_DOMAIN ||
-      process.env.EXPO_PUBLIC_AUTH0_DOMAIN ||
-      "dev-cz7g2cer3i7mpz25.jp.auth0.com";
+      process.env.EXPO_PUBLIC_AUTH0_DOMAIN;
+
+    if (!domain) {
+      throw new Error(
+        "Auth0ドメインが設定されていません。EXPO_PUBLIC_AUTH0_DOMAINを設定してください。"
+      );
+    }
     const apiAudience =
       audience ||
       (env

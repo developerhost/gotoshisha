@@ -76,15 +76,14 @@ describe("jwt", () => {
       expect(result).toEqual(mockUser);
     });
 
-    it("環境変数がない場合はデフォルト値を使用する", async () => {
+    it("環境変数がない場合はエラーをスローする", async () => {
       const result = await verifyAuth0Token(mockToken);
 
-      expect(createRemoteJWKSet).toHaveBeenCalledWith(
-        new URL(
-          "https://dev-cz7g2cer3i7mpz25.jp.auth0.com/.well-known/jwks.json"
-        )
+      expect(result).toBeNull();
+      expect(console.error).toHaveBeenCalledWith(
+        "JWT 検証エラー:",
+        expect.any(Error)
       );
-      expect(result).toEqual(mockUser);
     });
 
     it("カスタムドメインとオーディエンスを使用できる", async () => {
@@ -344,6 +343,7 @@ describe("jwt", () => {
     });
 
     it("process.env.EXPO_PUBLIC_API_URLをフォールバックとして使用する", async () => {
+      process.env.EXPO_PUBLIC_AUTH0_DOMAIN = "env.auth0.com";
       process.env.EXPO_PUBLIC_API_URL = "https://fallback-api.com";
       delete process.env.AUTH0_AUDIENCE;
 
@@ -359,7 +359,7 @@ describe("jwt", () => {
       await verifyAuth0Token(mockToken);
 
       expect(jwtVerify).toHaveBeenCalledWith(mockToken, testMockJWKS, {
-        issuer: "https://dev-cz7g2cer3i7mpz25.jp.auth0.com/",
+        issuer: "https://env.auth0.com/",
         audience: "https://fallback-api.com",
       });
     });

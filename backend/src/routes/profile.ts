@@ -13,10 +13,7 @@ import { PrismaD1 } from "@prisma/adapter-d1";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import type { Env } from "@/types";
-import {
-  extractBearerToken,
-  verifyUserAuthorization,
-} from "@/lib/auth/jwt";
+import { extractBearerToken, verifyUserAuthorization } from "@/lib/auth/jwt";
 import { verifyTokenByEnvironment } from "@/lib/auth/jwt-utils";
 
 // リクエストスキーマ
@@ -67,6 +64,117 @@ function validateUserInfoAgainstToken(
   return true;
 }
 
+/**
+ * JWTトークンまたはリクエストボディからユーザーを作成
+ */
+async function createUserFromTokenOrBody(
+  prisma: PrismaClient,
+  userId: string,
+  env: Env,
+  authHeader: string | undefined,
+  userInfo?: { email: string; name?: string; picture?: string }
+) {
+  let userEmail: string | undefined;
+  let userName: string | undefined;
+
+  // JWTトークンから認証済みユーザー情報を取得
+  const token = extractBearerToken(authHeader);
+  let tokenUser: {
+    email?: string;
+    name?: string;
+    picture?: string;
+  } | null = null;
+
+  if (token) {
+    // JWTからユーザー情報を取得（環境に応じて署名検証を実行）
+    tokenUser = await verifyTokenByEnvironment(token, env);
+    console.log("Decoded user from JWT:", tokenUser);
+  }
+
+  // リクエストボディのユーザー情報を検証
+  if (userInfo) {
+    if (tokenUser) {
+      // JWTトークンとリクエストボディの情報を照合
+      if (validateUserInfoAgainstToken(userInfo, tokenUser)) {
+        userEmail = userInfo.email;
+        userName = userInfo.name;
+        console.log("Creating user with validated info from request body:", {
+          email: userEmail,
+          name: userName,
+        });
+      } else {
+        console.warn("User info validation failed, using token info");
+        userEmail = tokenUser.email;
+        userName = tokenUser.name;
+      }
+    } else {
+      console.warn("No token provided, cannot validate user info.");
+      // トークンがない場合は認証されていないため、ユーザー作成を拒否
+      throw new Error(
+        "認証が必要です。有効なアクセストークンを提供してください。"
+      );
+    }
+  } else if (tokenUser) {
+    // リクエストボディにユーザー情報がない場合はトークンから取得
+    userEmail = tokenUser.email;
+    userName = tokenUser.name;
+    console.log("Creating user with info from token:", {
+      email: userEmail,
+      name: userName,
+    });
+  } else {
+    console.log("No token and no user info provided");
+    // GET エンドポイント用のエラーメッセージ（userInfo が undefined の場合）
+    const errorMessage =
+      userInfo === undefined
+        ? "認証が必要です。有効なアクセストークンを提供してください。"
+        : "認証が必要です。有効なアクセストークンまたはユーザー情報を提供してください。";
+    throw new Error(errorMessage);
+  }
+
+  // メールアドレスが取得できない場合はエラーを返す
+  if (!userEmail) {
+    console.error("No valid email address available for user creation");
+    throw new Error(
+      "有効なメールアドレスが必要です。認証プロバイダーからメールアドレスを取得できませんでした。"
+    );
+  }
+
+  try {
+    const user = await prisma.user.create({
+      data: {
+        id: userId,
+        email: userEmail,
+        name: userName,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        bio: true,
+        avatar: true,
+        createdAt: true,
+      },
+    });
+    console.log("User created successfully:", {
+      id: userId,
+      email: userEmail,
+      name: userName,
+    });
+    return user;
+  } catch (error) {
+    console.error("User creation failed:", error);
+    // メールアドレスのユニーク制約違反の場合
+    if (
+      error instanceof Error &&
+      error.message.includes("UNIQUE constraint failed")
+    ) {
+      throw new Error("このメールアドレスは既に使用されています。");
+    }
+    throw error;
+  }
+}
+
 const app = new Hono<{ Bindings: Env }>();
 
 // プロフィール取得または作成（ユーザー情報を受け取る）
@@ -104,115 +212,27 @@ app.post(
 
       // ユーザーが存在しない場合は、リクエストボディまたはJWTトークンから情報を取得して作成
       if (!user) {
-        let userEmail: string | undefined;
-        let userName: string | undefined;
-
-        // JWTトークンから認証済みユーザー情報を取得
-        const token = extractBearerToken(authHeader);
-        let tokenUser: {
-          email?: string;
-          name?: string;
-          picture?: string;
-        } | null = null;
-
-        if (token) {
-          // JWTからユーザー情報を取得（環境に応じて署名検証を実行）
-          tokenUser = await verifyTokenByEnvironment(token, c.env);
-          console.log("Decoded user from JWT:", tokenUser);
-        }
-
-        // リクエストボディのユーザー情報を検証
-        if (userInfo) {
-          if (tokenUser) {
-            // JWTトークンとリクエストボディの情報を照合
-            if (validateUserInfoAgainstToken(userInfo, tokenUser)) {
-              userEmail = userInfo.email;
-              userName = userInfo.name;
-              console.log(
-                "Creating user with validated info from request body:",
-                { email: userEmail, name: userName }
-              );
-            } else {
-              console.warn("User info validation failed, using token info");
-              userEmail = tokenUser.email;
-              userName = tokenUser.name;
-            }
-          } else {
-            console.warn("No token provided, cannot validate user info.");
-            // トークンがない場合は認証されていないため、ユーザー作成を拒否
-            return c.json(
-              {
-                error:
-                  "認証が必要です。有効なアクセストークンを提供してください。",
-              },
-              401
-            );
-          }
-        } else if (tokenUser) {
-          // リクエストボディにユーザー情報がない場合はトークンから取得
-          userEmail = tokenUser.email;
-          userName = tokenUser.name;
-          console.log("Creating user with info from token:", {
-            email: userEmail,
-            name: userName,
-          });
-        } else {
-          console.log("No token and no user info provided");
-          return c.json(
-            {
-              error:
-                "認証が必要です。有効なアクセストークンまたはユーザー情報を提供してください。",
-            },
-            401
-          );
-        }
-
-        // メールアドレスが取得できない場合はエラーを返す
-        if (!userEmail) {
-          console.error("No valid email address available for user creation");
-          return c.json(
-            {
-              error:
-                "有効なメールアドレスが必要です。認証プロバイダーからメールアドレスを取得できませんでした。",
-            },
-            400
-          );
-        }
-
         try {
-          user = await prisma.user.create({
-            data: {
-              id: userId,
-              email: userEmail,
-              name: userName,
-            },
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              bio: true,
-              avatar: true,
-              createdAt: true,
-            },
-          });
-          console.log("User created successfully:", {
-            id: userId,
-            email: userEmail,
-            name: userName,
-          });
+          user = await createUserFromTokenOrBody(
+            prisma,
+            userId,
+            c.env,
+            authHeader,
+            userInfo
+          );
         } catch (error) {
-          console.error("User creation failed:", error);
-          // メールアドレスのユニーク制約違反の場合
-          if (
-            error instanceof Error &&
-            error.message.includes("UNIQUE constraint failed")
-          ) {
-            return c.json(
-              {
-                error: "このメールアドレスは既に使用されています。",
-              },
-              409
-            );
+          if (error instanceof Error) {
+            if (error.message.includes("認証が必要です")) {
+              return c.json({ error: error.message }, 401);
+            }
+            if (error.message.includes("有効なメールアドレスが必要です")) {
+              return c.json({ error: error.message }, 400);
+            }
+            if (
+              error.message.includes("このメールアドレスは既に使用されています")
+            ) {
+              return c.json({ error: error.message }, 409);
+            }
           }
           throw error;
         }
@@ -254,80 +274,26 @@ app.get("/:userId", zValidator("param", GetProfileSchema), async (c) => {
 
     // ユーザーが存在しない場合は、JWTトークンから情報を取得して作成
     if (!user) {
-      const token = extractBearerToken(authHeader);
-      let userEmail: string | undefined;
-      let userName: string | undefined;
-
-      console.log("Token extracted:", token ? "Present" : "Missing");
-
-      if (!token) {
-        return c.json(
-          {
-            error: "認証が必要です。有効なアクセストークンを提供してください。",
-          },
-          401
-        );
-      }
-
-      // JWTからユーザー情報を取得（環境に応じて署名検証を実行）
-      const decodedUser = await verifyTokenByEnvironment(token, c.env);
-      console.log("Decoded user from JWT:", decodedUser);
-
-      if (decodedUser) {
-        userEmail = decodedUser.email;
-        userName = decodedUser.name;
-        console.log("Creating user with decoded info:", {
-          email: userEmail,
-          name: userName,
-        });
-      }
-
-      // メールアドレスが取得できない場合はエラーを返す
-      if (!userEmail) {
-        console.error("No valid email address available for user creation");
-        return c.json(
-          {
-            error:
-              "有効なメールアドレスが必要です。認証プロバイダーからメールアドレスを取得できませんでした。",
-          },
-          400
-        );
-      }
-
       try {
-        user = await prisma.user.create({
-          data: {
-            id: userId,
-            email: userEmail,
-            name: userName,
-          },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            bio: true,
-            avatar: true,
-            createdAt: true,
-          },
-        });
-        console.log("User created successfully:", {
-          id: userId,
-          email: userEmail,
-          name: userName,
-        });
+        user = await createUserFromTokenOrBody(
+          prisma,
+          userId,
+          c.env,
+          authHeader
+        );
       } catch (error) {
-        console.error("User creation failed:", error);
-        // メールアドレスのユニーク制約違反の場合
-        if (
-          error instanceof Error &&
-          error.message.includes("UNIQUE constraint failed")
-        ) {
-          return c.json(
-            {
-              error: "このメールアドレスは既に使用されています。",
-            },
-            409
-          );
+        if (error instanceof Error) {
+          if (error.message.includes("認証が必要です")) {
+            return c.json({ error: error.message }, 401);
+          }
+          if (error.message.includes("有効なメールアドレスが必要です")) {
+            return c.json({ error: error.message }, 400);
+          }
+          if (
+            error.message.includes("このメールアドレスは既に使用されています")
+          ) {
+            return c.json({ error: error.message }, 409);
+          }
         }
         throw error;
       }
