@@ -33,6 +33,7 @@ model User {
   id        String   @id @default(cuid()) // ユーザーID（CUID）
   email     String   @unique // メールアドレス（ユニーク）
   name      String? // ユーザー名（任意）
+  bio       String? // 自己紹介（任意）
   avatar    String? // アバター画像URL（任意）
   createdAt DateTime @default(now()) // 作成日時
   updatedAt DateTime @updatedAt // 更新日時

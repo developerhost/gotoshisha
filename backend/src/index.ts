@@ -2,13 +2,14 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
-import { checkDatabaseHealth, createPrismaClient } from "@/lib/db";
+import { checkDatabaseHealth, createPrismaClient } from "@/lib/db/db";
 import { createErrorResponse, createSuccessResponse } from "@/lib/utils";
 import type { Env } from "@/types";
 import type { PrismaClient } from "@prisma/client";
 
 // ルーターのインポート
 import shops from "@/routes/shops";
+import profile from "@/routes/profile";
 // import { usersRouter } from '@/routes/users';
 // import { postsRouter } from '@/routes/posts';
 // import { commentsRouter } from '@/routes/comments';
@@ -93,6 +94,7 @@ app.get("/api", (c) => {
       endpoints: {
         health: "/health",
         shops: "/api/shops",
+        profile: "/api/profile",
         users: "/api/users",
         posts: "/api/posts",
         comments: "/api/comments",
@@ -107,6 +109,7 @@ app.get("/api", (c) => {
  * ルーターの登録
  */
 app.route("/api/shops", shops);
+app.route("/api/profile", profile);
 // app.route('/api/users', usersRouter);
 // app.route('/api/posts', postsRouter);
 // app.route('/api/comments', commentsRouter);

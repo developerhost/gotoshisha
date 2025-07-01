@@ -12,7 +12,7 @@ import {
   ShopRelationCreateSchema,
   ShopRelationDeleteSchema,
   ShopUpdateSchema,
-} from "../lib/validation/shops";
+} from "../lib/shop/shops";
 
 interface Env {
   Variables: {
@@ -73,16 +73,22 @@ shops.get("/", zValidator("query", ShopQuerySchema), async (c) => {
 
   // 位置情報による検索
   if (query.latitude && query.longitude && query.radius) {
-    console.log(`位置情報検索: lat=${query.latitude}, lng=${query.longitude}, radius=${query.radius}km`);
-    
+    console.log(
+      `位置情報検索: lat=${query.latitude}, lng=${query.longitude}, radius=${query.radius}km`
+    );
+
     // radiusはkm単位なので、1度 ≈ 111kmで計算
     const latRange = query.radius / 111; // 1度 ≈ 111km
     const lonRange =
       query.radius / (111 * Math.cos((query.latitude * Math.PI) / 180));
 
     console.log(`検索範囲: latRange=${latRange}度, lonRange=${lonRange}度`);
-    console.log(`緯度範囲: ${query.latitude - latRange} 〜 ${query.latitude + latRange}`);
-    console.log(`経度範囲: ${query.longitude - lonRange} 〜 ${query.longitude + lonRange}`);
+    console.log(
+      `緯度範囲: ${query.latitude - latRange} 〜 ${query.latitude + latRange}`
+    );
+    console.log(
+      `経度範囲: ${query.longitude - lonRange} 〜 ${query.longitude + lonRange}`
+    );
 
     where.latitude = {
       gte: query.latitude - latRange,
@@ -128,7 +134,7 @@ shops.get("/", zValidator("query", ShopQuerySchema), async (c) => {
 
   try {
     console.log(`検索条件:`, JSON.stringify(where, null, 2));
-    
+
     // 位置情報がある場合は距離計算を含む特別な処理
     if (query.latitude && query.longitude && query.radius) {
       // 店舗データの取得（位置情報フィルター適用）
@@ -168,8 +174,10 @@ shops.get("/", zValidator("query", ShopQuerySchema), async (c) => {
         },
       });
 
-      console.log(`データベース検索結果: ${allShops.length}件の店舗が見つかりました`);
-      allShops.forEach(shop => {
+      console.log(
+        `データベース検索結果: ${allShops.length}件の店舗が見つかりました`
+      );
+      allShops.forEach((shop) => {
         console.log(`- ${shop.name}: (${shop.latitude}, ${shop.longitude})`);
       });
 
@@ -681,10 +689,13 @@ shops.post(
         });
       }
 
-      return c.json({
-        success: true,
-        message: "関連要素を追加しました",
-      }, 201);
+      return c.json(
+        {
+          success: true,
+          message: "関連要素を追加しました",
+        },
+        201
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // 重複エラーの処理
