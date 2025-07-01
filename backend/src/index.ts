@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
-import { checkDatabaseHealth, createPrismaClient } from "@/lib/db";
+import { checkDatabaseHealth, createPrismaClient } from "@/lib/db/db";
 import { createErrorResponse, createSuccessResponse } from "@/lib/utils";
 import type { Env } from "@/types";
 import type { PrismaClient } from "@prisma/client";

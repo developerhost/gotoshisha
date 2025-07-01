@@ -16,8 +16,8 @@ import type { Env } from "@/types";
 import {
   extractBearerToken,
   verifyUserAuthorization,
-} from "@/lib/jwt";
-import { verifyTokenByEnvironment } from "@/lib/jwt-utils";
+} from "@/lib/auth/jwt";
+import { verifyTokenByEnvironment } from "@/lib/auth/jwt-utils";
 
 // リクエストスキーマ
 const UpdateProfileSchema = z.object({
