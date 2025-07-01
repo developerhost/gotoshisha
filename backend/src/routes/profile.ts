@@ -14,11 +14,10 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import type { Env } from "@/types";
 import {
-  decodeAuth0Token,
   extractBearerToken,
-  verifyAuth0Token,
   verifyUserAuthorization,
 } from "@/lib/jwt";
+import { verifyTokenByEnvironment } from "@/lib/jwt-utils";
 
 // リクエストスキーマ
 const UpdateProfileSchema = z.object({
@@ -118,14 +117,7 @@ app.post(
 
         if (token) {
           // JWTからユーザー情報を取得（環境に応じて署名検証を実行）
-          tokenUser =
-            c.env.ENVIRONMENT === "development"
-              ? decodeAuth0Token(token)
-              : await verifyAuth0Token(
-                  token,
-                  c.env,
-                  c.env.EXPO_PUBLIC_AUTH0_DOMAIN
-                );
+          tokenUser = await verifyTokenByEnvironment(token, c.env);
           console.log("Decoded user from JWT:", tokenUser);
         }
 
@@ -278,14 +270,7 @@ app.get("/:userId", zValidator("param", GetProfileSchema), async (c) => {
       }
 
       // JWTからユーザー情報を取得（環境に応じて署名検証を実行）
-      const decodedUser =
-        c.env.ENVIRONMENT === "development"
-          ? decodeAuth0Token(token)
-          : await verifyAuth0Token(
-              token,
-              c.env,
-              c.env.EXPO_PUBLIC_AUTH0_DOMAIN
-            );
+      const decodedUser = await verifyTokenByEnvironment(token, c.env);
       console.log("Decoded user from JWT:", decodedUser);
 
       if (decodedUser) {
@@ -382,14 +367,7 @@ app.put(
       }
 
       // JWTからユーザー情報を取得
-      const decodedUser =
-        c.env.ENVIRONMENT === "development"
-          ? decodeAuth0Token(token)
-          : await verifyAuth0Token(
-              token,
-              c.env,
-              c.env.EXPO_PUBLIC_AUTH0_DOMAIN
-            );
+      const decodedUser = await verifyTokenByEnvironment(token, c.env);
       if (!decodedUser || !decodedUser.sub) {
         return c.json(
           {
