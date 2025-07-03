@@ -3,7 +3,7 @@
  * 認証状態を確認してホームページにリダイレクト
  */
 import { useRouter } from "expo-router";
-import { useAuth } from "./contexts/AuthContext.web";
+import { useAuth } from "./contexts/AuthContext";
 import { useEffect, useCallback, useState } from "react";
 import { LoadingScreen } from "./features/login/LoadingScreen";
 import { AppHeader } from "./components/AppHeader";
@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native";
 
 export default function IndexScreen() {
   const { isAuthenticated, isLoading, logout } = useAuth();
+
   const router = useRouter();
   const [showTutorial, setShowTutorial] = useState(false);
 
