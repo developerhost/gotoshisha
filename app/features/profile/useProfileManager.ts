@@ -8,7 +8,7 @@
  * - プロフィール更新のハンドリング
  */
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext.web";
+import { useAuth } from "../../contexts/AuthContext";
 import { useProfile } from "./useProfile";
 import { UpdateProfileRequest } from "../../api/profile";
 /**
