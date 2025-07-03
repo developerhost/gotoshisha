@@ -2,7 +2,9 @@
  * テスト用ヘルパー関数とモックデータ
  */
 import { vi } from "vitest";
+import { Hono } from "hono";
 import type { PrismaClient } from "@prisma/client";
+import type { Env } from "@/types";
 
 // モックPrismaクライアントを作成
 export const createMockPrisma = () => {
@@ -213,3 +215,44 @@ export const createMockContext = (
 
   return { mockContext, mockPrisma };
 };
+
+/**
+ * テスト用のHonoアプリを作成
+ */
+export function createTestApp(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  prismaClient: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  router: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Hono<{ Bindings: Env; Variables: { prisma: any } }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const app = new Hono<{ Bindings: Env; Variables: { prisma: any } }>();
+
+  // Prismaクライアントをコンテキストに設定
+  app.use("*", async (c, next) => {
+    c.set("prisma", prismaClient);
+    await next();
+  });
+
+  app.route("/api/shops", router);
+  return app;
+}
+
+/**
+ * モックPrismaクライアントを作成（代替実装）
+ */
+export function createMockPrismaClient(
+  overrides: Partial<PrismaClient> = {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any {
+  return {
+    ...createMockPrisma(),
+    user: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    ...overrides,
+  };
+}

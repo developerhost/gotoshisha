@@ -21,11 +21,13 @@
 ### フロントエンドのセットアップ
 
 1. 依存関係をインストール:
+
    ```bash
    pnpm install
    ```
 
 2. 開発サーバーを起動:
+
    ```bash
    pnpm start
    # または iOS の場合
@@ -42,21 +44,25 @@
 ### バックエンドのセットアップ
 
 1. バックエンドディレクトリに移動:
+
    ```bash
    cd backend
    ```
 
 2. 依存関係をインストール:
+
    ```bash
    pnpm install
    ```
 
 3. 環境変数を設定:
+
    ```bash
    cp .env.example .env
    ```
 
 4. Prisma クライアントを生成:
+
    ```bash
    pnpm db:generate
    ```
@@ -95,21 +101,25 @@
 このプロジェクトは継続的インテグレーションのために GitHub Actions を使用しています。CI パイプラインには以下が含まれます：
 
 ### フロントエンド CI
+
 - TypeScript 型チェック
 - ESLint リンティング
 - Vitest ユニットテスト
 
 ### バックエンド CI
+
 - Prisma クライアント生成
 - TypeScript 型チェック
 - ESLint リンティング
 - Vitest ユニットテスト
 
 ### ビルドチェック
+
 - バックエンドビルド検証
 - Expo Web エクスポート検証
 
 CI は以下の場合に実行されます：
+
 - `main` および `develop` ブランチへのプッシュ
 - `main` および `develop` ブランチへのプルリクエスト
 
@@ -169,3 +179,9 @@ cd backend && pnpm type-check
 App.tsx でスタートアップ時に expo-asset を使用してアセットをキャッシュすることで、アセットバンドリングの結果をシミュレートしています。
 
 ![実際の結果](./docs/actual.png)
+
+### ローカルブランチの削除
+
+```bash
+git branch -vv | grep ': gone]' | awk '{print $1}' | while
+```

@@ -1,5 +1,4 @@
-import { Platform } from "react-native";
-import * as SecureStore from "expo-secure-store";
+import { storage, StorageHelper } from "../../lib/storage";
 import { UserInfo } from "./types";
 
 export interface AuthTokens {
@@ -25,60 +24,51 @@ export class AuthStorage {
     if (!tokens.accessToken || !tokens.user) {
       throw new Error("Invalid tokens: accessToken and user are required");
     }
-    if (Platform.OS === "web") {
-      localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, tokens.accessToken);
-      if (tokens.idToken) {
-        localStorage.setItem(AUTH_STORAGE_KEYS.ID_TOKEN, tokens.idToken);
-      }
-      localStorage.setItem(AUTH_STORAGE_KEYS.USER, JSON.stringify(tokens.user));
-    } else {
-      await SecureStore.setItemAsync(
-        AUTH_STORAGE_KEYS.TOKEN,
-        tokens.accessToken
-      );
-      if (tokens.idToken) {
-        await SecureStore.setItemAsync(AUTH_STORAGE_KEYS.ID_TOKEN, tokens.idToken);
-      }
-      await SecureStore.setItemAsync(
-        AUTH_STORAGE_KEYS.USER,
-        JSON.stringify(tokens.user)
-      );
+
+    await storage.setItem(AUTH_STORAGE_KEYS.TOKEN, tokens.accessToken);
+    if (tokens.idToken) {
+      await storage.setItem(AUTH_STORAGE_KEYS.ID_TOKEN, tokens.idToken);
     }
+    await StorageHelper.setObject(AUTH_STORAGE_KEYS.USER, tokens.user);
   }
 
   /**
    * 認証トークンを読み込み
    */
   static async load(): Promise<AuthTokens | null> {
+    const startTime = Date.now();
+
     try {
-      if (Platform.OS === "web") {
-        const token = localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN);
-        const idToken = localStorage.getItem(AUTH_STORAGE_KEYS.ID_TOKEN);
-        const userData = localStorage.getItem(AUTH_STORAGE_KEYS.USER);
+      const token = await storage.getItem(AUTH_STORAGE_KEYS.TOKEN);
 
-        if (!token || !userData) return null;
+      const idToken = await storage.getItem(AUTH_STORAGE_KEYS.ID_TOKEN);
 
-        return {
-          accessToken: token,
-          idToken: idToken || undefined,
-          user: JSON.parse(userData) as UserInfo,
-        };
-      } else {
-        const token = await SecureStore.getItemAsync(AUTH_STORAGE_KEYS.TOKEN);
-        const idToken = await SecureStore.getItemAsync(AUTH_STORAGE_KEYS.ID_TOKEN);
-        const userData = await SecureStore.getItemAsync(AUTH_STORAGE_KEYS.USER);
+      const user = await StorageHelper.getObject<UserInfo>(
+        AUTH_STORAGE_KEYS.USER
+      );
 
-        if (!token || !userData) return null;
-
-        return {
-          accessToken: token,
-          idToken: idToken || undefined,
-          user: JSON.parse(userData),
-        };
+      if (!token || !user) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[${
+            Date.now() - startTime
+          }ms] AuthStorage.load: トークンまたはユーザー情報が見つかりません`
+        );
+        // トークンまたはユーザー情報がない場合はnullを返す
+        return null;
       }
+
+      return {
+        accessToken: token,
+        idToken: idToken || undefined,
+        user,
+      };
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error("認証トークンの読み込みに失敗:", error);
+      console.error(
+        `[${Date.now() - startTime}ms] 認証トークンの読み込みに失敗:`,
+        error
+      );
       return null;
     }
   }
@@ -88,15 +78,9 @@ export class AuthStorage {
    */
   static async clear(): Promise<void> {
     try {
-      if (Platform.OS === "web") {
-        localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN);
-        localStorage.removeItem(AUTH_STORAGE_KEYS.ID_TOKEN);
-        localStorage.removeItem(AUTH_STORAGE_KEYS.USER);
-      } else {
-        await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.TOKEN);
-        await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.ID_TOKEN);
-        await SecureStore.deleteItemAsync(AUTH_STORAGE_KEYS.USER);
-      }
+      await storage.removeItem(AUTH_STORAGE_KEYS.TOKEN);
+      await storage.removeItem(AUTH_STORAGE_KEYS.ID_TOKEN);
+      await storage.removeItem(AUTH_STORAGE_KEYS.USER);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("認証データのクリアに失敗:", error);

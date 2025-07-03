@@ -24,7 +24,19 @@
       }
     },
     "adhoc": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "provisioningProfilePath": "./provisioning/adhoc.mobileprovision",
+        "enterpriseProvisioning": "adhoc"
+      }
+    },
+    "development-device": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": false,
+        "enterpriseProvisioning": "adhoc"
+      }
     },
     "development-simulator": {
       "developmentClient": true,

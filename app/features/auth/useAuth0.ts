@@ -69,6 +69,9 @@ export function useAuth0(): UseAuth0Result {
           return;
         }
         setUser(tokens.user);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log("useAuth0: No stored tokens found");
       }
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -77,6 +80,8 @@ export function useAuth0(): UseAuth0Result {
       await AuthStorage.clear();
       setError(err as Error);
     } finally {
+      // eslint-disable-next-line no-console
+      console.log("useAuth0: Setting isLoading to false");
       setIsLoading(false);
     }
   }, []);
@@ -84,21 +89,24 @@ export function useAuth0(): UseAuth0Result {
   /**
    * 認証成功時の処理
    */
-  const handleAuthSuccess = useCallback(async (accessToken: string, idToken?: string) => {
-    try {
-      const userInfo = await Auth0Api.getUserInfo(accessToken);
-      await AuthStorage.save({ accessToken, idToken, user: userInfo });
-      setUser(userInfo);
-      setError(null);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("認証成功処理に失敗:", err);
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const handleAuthSuccess = useCallback(
+    async (accessToken: string, idToken?: string) => {
+      try {
+        const userInfo = await Auth0Api.getUserInfo(accessToken);
+        await AuthStorage.save({ accessToken, idToken, user: userInfo });
+        setUser(userInfo);
+        setError(null);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("認証成功処理に失敗:", err);
+        setError(err as Error);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   /**
    * 認証レスポンスの処理
@@ -152,7 +160,10 @@ export function useAuth0(): UseAuth0Result {
             );
           }
 
-          await handleAuthSuccess(tokenResponse.accessToken, tokenResponse.idToken);
+          await handleAuthSuccess(
+            tokenResponse.accessToken,
+            tokenResponse.idToken
+          );
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error("トークン交換に失敗:", err);
@@ -183,7 +194,18 @@ export function useAuth0(): UseAuth0Result {
    * 認証状態の初期化
    */
   useEffect(() => {
-    loadStoredAuth();
+    // 安全策：10秒後に強制的にisLoadingをfalseにする
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+    }, 10000);
+
+    loadStoredAuth().finally(() => {
+      clearTimeout(timeoutId);
+    });
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [loadStoredAuth]);
 
   /**

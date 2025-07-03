@@ -2,6 +2,11 @@ const { getDefaultConfig } = require("expo/metro-config");
 
 const config = getDefaultConfig(__dirname);
 
+// Web版でreact-native-mapsをモックに置き換える設定（より確実な方法）
+config.resolver.alias = {
+  "react-native-maps": require.resolve("./web-mock/react-native-maps.js"),
+};
+
 // テストファイルとテスト関連の依存関係を除外
 config.resolver.blockList = [
   // テストファイルを除外

@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { AuthProvider } from "./contexts/AuthContext.web";
+import { AuthProvider } from "./contexts/AuthContext";
 import { TamaguiProvider } from "tamagui";
 import tamaguiConfig from "../tamagui.config";
 import { QueryProvider } from "./providers/QueryProvider";
