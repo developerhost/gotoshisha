@@ -91,7 +91,7 @@ describe("AuthStorage", () => {
 
         // console.errorが呼ばれたことを確認
         expect(consoleSpy).toHaveBeenCalledWith(
-          "認証トークンの読み込みに失敗:",
+          "Failed to load object from storage (auth0_user):",
           expect.any(SyntaxError)
         );
 
