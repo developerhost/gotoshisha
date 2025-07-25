@@ -86,8 +86,31 @@ function createStorage(): StorageInterface {
 
 /**
  * 統一されたストレージインスタンス
+ * 遅延初期化により、テスト時のプラットフォーム切り替えに対応
  */
-export const storage = createStorage();
+let _storage: StorageInterface | null = null;
+
+export const storage: StorageInterface = {
+  async setItem(key: string, value: string): Promise<void> {
+    if (!_storage) _storage = createStorage();
+    return _storage.setItem(key, value);
+  },
+  async getItem(key: string): Promise<string | null> {
+    if (!_storage) _storage = createStorage();
+    return _storage.getItem(key);
+  },
+  async removeItem(key: string): Promise<void> {
+    if (!_storage) _storage = createStorage();
+    return _storage.removeItem(key);
+  },
+};
+
+/**
+ * テスト用: ストレージインスタンスをリセット
+ */
+export function resetStorageForTesting(): void {
+  _storage = null;
+}
 
 /**
  * ストレージヘルパー関数

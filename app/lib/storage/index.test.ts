@@ -3,7 +3,7 @@
  */
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { storage, StorageHelper } from "./index";
+import { storage, StorageHelper, resetStorageForTesting } from "./index";
 
 // Platform とモジュールをモック化
 vi.mock("react-native", () => ({
@@ -39,6 +39,7 @@ describe("ストレージ抽象化レイヤー", () => {
   describe("Webプラットフォーム", () => {
     beforeEach(() => {
       vi.mocked(Platform).OS = "web";
+      resetStorageForTesting();
     });
 
     describe("storage", () => {
@@ -110,6 +111,7 @@ describe("ストレージ抽象化レイヤー", () => {
   describe("ネイティブプラットフォーム", () => {
     beforeEach(() => {
       vi.mocked(Platform).OS = "ios";
+      resetStorageForTesting();
     });
 
     describe("storage", () => {

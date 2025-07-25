@@ -8,6 +8,7 @@ import {
   setTutorialCompleted,
   resetTutorialStatus,
 } from "./storage";
+import { resetStorageForTesting } from "../../lib/storage";
 
 // Platform とモジュールをモック化
 vi.mock("react-native", () => ({
@@ -41,6 +42,7 @@ describe("チュートリアルストレージ機能", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    resetStorageForTesting();
     // コンソールエラーをモック化してテスト出力をクリーンに保つ
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
@@ -81,7 +83,7 @@ describe("チュートリアルストレージ機能", () => {
       expect(result).toBe(false);
       // eslint-disable-next-line no-console
       expect(console.error).toHaveBeenCalledWith(
-        "Failed to load boolean from storage (tutorial_completed):",
+        "storage.getItem (native): Error getting tutorial_completed:",
         mockError
       );
     });

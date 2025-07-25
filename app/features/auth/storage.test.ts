@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, beforeAll, vi } from "vitest";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { AuthStorage, AUTH_STORAGE_KEYS, AuthTokens } from "./storage";
+import { resetStorageForTesting } from "../../lib/storage";
 
 // 依存関係のモック
 vi.mock("react-native", () => ({
@@ -40,6 +41,7 @@ describe("AuthStorage", () => {
     beforeAll(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Platform as any).OS = "web";
+      resetStorageForTesting();
     });
 
     describe("save", () => {
@@ -138,6 +140,7 @@ describe("AuthStorage", () => {
     beforeAll(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Platform as any).OS = "ios";
+      resetStorageForTesting();
     });
 
     describe("save", () => {
