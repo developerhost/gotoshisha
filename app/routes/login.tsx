@@ -1,8 +1,9 @@
 import React from "react";
 import { YStack, Text, Button } from "tamagui";
 import { SafeAreaView } from "react-native";
-import { useAuth } from "../contexts/AuthContext.web";
+import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "expo-router";
+import { Logger } from "../utils/logger";
 
 export default function LoginScreen() {
   const { login, isLoading, error } = useAuth();
@@ -13,8 +14,7 @@ export default function LoginScreen() {
       await login();
       router.replace("/");
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error("Login failed:", e);
+      Logger.error("Login failed:", e);
     }
   };
 
@@ -30,10 +30,20 @@ export default function LoginScreen() {
       >
         <YStack alignItems="center" gap="$3" marginBottom="$6">
           <Text fontSize="$9">🚀</Text>
-          <Text fontSize="$9" fontWeight="bold" color="$purple11" textAlign="center">
+          <Text
+            fontSize="$9"
+            fontWeight="bold"
+            color="$purple11"
+            textAlign="center"
+          >
             GoToShisha
           </Text>
-          <Text fontSize="$5" color="$gray11" textAlign="center" lineHeight="$1">
+          <Text
+            fontSize="$5"
+            color="$gray11"
+            textAlign="center"
+            lineHeight="$1"
+          >
             シーシャカフェを見つけよう
           </Text>
           <Text fontSize="$4" color="$gray10" textAlign="center" marginTop="$2">
@@ -71,11 +81,29 @@ export default function LoginScreen() {
         </YStack>
 
         {error && (
-          <YStack alignItems="center" marginTop="$4" backgroundColor="$red2" padding="$3" borderRadius="$4" borderColor="$red6" borderWidth={1}>
-            <Text color="$red11" textAlign="center" fontSize="$3" fontWeight="600">
+          <YStack
+            alignItems="center"
+            marginTop="$4"
+            backgroundColor="$red2"
+            padding="$3"
+            borderRadius="$4"
+            borderColor="$red6"
+            borderWidth={1}
+          >
+            <Text
+              color="$red11"
+              textAlign="center"
+              fontSize="$3"
+              fontWeight="600"
+            >
               ⚠️ ログインエラー
             </Text>
-            <Text color="$red10" marginTop="$1" textAlign="center" fontSize="$2">
+            <Text
+              color="$red10"
+              marginTop="$1"
+              textAlign="center"
+              fontSize="$2"
+            >
               {error.message}
             </Text>
           </YStack>

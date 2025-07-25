@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, beforeAll, vi } from "vitest";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { AuthStorage, AUTH_STORAGE_KEYS, AuthTokens } from "./storage";
+import { resetStorageForTesting } from "../../lib/storage";
+import { Logger } from "../../utils/logger";
 
 // 依存関係のモック
 vi.mock("react-native", () => ({
@@ -40,6 +42,7 @@ describe("AuthStorage", () => {
     beforeAll(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Platform as any).OS = "web";
+      resetStorageForTesting();
     });
 
     describe("save", () => {
@@ -81,22 +84,14 @@ describe("AuthStorage", () => {
         localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, mockTokens.accessToken);
         localStorage.setItem(AUTH_STORAGE_KEYS.USER, "invalid-json");
 
-        // console.errorをモック化してログ出力を抑制
-        const consoleSpy = vi
-          .spyOn(console, "error")
-          .mockImplementation(() => {});
-
         const result = await AuthStorage.load();
         expect(result).toBeNull();
 
-        // console.errorが呼ばれたことを確認
-        expect(consoleSpy).toHaveBeenCalledWith(
-          "認証トークンの読み込みに失敗:",
+        // Logger.errorが呼ばれたことを確認
+        expect(Logger.error).toHaveBeenCalledWith(
+          "Failed to load object from storage (auth0_user):",
           expect.any(SyntaxError)
         );
-
-        // モックを復元
-        consoleSpy.mockRestore();
       });
     });
 
@@ -138,6 +133,7 @@ describe("AuthStorage", () => {
     beforeAll(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Platform as any).OS = "ios";
+      resetStorageForTesting();
     });
 
     describe("save", () => {

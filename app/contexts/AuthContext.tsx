@@ -1,92 +1,52 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { useAuth0 as useAuth0Native } from "react-native-auth0";
-import { UseAuth0Result } from "../features/auth/useAuth0";
-import { UserInfo } from "../features/auth/types";
+import { Platform } from "react-native";
+import { useAuth0, UseAuth0Result } from "../features/auth/useAuth0";
+import { Logger } from "../utils/logger";
 
 interface AuthContextData extends UseAuth0Result {}
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 /**
- * ネイティブプラットフォーム用の認証プロバイダーコンポーネント
- * expo-auth-sessionの代わりにreact-native-auth0を使用
+ * Web版認証プロバイダー
+ */
+const WebAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  Logger.debug("WebAuthProvider: Initializing");
+  const auth0 = useAuth0();
+  Logger.debug("WebAuthProvider: Auth0 data:", auth0);
+  return <AuthContext.Provider value={auth0}>{children}</AuthContext.Provider>;
+};
+
+/**
+ * ネイティブ版認証プロバイダー
+ */
+const NativeAuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  Logger.debug("NativeAuthProvider: Initializing with custom useAuth0");
+
+  // カスタムuseAuth0フックを使用（Web版と同じ）
+  const auth0 = useAuth0();
+  Logger.debug("NativeAuthProvider: Custom useAuth0 result:", auth0);
+
+  return <AuthContext.Provider value={auth0}>{children}</AuthContext.Provider>;
+};
+
+/**
+ * クロスプラットフォーム対応の認証プロバイダーコンポーネント
+ * 全プラットフォーム: カスタムuseAuth0フック（expo-auth-session）を使用
  */
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, authorize, clearSession, error, isLoading, getCredentials } =
-    useAuth0Native();
+  Logger.debug("AuthProvider: Platform.OS =", Platform.OS);
 
-  // Convert react-native-auth0 user to our UserInfo type
-  const convertedUser: UserInfo | null = user
-    ? {
-        sub: user.sub || "",
-        name: user.name,
-        given_name: user.givenName,
-        family_name: user.familyName,
-        middle_name: user.middleName,
-        nickname: user.nickname,
-        preferred_username: user.preferredUsername,
-        profile: user.profile,
-        picture: user.picture,
-        website: user.website,
-        email: user.email,
-        email_verified: user.emailVerified,
-        gender: user.gender,
-        birthdate: user.birthdate,
-        zoneinfo: user.zoneinfo,
-        locale: user.locale,
-        phone_number: user.phoneNumber,
-        phone_number_verified: user.phoneNumberVerified,
-        // Note: react-native-auth0 returns address as string, not object
-        address: user.address ? undefined : undefined,
-        updated_at: user.updatedAt,
-      }
-    : null;
+  // プラットフォーム分岐
+  if (Platform.OS === "web") {
+    return <WebAuthProvider>{children}</WebAuthProvider>;
+  }
 
-  const authContextValue: AuthContextData = {
-    user: convertedUser,
-    isLoading,
-    isAuthenticated: !!user,
-    error,
-    login: async () => {
-      try {
-        await authorize();
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error("ログインエラー:", err);
-        throw err;
-      }
-    },
-    logout: async () => {
-      try {
-        await clearSession();
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error("ログアウトエラー:", err);
-        throw err;
-      }
-    },
-    getAccessToken: async () => {
-      try {
-        if (!user) {
-          return null;
-        }
-        const credentials = await getCredentials();
-        return credentials?.accessToken || null;
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error("アクセストークン取得エラー:", err);
-        return null;
-      }
-    },
-  };
-
-  return (
-    <AuthContext.Provider value={authContextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <NativeAuthProvider>{children}</NativeAuthProvider>;
 };
 
 /**

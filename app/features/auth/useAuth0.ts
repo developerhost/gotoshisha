@@ -11,6 +11,7 @@ import { auth0Config } from "../../config/auth0";
 import { AuthStorage } from "./storage";
 import { Auth0Api } from "./auth0Api";
 import { UserInfo } from "./types";
+import { Logger } from "../../utils/logger";
 
 export interface UseAuth0Result {
   user: UserInfo | null;
@@ -60,23 +61,41 @@ export function useAuth0(): UseAuth0Result {
    */
   const loadStoredAuth = useCallback(async () => {
     try {
-      const tokens = await AuthStorage.load();
+      Logger.debug("loadStoredAuth: 認証データの読み込みを開始");
+
+      // タイムアウト機能付きでトークンを読み込み
+      const loadPromise = AuthStorage.load();
+      const timeoutPromise = new Promise<null>((_, reject) => {
+        setTimeout(
+          () => reject(new Error("認証データの読み込みタイムアウト")),
+          15000
+        );
+      });
+
+      const tokens = await Promise.race([loadPromise, timeoutPromise]);
+
       if (tokens) {
         if (!tokens.accessToken || !tokens.user) {
-          // eslint-disable-next-line no-console
-          console.warn("Invalid stored tokens, clearing storage");
+          Logger.warn("Invalid stored tokens, clearing storage");
           await AuthStorage.clear();
           return;
         }
+        Logger.debug("loadStoredAuth: 有効な認証データを復元しました");
         setUser(tokens.user);
+      } else {
+        Logger.debug("useAuth0: No stored tokens found");
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("保存された認証情報の読み込みに失敗:", err);
+      Logger.error("保存された認証情報の読み込みに失敗:", err);
       // Clear potentially corrupted storage
-      await AuthStorage.clear();
+      try {
+        await AuthStorage.clear();
+      } catch (clearError) {
+        Logger.error("認証データのクリアに失敗:", clearError);
+      }
       setError(err as Error);
     } finally {
+      Logger.debug("useAuth0: Setting isLoading to false");
       setIsLoading(false);
     }
   }, []);
@@ -84,21 +103,24 @@ export function useAuth0(): UseAuth0Result {
   /**
    * 認証成功時の処理
    */
-  const handleAuthSuccess = useCallback(async (accessToken: string, idToken?: string) => {
-    try {
-      const userInfo = await Auth0Api.getUserInfo(accessToken);
-      await AuthStorage.save({ accessToken, idToken, user: userInfo });
-      setUser(userInfo);
-      setError(null);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("認証成功処理に失敗:", err);
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const handleAuthSuccess = useCallback(
+    async (accessToken: string, idToken?: string) => {
+      try {
+        const userInfo = await Auth0Api.getUserInfo(accessToken);
+        await AuthStorage.save({ accessToken, idToken, user: userInfo });
+        setUser(userInfo);
+        setError(null);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("認証成功処理に失敗:", err);
+        setError(err as Error);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   /**
    * 認証レスポンスの処理
@@ -152,10 +174,12 @@ export function useAuth0(): UseAuth0Result {
             );
           }
 
-          await handleAuthSuccess(tokenResponse.accessToken, tokenResponse.idToken);
+          await handleAuthSuccess(
+            tokenResponse.accessToken,
+            tokenResponse.idToken
+          );
         } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error("トークン交換に失敗:", err);
+          Logger.error("トークン交換に失敗:", err);
           setError(err as Error);
           setIsLoading(false);
         }
@@ -183,7 +207,19 @@ export function useAuth0(): UseAuth0Result {
    * 認証状態の初期化
    */
   useEffect(() => {
-    loadStoredAuth();
+    // 安全策：20秒後に強制的にisLoadingをfalseにする
+    const timeoutId = setTimeout(() => {
+      Logger.warn("認証初期化がタイムアウトしました");
+      setIsLoading(false);
+    }, 20000);
+
+    loadStoredAuth().finally(() => {
+      clearTimeout(timeoutId);
+    });
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [loadStoredAuth]);
 
   /**
@@ -209,8 +245,7 @@ export function useAuth0(): UseAuth0Result {
       setError(null);
       await promptAsync();
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("ログインエラー:", err);
+      Logger.error("ログインエラー:", err);
       setError(err as Error);
       setIsLoading(false);
       throw err;
@@ -227,8 +262,7 @@ export function useAuth0(): UseAuth0Result {
       await AuthStorage.clear();
       setUser(null);
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("ログアウトエラー:", err);
+      Logger.error("ログアウトエラー:", err);
       setError(err as Error);
       throw err;
     } finally {
@@ -244,8 +278,7 @@ export function useAuth0(): UseAuth0Result {
       const tokens = await AuthStorage.load();
       return tokens?.accessToken || null;
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("アクセストークン取得エラー:", err);
+      Logger.error("アクセストークン取得エラー:", err);
       return null;
     }
   }, []);

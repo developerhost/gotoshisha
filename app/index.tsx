@@ -3,7 +3,7 @@
  * 認証状態を確認してホームページにリダイレクト
  */
 import { useRouter } from "expo-router";
-import { useAuth } from "./contexts/AuthContext.web";
+import { useAuth } from "./contexts/AuthContext";
 import { useEffect, useCallback, useState } from "react";
 import { LoadingScreen } from "./features/login/LoadingScreen";
 import { AppHeader } from "./components/AppHeader";
@@ -12,9 +12,11 @@ import { Tutorial } from "./features/tutorial/Tutorial";
 import { isTutorialCompleted } from "./features/tutorial/storage";
 import type { LogoutHandler } from "./types/auth";
 import { SafeAreaView } from "react-native";
+import { Logger } from "./utils/logger";
 
 export default function IndexScreen() {
   const { isAuthenticated, isLoading, logout } = useAuth();
+
   const router = useRouter();
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -46,8 +48,7 @@ export default function IndexScreen() {
       await logout();
       router.replace("/routes/login");
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Logout error:", error);
+      Logger.error("Logout error:", error);
     }
   }, [logout, router]);
 

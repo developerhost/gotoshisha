@@ -11,6 +11,7 @@ export function LoadingScreen() {
       justifyContent="center"
       alignItems="center"
       backgroundColor="$backgroundSoft"
+      padding="$4"
     >
       <Text fontSize="$6" color="$purple11" marginBottom="$2">
         🚀
@@ -18,7 +19,7 @@ export function LoadingScreen() {
       <Text fontSize="$5" fontWeight="600" color="$purple11">
         GoToShisha
       </Text>
-      <Text fontSize="$3" color="$gray10">
+      <Text fontSize="$3" color="$gray10" marginBottom="$4">
         読み込み中...
       </Text>
     </YStack>

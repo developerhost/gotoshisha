@@ -6,7 +6,8 @@
  * - プロフィール情報の更新（PUT）
  * - エラーハンドリングとログ出力
  */
-import { apiClient } from "../config/api";
+import { BaseApi } from "./baseApi";
+import { Logger } from "../utils/logger";
 
 export interface UserProfile {
   id: string;
@@ -54,58 +55,50 @@ export async function getUserProfile(
   userInfo?: { email?: string; name?: string; picture?: string }
 ): Promise<UserProfile> {
   if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("getUserProfile called with userId:", userId);
-    // eslint-disable-next-line no-console
-    console.log("User info provided:", userInfo);
+    Logger.debug("getUserProfile called with userId:", userId);
+    Logger.debug("User info provided:", userInfo);
   }
 
-  const options: { token?: string } = {};
-  if (token) {
-    options.token = token;
-  }
+  try {
+    // ユーザー情報がある場合はPOST（retrieve）を使用、ない場合はGETを使用
+    const response = userInfo
+      ? await BaseApi.post<UserProfile>(
+          `/api/profile/${userId}/retrieve`,
+          { user: userInfo },
+          { skipAuth: !token }
+        )
+      : await BaseApi.get<UserProfile>(
+          `/api/profile/${userId}`,
+          {},
+          { skipAuth: !token }
+        );
 
-  // ユーザー情報がある場合はPOST（retrieve）を使用、ない場合はGETを使用
-  const response = userInfo
-    ? await apiClient.post(`/api/profile/${userId}/retrieve`, {
-        json: { user: userInfo },
-        ...options,
-      })
-    : await apiClient.get(`/api/profile/${userId}`, options);
-
-  if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("API response status:", response.status);
-  }
-
-  if (!response.ok) {
-    const errorData = await response.json();
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
-      console.error("API error:", errorData);
+      Logger.debug("Profile data:", response);
     }
 
-    // 具体的なエラーメッセージを提供
-    if (response.status === 401) {
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.error || "プロフィールの取得に失敗しました");
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      Logger.error("API error:", error);
+    }
+
+    // BaseApiのApiErrorを使用したエラーハンドリング
+    if (error instanceof Error && error.message.includes("401")) {
       throw new Error("認証が必要です。ログインしてから再試行してください。");
-    } else if (response.status === 400) {
+    } else if (error instanceof Error && error.message.includes("400")) {
       throw new Error(
-        errorData.error ||
-          "ユーザー情報の取得に失敗しました。有効なメールアドレスが必要です。"
+        "ユーザー情報の取得に失敗しました。有効なメールアドレスが必要です。"
       );
-    } else if (response.status === 409) {
+    } else if (error instanceof Error && error.message.includes("409")) {
       throw new Error("このメールアドレスは既に使用されています。");
     } else {
-      throw new Error(errorData.error || "プロフィールの取得に失敗しました");
+      throw new Error("プロフィールの取得に失敗しました");
     }
   }
-
-  const data = await response.json();
-  if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("Profile data:", data);
-  }
-  return data;
 }
 
 /**
@@ -134,32 +127,28 @@ export async function updateUserProfile(
   token?: string
 ): Promise<UserProfile> {
   if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("updateUserProfile called with:", { userId, profile });
-  }
-  const response = await apiClient.put(`/api/profile/${userId}`, {
-    json: profile,
-    token,
-  });
-
-  if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("Update response status:", response.status);
+    Logger.debug("updateUserProfile called with:", { userId, profile });
   }
 
-  if (!response.ok) {
-    const errorData = await response.json();
+  try {
+    const response = await BaseApi.put<UserProfile>(
+      `/api/profile/${userId}`,
+      profile,
+      { skipAuth: !token }
+    );
+
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
-      console.error("Update API error:", errorData);
+      Logger.debug("Updated profile data:", response);
     }
-    throw new Error(errorData.error || "プロフィールの更新に失敗しました");
-  }
 
-  const data = await response.json();
-  if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("Updated profile data:", data);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.error || "プロフィールの更新に失敗しました");
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      Logger.error("Update API error:", error);
+    }
+    throw new Error("プロフィールの更新に失敗しました");
   }
-  return data;
 }

@@ -9,6 +9,7 @@ import {
 } from "../config/api";
 import type { ApiResponse } from "../types/api";
 import { AuthStorage } from "../features/auth/storage";
+import { Logger } from "../utils/logger";
 
 // APIエラークラス
 export class ApiError extends Error {
@@ -48,8 +49,7 @@ export class BaseApi {
       const authData = await AuthStorage.load();
       return authData?.accessToken || null;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to get auth token:", error);
+      Logger.error("Failed to get auth token:", error);
       return null;
     }
   }

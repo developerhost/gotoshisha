@@ -7,7 +7,7 @@ import MapView, {
   PROVIDER_GOOGLE,
 } from "react-native-maps";
 import { SHINJUKU_COORDINATE } from "../constants/location";
-import { useAuth } from "../contexts/AuthContext.web";
+import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "expo-router";
 import { useMapState } from "../features/map/useMapState";
 import { ShopDetailSheet } from "../features/shop/ShopDetailSheet";
@@ -126,30 +126,55 @@ export default function MapScreen() {
 
   return (
     <YStack flex={1}>
-      <MapView
-        style={{ flex: 1 }}
-        initialCamera={initialCamera}
-        provider={Platform.OS === "ios" ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-        onRegionChangeComplete={handleRegionChangeComplete}
-      >
-        {/* 店舗のピンを表示 */}
-        {shops.map((shop: Shop) => (
-          <Marker
-            key={shop.id}
-            coordinate={{
-              latitude: shop.latitude!,
-              longitude: shop.longitude!,
-            }}
-            icon={require("../assets/images/pin.png")}
-            anchor={{ x: 0.5, y: 1 }}
-            onPress={() => {
-              setSelectedShop(shop);
-            }}
-          />
-        ))}
-      </MapView>
+      {Platform.OS === "web" ? (
+        // Web版ではMapViewの代わりにプレースホルダーを表示
+        <YStack
+          flex={1}
+          justifyContent="center"
+          alignItems="center"
+          backgroundColor="$gray3"
+        >
+          <Text fontSize="$6" fontWeight="600" marginBottom="$4">
+            🗺️ マップ機能
+          </Text>
+          <Text
+            fontSize="$4"
+            color="$gray10"
+            textAlign="center"
+            marginBottom="$4"
+          >
+            Web版ではマップ機能はサポートされていません。
+          </Text>
+          <Text fontSize="$3" color="$gray9" textAlign="center">
+            モバイルアプリでご利用ください。
+          </Text>
+        </YStack>
+      ) : (
+        <MapView
+          style={{ flex: 1 }}
+          initialCamera={initialCamera}
+          provider={Platform.OS === "ios" ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
+          showsUserLocation={true}
+          showsMyLocationButton={true}
+          onRegionChangeComplete={handleRegionChangeComplete}
+        >
+          {/* 店舗のピンを表示 */}
+          {shops.map((shop: Shop) => (
+            <Marker
+              key={shop.id}
+              coordinate={{
+                latitude: shop.latitude!,
+                longitude: shop.longitude!,
+              }}
+              icon={require("../assets/images/pin.png")}
+              anchor={{ x: 0.5, y: 1 }}
+              onPress={() => {
+                setSelectedShop(shop);
+              }}
+            />
+          ))}
+        </MapView>
+      )}
 
       {user && (
         <YStack

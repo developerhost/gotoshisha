@@ -17,6 +17,7 @@ import type {
   ShopUpdateInput,
   ShopQueryParams,
 } from "../../types/api";
+import { Logger } from "../../utils/logger";
 
 /**
  * 関連要素タイプをAPIパラメータに変換する
@@ -119,8 +120,7 @@ export const useCreateShop = () => {
       queryClient.setQueryData(queryKeys.shops.detail(newShop.id), newShop);
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
-      console.error("店舗作成エラー:", error);
+      Logger.error("店舗作成エラー:", error);
     },
   });
 };
@@ -145,8 +145,7 @@ export const useUpdateShop = () => {
       invalidateQueries.shops.list();
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
-      console.error("店舗更新エラー:", error);
+      Logger.error("店舗更新エラー:", error);
     },
   });
 };
@@ -169,8 +168,7 @@ export const useDeleteShop = () => {
       invalidateQueries.shops.list();
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
-      console.error("店舗削除エラー:", error);
+      Logger.error("店舗削除エラー:", error);
     },
   });
 };
@@ -197,8 +195,7 @@ export const useAddShopRelation = () => {
       invalidateQueries.shops.detail(shopId);
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
-      console.error("関連要素追加エラー:", error);
+      Logger.error("関連要素追加エラー:", error);
     },
   });
 };
@@ -225,8 +222,7 @@ export const useRemoveShopRelation = () => {
       invalidateQueries.shops.detail(shopId);
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
-      console.error("関連要素削除エラー:", error);
+      Logger.error("関連要素削除エラー:", error);
     },
   });
 };
@@ -313,21 +309,18 @@ export const useMapShopsCollection = () => {
   // 新しいエリアの店舗を取得・追加
   const collectShopsFromArea = useCallback(
     async (latitude: number, longitude: number, radius: number = 5) => {
-      // eslint-disable-next-line no-console
-      console.log(
+      Logger.debug(
         `Collecting shops from area: lat=${latitude}, lng=${longitude}, radius=${radius}km`
       );
 
       // 既に検索済みのエリアなら何もしない
       if (isAreaSearched(latitude, longitude, radius)) {
-        // eslint-disable-next-line no-console
-        console.log("Area already searched, skipping...");
+        Logger.debug("Area already searched, skipping...");
         return Array.from(collectedShops.values());
       }
 
       try {
-        // eslint-disable-next-line no-console
-        console.log("Fetching shops from API...");
+        Logger.debug("Fetching shops from API...");
         const response = await ShopsApi.searchNearbyShops(
           latitude,
           longitude,
@@ -337,12 +330,10 @@ export const useMapShopsCollection = () => {
           }
         );
 
-        // eslint-disable-next-line no-console
-        console.log(`API response: ${response.shops.length} shops found`);
+        Logger.debug(`API response: ${response.shops.length} shops found`);
         response.shops.forEach((shop) => {
           if (isValidShop(shop)) {
-            // eslint-disable-next-line no-console
-            console.log(
+            Logger.debug(
               `- ${shop.name}: (${shop.latitude}, ${shop.longitude})`
             );
           }
@@ -356,8 +347,7 @@ export const useMapShopsCollection = () => {
               newMap.set(shop.id, shop);
             }
           });
-          // eslint-disable-next-line no-console
-          console.log(`Total collected shops: ${newMap.size}`);
+          Logger.debug(`Total collected shops: ${newMap.size}`);
           return newMap;
         });
 
@@ -366,8 +356,7 @@ export const useMapShopsCollection = () => {
 
         return Array.from(collectedShops.values());
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("店舗データの収集に失敗:", error);
+        Logger.error("店舗データの収集に失敗:", error);
         return Array.from(collectedShops.values());
       }
     },

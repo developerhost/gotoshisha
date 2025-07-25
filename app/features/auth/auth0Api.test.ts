@@ -39,11 +39,12 @@ describe("Auth0Api", () => {
 
       expect(fetch).toHaveBeenCalledWith(
         `https://${auth0Config.domain}/userinfo`,
-        {
+        expect.objectContaining({
           headers: {
             Authorization: `Bearer ${mockAccessToken}`,
           },
-        }
+          signal: expect.any(AbortSignal),
+        })
       );
       expect(result).toEqual(mockUserInfo);
     });

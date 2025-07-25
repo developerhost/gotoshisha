@@ -1,27 +1,49 @@
 /**
  * チュートリアルストレージ機能のテスト
  */
+// import { Platform } from "react-native"; // 現在未使用
 import * as SecureStore from "expo-secure-store";
 import {
   isTutorialCompleted,
   setTutorialCompleted,
   resetTutorialStatus,
 } from "./storage";
+import { resetStorageForTesting } from "../../lib/storage";
+import { Logger } from "../../utils/logger";
 
-// SecureStore をモック化
+// Platform とモジュールをモック化
+vi.mock("react-native", () => ({
+  Platform: {
+    OS: "ios", // ネイティブテスト用
+  },
+}));
+
 vi.mock("expo-secure-store", () => ({
   getItemAsync: vi.fn(),
   setItemAsync: vi.fn(),
   deleteItemAsync: vi.fn(),
 }));
 
+// localStorage モック（Web用）
+const mockLocalStorage = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+};
+
+Object.defineProperty(global, "localStorage", {
+  value: mockLocalStorage,
+  writable: true,
+});
+
 describe("チュートリアルストレージ機能", () => {
   const mockGetItemAsync = vi.mocked(SecureStore.getItemAsync);
   const mockSetItemAsync = vi.mocked(SecureStore.setItemAsync);
-  const mockDeleteItemAsync = vi.mocked(SecureStore.deleteItemAsync);
+  // const mockDeleteItemAsync = vi.mocked(SecureStore.deleteItemAsync); // 現在未使用
 
   beforeEach(() => {
     vi.clearAllMocks();
+    resetStorageForTesting();
     // コンソールエラーをモック化してテスト出力をクリーンに保つ
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
@@ -60,9 +82,9 @@ describe("チュートリアルストレージ機能", () => {
       const result = await isTutorialCompleted();
 
       expect(result).toBe(false);
-      // eslint-disable-next-line no-console
-      expect(console.error).toHaveBeenCalledWith(
-        "Failed to check tutorial status:",
+      // Logger.errorが呼ばれたことを確認
+      expect(Logger.error).toHaveBeenCalledWith(
+        "storage.getItem (native): Error getting tutorial_completed:",
         mockError
       );
     });
@@ -84,11 +106,13 @@ describe("チュートリアルストレージ機能", () => {
       const mockError = new Error("SecureStore save error");
       mockSetItemAsync.mockRejectedValue(mockError);
 
-      await setTutorialCompleted();
+      await expect(setTutorialCompleted()).rejects.toThrow(
+        "SecureStore save error"
+      );
 
-      // eslint-disable-next-line no-console
-      expect(console.error).toHaveBeenCalledWith(
-        "Failed to save tutorial status:",
+      // Logger.errorが呼ばれたことを確認
+      expect(Logger.error).toHaveBeenCalledWith(
+        "Failed to save boolean to storage (tutorial_completed):",
         mockError
       );
     });
@@ -96,21 +120,22 @@ describe("チュートリアルストレージ機能", () => {
 
   describe("resetTutorialStatus", () => {
     it("チュートリアル状態を正常にリセットする", async () => {
-      mockDeleteItemAsync.mockResolvedValue();
-
       await resetTutorialStatus();
 
-      expect(mockDeleteItemAsync).toHaveBeenCalledWith("tutorial_completed");
+      expect(mockSetItemAsync).toHaveBeenCalledWith(
+        "tutorial_completed",
+        "false"
+      );
     });
 
     it("SecureStoreでエラーが発生した場合はエラーログを出力する", async () => {
-      const mockError = new Error("SecureStore delete error");
-      mockDeleteItemAsync.mockRejectedValue(mockError);
+      const mockError = new Error("SecureStore save error");
+      mockSetItemAsync.mockRejectedValue(mockError);
 
       await resetTutorialStatus();
 
-      // eslint-disable-next-line no-console
-      expect(console.error).toHaveBeenCalledWith(
+      // Logger.errorが呼ばれたことを確認
+      expect(Logger.error).toHaveBeenCalledWith(
         "Failed to reset tutorial status:",
         mockError
       );
@@ -145,9 +170,11 @@ describe("チュートリアルストレージ機能", () => {
       expect(beforeReset).toBe(true);
 
       // リセット実行
-      mockDeleteItemAsync.mockResolvedValue();
       await resetTutorialStatus();
-      expect(mockDeleteItemAsync).toHaveBeenCalledWith("tutorial_completed");
+      expect(mockSetItemAsync).toHaveBeenCalledWith(
+        "tutorial_completed",
+        "false"
+      );
 
       // リセット後 - 未完了状態
       mockGetItemAsync.mockResolvedValue(null);

@@ -11,6 +11,7 @@ import type {
   ShopQueryParams,
   ShopRelationParams,
 } from "../types/api";
+import { Logger } from "../utils/logger";
 
 /**
  * シーシャ店舗APIクラス
@@ -169,8 +170,7 @@ export class ShopsApi {
     try {
       return JSON.parse(field) as T;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to parse JSON field:", error);
+      Logger.error("Failed to parse JSON field:", error);
       return undefined;
     }
   }

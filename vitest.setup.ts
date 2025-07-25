@@ -66,6 +66,22 @@ vi.mock("expo-secure-store", () => ({
   deleteItemAsync: vi.fn(),
 }));
 
+// Mock Logger
+vi.mock("./app/utils/logger", () => ({
+  Logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+  default: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 // Clear all mocks before each test
 beforeEach(() => {
   vi.clearAllMocks();
