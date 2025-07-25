@@ -35,7 +35,6 @@
     "react-native": "0.79.4",
     "react-native-auth0": "^4.6.0",
     "react-native-dotenv": "^3.4.11",
-    "react-native-logs": "^5.3.0",
     "react-native-maps": "1.20.1",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
