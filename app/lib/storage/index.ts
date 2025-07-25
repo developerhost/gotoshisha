@@ -38,8 +38,31 @@ function createStorage(): StorageInterface {
   } else {
     return {
       async setItem(key: string, value: string): Promise<void> {
-        Logger.debug(`storage.setItem (native): ${key} =`, value);
-        await SecureStore.setItemAsync(key, value);
+        try {
+          Logger.debug(`storage.setItem (native): ${key} =`, value);
+
+          // タイムアウト付きでSecureStore.setItemAsyncを実行
+          const timeoutPromise = new Promise<void>((_, reject) => {
+            setTimeout(
+              () =>
+                reject(
+                  new Error(`SecureStore setItem timeout for key: ${key}`)
+                ),
+              15000
+            );
+          });
+
+          await Promise.race([
+            SecureStore.setItemAsync(key, value),
+            timeoutPromise,
+          ]);
+        } catch (error) {
+          Logger.error(
+            `storage.setItem (native): Error setting ${key}:`,
+            error
+          );
+          throw error;
+        }
       },
       async getItem(key: string): Promise<string | null> {
         try {
@@ -49,7 +72,7 @@ function createStorage(): StorageInterface {
           const timeoutPromise = new Promise<string | null>((_, reject) => {
             setTimeout(
               () => reject(new Error(`SecureStore timeout for key: ${key}`)),
-              5000
+              15000
             );
           });
 
@@ -69,8 +92,31 @@ function createStorage(): StorageInterface {
         }
       },
       async removeItem(key: string): Promise<void> {
-        Logger.debug(`storage.removeItem (native): ${key}`);
-        await SecureStore.deleteItemAsync(key);
+        try {
+          Logger.debug(`storage.removeItem (native): ${key}`);
+
+          // タイムアウト付きでSecureStore.deleteItemAsyncを実行
+          const timeoutPromise = new Promise<void>((_, reject) => {
+            setTimeout(
+              () =>
+                reject(
+                  new Error(`SecureStore deleteItem timeout for key: ${key}`)
+                ),
+              15000
+            );
+          });
+
+          await Promise.race([
+            SecureStore.deleteItemAsync(key),
+            timeoutPromise,
+          ]);
+        } catch (error) {
+          Logger.error(
+            `storage.removeItem (native): Error removing ${key}:`,
+            error
+          );
+          throw error;
+        }
       },
     };
   }
@@ -129,7 +175,10 @@ export class StorageHelper {
       const value = await storage.getItem(key);
       Logger.debug(`StorageHelper.getObject: Raw value for ${key}:`, value);
       const result = value ? JSON.parse(value) : null;
-      Logger.debug(`StorageHelper.getObject: Parsed result for ${key}:`, result);
+      Logger.debug(
+        `StorageHelper.getObject: Parsed result for ${key}:`,
+        result
+      );
       return result;
     } catch (error) {
       Logger.error(`Failed to load object from storage (${key}):`, error);

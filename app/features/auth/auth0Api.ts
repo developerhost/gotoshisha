@@ -13,17 +13,30 @@ export class Auth0Api {
    * @returns ユーザー情報
    */
   static async getUserInfo(accessToken: string): Promise<UserInfo> {
-    const response = await fetch(`${Auth0Api.baseUrl}/userinfo`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒タイムアウト
 
-    if (!response.ok) {
-      throw new Error(`ユーザー情報の取得に失敗: ${response.statusText}`);
+    try {
+      const response = await fetch(`${Auth0Api.baseUrl}/userinfo`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`ユーザー情報の取得に失敗: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("ユーザー情報の取得がタイムアウトしました");
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    return response.json();
   }
 
   /**
@@ -64,30 +77,43 @@ export class Auth0Api {
     redirectUri: string,
     codeVerifier: string
   ): Promise<TokenResponse> {
-    const response = await fetch(`${Auth0Api.baseUrl}/oauth/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        grant_type: "authorization_code",
-        client_id: auth0Config.clientId,
-        code,
-        redirect_uri: redirectUri,
-        code_verifier: codeVerifier,
-      }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒タイムアウト
 
-    if (!response.ok) {
-      const errorData: Auth0ErrorResponse = await response.json();
-      throw new Error(
-        `トークン交換に失敗: ${
-          errorData.error_description || response.statusText
-        }`
-      );
+    try {
+      const response = await fetch(`${Auth0Api.baseUrl}/oauth/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          grant_type: "authorization_code",
+          client_id: auth0Config.clientId,
+          code,
+          redirect_uri: redirectUri,
+          code_verifier: codeVerifier,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const errorData: Auth0ErrorResponse = await response.json();
+        throw new Error(
+          `トークン交換に失敗: ${
+            errorData.error_description || response.statusText
+          }`
+        );
+      }
+
+      return response.json();
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("トークン交換がタイムアウトしました");
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    return response.json();
   }
 
   /**

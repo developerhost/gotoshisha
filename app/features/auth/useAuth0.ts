@@ -61,13 +61,26 @@ export function useAuth0(): UseAuth0Result {
    */
   const loadStoredAuth = useCallback(async () => {
     try {
-      const tokens = await AuthStorage.load();
+      Logger.debug("loadStoredAuth: 認証データの読み込みを開始");
+
+      // タイムアウト機能付きでトークンを読み込み
+      const loadPromise = AuthStorage.load();
+      const timeoutPromise = new Promise<null>((_, reject) => {
+        setTimeout(
+          () => reject(new Error("認証データの読み込みタイムアウト")),
+          15000
+        );
+      });
+
+      const tokens = await Promise.race([loadPromise, timeoutPromise]);
+
       if (tokens) {
         if (!tokens.accessToken || !tokens.user) {
           Logger.warn("Invalid stored tokens, clearing storage");
           await AuthStorage.clear();
           return;
         }
+        Logger.debug("loadStoredAuth: 有効な認証データを復元しました");
         setUser(tokens.user);
       } else {
         Logger.debug("useAuth0: No stored tokens found");
@@ -75,7 +88,11 @@ export function useAuth0(): UseAuth0Result {
     } catch (err) {
       Logger.error("保存された認証情報の読み込みに失敗:", err);
       // Clear potentially corrupted storage
-      await AuthStorage.clear();
+      try {
+        await AuthStorage.clear();
+      } catch (clearError) {
+        Logger.error("認証データのクリアに失敗:", clearError);
+      }
       setError(err as Error);
     } finally {
       Logger.debug("useAuth0: Setting isLoading to false");
@@ -190,10 +207,11 @@ export function useAuth0(): UseAuth0Result {
    * 認証状態の初期化
    */
   useEffect(() => {
-    // 安全策：10秒後に強制的にisLoadingをfalseにする
+    // 安全策：20秒後に強制的にisLoadingをfalseにする
     const timeoutId = setTimeout(() => {
+      Logger.warn("認証初期化がタイムアウトしました");
       setIsLoading(false);
-    }, 10000);
+    }, 20000);
 
     loadStoredAuth().finally(() => {
       clearTimeout(timeoutId);
