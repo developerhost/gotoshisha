@@ -7,6 +7,7 @@
  * - エラーハンドリングとログ出力
  */
 import { BaseApi } from "./baseApi";
+import { Logger } from "../utils/logger";
 
 export interface UserProfile {
   id: string;
@@ -54,10 +55,8 @@ export async function getUserProfile(
   userInfo?: { email?: string; name?: string; picture?: string }
 ): Promise<UserProfile> {
   if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("getUserProfile called with userId:", userId);
-    // eslint-disable-next-line no-console
-    console.log("User info provided:", userInfo);
+    Logger.debug("getUserProfile called with userId:", userId);
+    Logger.debug("User info provided:", userInfo);
   }
 
   try {
@@ -75,8 +74,7 @@ export async function getUserProfile(
         );
 
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
-      console.log("Profile data:", response);
+      Logger.debug("Profile data:", response);
     }
 
     if (response.success && response.data) {
@@ -85,8 +83,7 @@ export async function getUserProfile(
     throw new Error(response.error || "プロフィールの取得に失敗しました");
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
-      console.error("API error:", error);
+      Logger.error("API error:", error);
     }
 
     // BaseApiのApiErrorを使用したエラーハンドリング
@@ -130,8 +127,7 @@ export async function updateUserProfile(
   token?: string
 ): Promise<UserProfile> {
   if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.log("updateUserProfile called with:", { userId, profile });
+    Logger.debug("updateUserProfile called with:", { userId, profile });
   }
 
   try {
@@ -142,8 +138,7 @@ export async function updateUserProfile(
     );
 
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
-      console.log("Updated profile data:", response);
+      Logger.debug("Updated profile data:", response);
     }
 
     if (response.success && response.data) {
@@ -152,8 +147,7 @@ export async function updateUserProfile(
     throw new Error(response.error || "プロフィールの更新に失敗しました");
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
-      console.error("Update API error:", error);
+      Logger.error("Update API error:", error);
     }
     throw new Error("プロフィールの更新に失敗しました");
   }

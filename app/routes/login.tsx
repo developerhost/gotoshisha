@@ -3,6 +3,7 @@ import { YStack, Text, Button } from "tamagui";
 import { SafeAreaView } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "expo-router";
+import { Logger } from "../utils/logger";
 
 export default function LoginScreen() {
   const { login, isLoading, error } = useAuth();
@@ -13,8 +14,7 @@ export default function LoginScreen() {
       await login();
       router.replace("/");
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error("Login failed:", e);
+      Logger.error("Login failed:", e);
     }
   };
 

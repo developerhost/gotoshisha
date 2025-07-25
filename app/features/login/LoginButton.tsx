@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import { Button, Spinner } from "tamagui";
 import { useAuth0 } from "react-native-auth0";
+import { Logger } from "../../utils/logger";
 
 interface LoginButtonProps {
   onError?: (error: Error) => void;
@@ -24,8 +25,7 @@ export const LoginButton = ({ onError }: LoginButtonProps = {}) => {
       setIsLoading(true);
       await authorize();
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Login failed:", error);
+      Logger.error("Login failed:", error);
 
       // Show user-friendly error message
       const errorMessage =

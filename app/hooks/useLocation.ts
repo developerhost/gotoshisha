@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import * as Location from "expo-location";
 import { Linking, AppState } from "react-native";
 import { SHINJUKU_COORDINATE } from "../constants/location";
+import { Logger } from "../utils/logger";
 
 export interface LocationState {
   latitude: number | null;
@@ -32,8 +33,7 @@ export const useLocation = () => {
     try {
       await Linking.openSettings();
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("設定画面を開けませんでした:", error);
+      Logger.error("設定画面を開けませんでした:", error);
     }
   }, []);
 
@@ -66,8 +66,7 @@ export const useLocation = () => {
       // 権限をリクエスト
       const { status } = await Location.requestForegroundPermissionsAsync();
 
-      // eslint-disable-next-line no-console
-      console.log("位置情報の権限ステータス:", status);
+      Logger.debug("位置情報の権限ステータス:", status);
 
       // 権限が完全に拒否された場合のみフォールバック
       if (status === "denied") {
@@ -98,7 +97,7 @@ export const useLocation = () => {
           requiredAccuracy: 5000, // 「おおよそ」の場合を考慮して精度を緩和（5km以内）
         });
 
-        // console.log('最後に知られた位置:', lastKnownLocation);
+        // Logger.debug('最後に知られた位置:', lastKnownLocation);
 
         if (lastKnownLocation) {
           // 最後に知られた位置をすぐに設定し、ローディングを解除
@@ -114,8 +113,7 @@ export const useLocation = () => {
           hasQuickLocation = true;
         }
       } catch (lastKnownError) {
-        // eslint-disable-next-line no-console
-        console.log("最後に知られた位置の取得に失敗:", lastKnownError);
+        Logger.debug("最後に知られた位置の取得に失敗:", lastKnownError);
       }
 
       // バックグラウンドでより精密な現在位置を取得
@@ -126,7 +124,7 @@ export const useLocation = () => {
           distanceInterval: 100, // 100m以内の変化を検知
         });
 
-        // console.log('現在位置:', currentLocation);
+        // Logger.debug('現在位置:', currentLocation);
 
         // より精密な位置で更新（ローディングを確実に解除）
         setLocation((prev) => ({
@@ -152,8 +150,7 @@ export const useLocation = () => {
             error: "位置情報の取得に失敗しました。新宿駅周辺を表示しています。",
           }));
         }
-        // eslint-disable-next-line no-console
-        console.log("精密な位置の取得に失敗:", currentLocationError);
+        Logger.debug("精密な位置の取得に失敗:", currentLocationError);
       }
     } catch (error) {
       setLocation((prev) => ({
@@ -191,7 +188,7 @@ export const useLocation = () => {
             requiredAccuracy: 10000, // 「おおよそ」を考慮して精度を大幅に緩和（10km以内）
           });
 
-          // console.log('初期化時の最後に知られた位置:', lastKnownLocation);
+          // Logger.debug('初期化時の最後に知られた位置:', lastKnownLocation);
 
           if (lastKnownLocation) {
             setLocation((prev) => ({
@@ -203,16 +200,14 @@ export const useLocation = () => {
             }));
           }
         } catch (lastKnownError) {
-          // eslint-disable-next-line no-console
-          console.log(
+          Logger.debug(
             "初期化時の最後に知られた位置の取得に失敗:",
             lastKnownError
           );
         }
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("位置情報権限の確認に失敗:", error);
+      Logger.error("位置情報権限の確認に失敗:", error);
     }
   };
 

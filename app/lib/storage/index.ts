@@ -3,6 +3,7 @@
  */
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { Logger } from "../../utils/logger";
 
 /**
  * ストレージインターフェース
@@ -17,38 +18,32 @@ export interface StorageInterface {
  * プラットフォーム固有のストレージ実装を取得
  */
 function createStorage(): StorageInterface {
-  // eslint-disable-next-line no-console
-  console.log("createStorage: Platform.OS =", Platform.OS);
+  Logger.debug("createStorage: Platform.OS =", Platform.OS);
   if (Platform.OS === "web") {
     return {
       async setItem(key: string, value: string): Promise<void> {
-        // eslint-disable-next-line no-console
-        console.log(`storage.setItem (web): ${key} =`, value);
+        Logger.debug(`storage.setItem (web): ${key} =`, value);
         localStorage.setItem(key, value);
       },
       async getItem(key: string): Promise<string | null> {
         const result = localStorage.getItem(key);
-        // eslint-disable-next-line no-console
-        console.log(`storage.getItem (web): ${key} =`, result);
+        Logger.debug(`storage.getItem (web): ${key} =`, result);
         return result;
       },
       async removeItem(key: string): Promise<void> {
-        // eslint-disable-next-line no-console
-        console.log(`storage.removeItem (web): ${key}`);
+        Logger.debug(`storage.removeItem (web): ${key}`);
         localStorage.removeItem(key);
       },
     };
   } else {
     return {
       async setItem(key: string, value: string): Promise<void> {
-        // eslint-disable-next-line no-console
-        console.log(`storage.setItem (native): ${key} =`, value);
+        Logger.debug(`storage.setItem (native): ${key} =`, value);
         await SecureStore.setItemAsync(key, value);
       },
       async getItem(key: string): Promise<string | null> {
         try {
-          // eslint-disable-next-line no-console
-          console.log(`storage.getItem (native): Attempting to get ${key}`);
+          Logger.debug(`storage.getItem (native): Attempting to get ${key}`);
 
           // タイムアウト付きでSecureStore.getItemAsyncを実行
           const timeoutPromise = new Promise<string | null>((_, reject) => {
@@ -63,12 +58,10 @@ function createStorage(): StorageInterface {
             timeoutPromise,
           ]);
 
-          // eslint-disable-next-line no-console
-          console.log(`storage.getItem (native): ${key} =`, result);
+          Logger.debug(`storage.getItem (native): ${key} =`, result);
           return result;
         } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error(
+          Logger.error(
             `storage.getItem (native): Error getting ${key}:`,
             error
           );
@@ -76,8 +69,7 @@ function createStorage(): StorageInterface {
         }
       },
       async removeItem(key: string): Promise<void> {
-        // eslint-disable-next-line no-console
-        console.log(`storage.removeItem (native): ${key}`);
+        Logger.debug(`storage.removeItem (native): ${key}`);
         await SecureStore.deleteItemAsync(key);
       },
     };
@@ -123,8 +115,7 @@ export class StorageHelper {
     try {
       await storage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`Failed to save object to storage (${key}):`, error);
+      Logger.error(`Failed to save object to storage (${key}):`, error);
       throw error;
     }
   }
@@ -133,19 +124,15 @@ export class StorageHelper {
    * JSONからオブジェクトを読み込み
    */
   static async getObject<T>(key: string): Promise<T | null> {
-    // eslint-disable-next-line no-console
-    console.log(`StorageHelper.getObject: Getting key ${key}`);
+    Logger.debug(`StorageHelper.getObject: Getting key ${key}`);
     try {
       const value = await storage.getItem(key);
-      // eslint-disable-next-line no-console
-      console.log(`StorageHelper.getObject: Raw value for ${key}:`, value);
+      Logger.debug(`StorageHelper.getObject: Raw value for ${key}:`, value);
       const result = value ? JSON.parse(value) : null;
-      // eslint-disable-next-line no-console
-      console.log(`StorageHelper.getObject: Parsed result for ${key}:`, result);
+      Logger.debug(`StorageHelper.getObject: Parsed result for ${key}:`, result);
       return result;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`Failed to load object from storage (${key}):`, error);
+      Logger.error(`Failed to load object from storage (${key}):`, error);
       return null;
     }
   }
@@ -157,8 +144,7 @@ export class StorageHelper {
     try {
       await storage.setItem(key, value ? "true" : "false");
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`Failed to save boolean to storage (${key}):`, error);
+      Logger.error(`Failed to save boolean to storage (${key}):`, error);
       throw error;
     }
   }
@@ -171,8 +157,7 @@ export class StorageHelper {
       const value = await storage.getItem(key);
       return value === "true";
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`Failed to load boolean from storage (${key}):`, error);
+      Logger.error(`Failed to load boolean from storage (${key}):`, error);
       return false;
     }
   }
@@ -185,8 +170,7 @@ export class StorageHelper {
       const value = await storage.getItem(key);
       return value !== null;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`Failed to check key existence (${key}):`, error);
+      Logger.error(`Failed to check key existence (${key}):`, error);
       return false;
     }
   }

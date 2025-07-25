@@ -1,5 +1,6 @@
 import { storage, StorageHelper } from "../../lib/storage";
 import { UserInfo } from "./types";
+import { Logger } from "../../utils/logger";
 
 export interface AuthTokens {
   accessToken: string;
@@ -48,8 +49,7 @@ export class AuthStorage {
       );
 
       if (!token || !user) {
-        // eslint-disable-next-line no-console
-        console.warn(
+        Logger.warn(
           `[${
             Date.now() - startTime
           }ms] AuthStorage.load: トークンまたはユーザー情報が見つかりません`
@@ -64,8 +64,7 @@ export class AuthStorage {
         user,
       };
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(
+      Logger.error(
         `[${Date.now() - startTime}ms] 認証トークンの読み込みに失敗:`,
         error
       );
@@ -82,8 +81,7 @@ export class AuthStorage {
       await storage.removeItem(AUTH_STORAGE_KEYS.ID_TOKEN);
       await storage.removeItem(AUTH_STORAGE_KEYS.USER);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("認証データのクリアに失敗:", error);
+      Logger.error("認証データのクリアに失敗:", error);
       // Continue execution as clearing storage shouldn't block logout
     }
   }

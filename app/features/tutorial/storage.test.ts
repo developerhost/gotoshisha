@@ -9,6 +9,7 @@ import {
   resetTutorialStatus,
 } from "./storage";
 import { resetStorageForTesting } from "../../lib/storage";
+import { Logger } from "../../utils/logger";
 
 // Platform とモジュールをモック化
 vi.mock("react-native", () => ({
@@ -81,8 +82,8 @@ describe("チュートリアルストレージ機能", () => {
       const result = await isTutorialCompleted();
 
       expect(result).toBe(false);
-      // eslint-disable-next-line no-console
-      expect(console.error).toHaveBeenCalledWith(
+      // Logger.errorが呼ばれたことを確認
+      expect(Logger.error).toHaveBeenCalledWith(
         "storage.getItem (native): Error getting tutorial_completed:",
         mockError
       );
@@ -109,8 +110,8 @@ describe("チュートリアルストレージ機能", () => {
         "SecureStore save error"
       );
 
-      // eslint-disable-next-line no-console
-      expect(console.error).toHaveBeenCalledWith(
+      // Logger.errorが呼ばれたことを確認
+      expect(Logger.error).toHaveBeenCalledWith(
         "Failed to save boolean to storage (tutorial_completed):",
         mockError
       );
@@ -133,8 +134,8 @@ describe("チュートリアルストレージ機能", () => {
 
       await resetTutorialStatus();
 
-      // eslint-disable-next-line no-console
-      expect(console.error).toHaveBeenCalledWith(
+      // Logger.errorが呼ばれたことを確認
+      expect(Logger.error).toHaveBeenCalledWith(
         "Failed to reset tutorial status:",
         mockError
       );

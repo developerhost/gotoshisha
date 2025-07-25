@@ -2,6 +2,7 @@
  * チュートリアル表示履歴の管理 (クロスプラットフォーム対応)
  */
 import { StorageHelper } from "../../lib/storage";
+import { Logger } from "../../utils/logger";
 
 const TUTORIAL_COMPLETED_KEY = "tutorial_completed";
 
@@ -26,7 +27,6 @@ export const resetTutorialStatus = async (): Promise<void> => {
   try {
     await StorageHelper.setBoolean(TUTORIAL_COMPLETED_KEY, false);
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("Failed to reset tutorial status:", error);
+    Logger.error("Failed to reset tutorial status:", error);
   }
 };

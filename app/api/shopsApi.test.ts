@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ShopsApi } from "./shopsApi";
 import { BaseApi } from "./baseApi";
+import { Logger } from "../utils/logger";
 
 // BaseApiのモック
 vi.mock("./baseApi", () => ({
@@ -254,23 +255,15 @@ describe("ShopsApi", () => {
     });
 
     it("無効なJSON文字列の場合undefinedを返すこと", () => {
-      // console.errorをモック化してログ出力を抑制
-      const consoleSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-
       const invalidJson = "not json";
       const result = ShopsApi.parseJsonField(invalidJson);
 
       expect(result).toBeUndefined();
-      // console.errorが呼ばれたことを確認
-      expect(consoleSpy).toHaveBeenCalledWith(
+      // Logger.errorが呼ばれたことを確認
+      expect(Logger.error).toHaveBeenCalledWith(
         "Failed to parse JSON field:",
         expect.any(SyntaxError)
       );
-
-      // モックを復元
-      consoleSpy.mockRestore();
     });
 
     it("undefinedの場合undefinedを返すこと", () => {

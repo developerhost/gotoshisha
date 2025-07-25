@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { Platform } from "react-native";
 import { useAuth0, UseAuth0Result } from "../features/auth/useAuth0";
+import { Logger } from "../utils/logger";
 
 interface AuthContextData extends UseAuth0Result {}
 
@@ -10,11 +11,9 @@ const AuthContext = createContext<AuthContextData | undefined>(undefined);
  * Web版認証プロバイダー
  */
 const WebAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // eslint-disable-next-line no-console
-  console.log("WebAuthProvider: Initializing");
+  Logger.debug("WebAuthProvider: Initializing");
   const auth0 = useAuth0();
-  // eslint-disable-next-line no-console
-  console.log("WebAuthProvider: Auth0 data:", auth0);
+  Logger.debug("WebAuthProvider: Auth0 data:", auth0);
   return <AuthContext.Provider value={auth0}>{children}</AuthContext.Provider>;
 };
 
@@ -24,13 +23,11 @@ const WebAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 const NativeAuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // eslint-disable-next-line no-console
-  console.log("NativeAuthProvider: Initializing with custom useAuth0");
+  Logger.debug("NativeAuthProvider: Initializing with custom useAuth0");
 
   // カスタムuseAuth0フックを使用（Web版と同じ）
   const auth0 = useAuth0();
-  // eslint-disable-next-line no-console
-  console.log("NativeAuthProvider: Custom useAuth0 result:", auth0);
+  Logger.debug("NativeAuthProvider: Custom useAuth0 result:", auth0);
 
   return <AuthContext.Provider value={auth0}>{children}</AuthContext.Provider>;
 };
@@ -42,8 +39,7 @@ const NativeAuthProvider: React.FC<{ children: ReactNode }> = ({
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // eslint-disable-next-line no-console
-  console.log("AuthProvider: Platform.OS =", Platform.OS);
+  Logger.debug("AuthProvider: Platform.OS =", Platform.OS);
 
   // プラットフォーム分岐
   if (Platform.OS === "web") {

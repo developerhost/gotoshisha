@@ -12,6 +12,7 @@ import { Tutorial } from "./features/tutorial/Tutorial";
 import { isTutorialCompleted } from "./features/tutorial/storage";
 import type { LogoutHandler } from "./types/auth";
 import { SafeAreaView } from "react-native";
+import { Logger } from "./utils/logger";
 
 export default function IndexScreen() {
   const { isAuthenticated, isLoading, logout } = useAuth();
@@ -47,8 +48,7 @@ export default function IndexScreen() {
       await logout();
       router.replace("/routes/login");
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Logout error:", error);
+      Logger.error("Logout error:", error);
     }
   }, [logout, router]);
 

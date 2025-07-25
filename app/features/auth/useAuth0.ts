@@ -11,6 +11,7 @@ import { auth0Config } from "../../config/auth0";
 import { AuthStorage } from "./storage";
 import { Auth0Api } from "./auth0Api";
 import { UserInfo } from "./types";
+import { Logger } from "../../utils/logger";
 
 export interface UseAuth0Result {
   user: UserInfo | null;
@@ -63,25 +64,21 @@ export function useAuth0(): UseAuth0Result {
       const tokens = await AuthStorage.load();
       if (tokens) {
         if (!tokens.accessToken || !tokens.user) {
-          // eslint-disable-next-line no-console
-          console.warn("Invalid stored tokens, clearing storage");
+          Logger.warn("Invalid stored tokens, clearing storage");
           await AuthStorage.clear();
           return;
         }
         setUser(tokens.user);
       } else {
-        // eslint-disable-next-line no-console
-        console.log("useAuth0: No stored tokens found");
+        Logger.debug("useAuth0: No stored tokens found");
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("保存された認証情報の読み込みに失敗:", err);
+      Logger.error("保存された認証情報の読み込みに失敗:", err);
       // Clear potentially corrupted storage
       await AuthStorage.clear();
       setError(err as Error);
     } finally {
-      // eslint-disable-next-line no-console
-      console.log("useAuth0: Setting isLoading to false");
+      Logger.debug("useAuth0: Setting isLoading to false");
       setIsLoading(false);
     }
   }, []);
@@ -165,8 +162,7 @@ export function useAuth0(): UseAuth0Result {
             tokenResponse.idToken
           );
         } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error("トークン交換に失敗:", err);
+          Logger.error("トークン交換に失敗:", err);
           setError(err as Error);
           setIsLoading(false);
         }
@@ -231,8 +227,7 @@ export function useAuth0(): UseAuth0Result {
       setError(null);
       await promptAsync();
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("ログインエラー:", err);
+      Logger.error("ログインエラー:", err);
       setError(err as Error);
       setIsLoading(false);
       throw err;
@@ -249,8 +244,7 @@ export function useAuth0(): UseAuth0Result {
       await AuthStorage.clear();
       setUser(null);
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("ログアウトエラー:", err);
+      Logger.error("ログアウトエラー:", err);
       setError(err as Error);
       throw err;
     } finally {
@@ -266,8 +260,7 @@ export function useAuth0(): UseAuth0Result {
       const tokens = await AuthStorage.load();
       return tokens?.accessToken || null;
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("アクセストークン取得エラー:", err);
+      Logger.error("アクセストークン取得エラー:", err);
       return null;
     }
   }, []);
