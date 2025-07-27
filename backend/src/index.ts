@@ -10,11 +10,6 @@ import type { PrismaClient } from "@prisma/client";
 // ルーターのインポート
 import shops from "@/routes/shops";
 import profile from "@/routes/profile";
-// import { usersRouter } from '@/routes/users';
-// import { postsRouter } from '@/routes/posts';
-// import { commentsRouter } from '@/routes/comments';
-// import { tagsRouter } from '@/routes/tags';
-// import { likesRouter } from '@/routes/likes';
 
 /**
  * Honoアプリケーションのインスタンスを作成
