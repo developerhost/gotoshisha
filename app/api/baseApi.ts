@@ -127,8 +127,17 @@ export class BaseApi {
           throw new ApiError(response.status, response.statusText, data);
         }
 
-        // 成功レスポンス
-        return data as ApiResponse<T>;
+        // レスポンスがApiResponse形式かどうかをチェック
+        if (data && typeof data === "object" && "success" in data) {
+          // すでにApiResponse形式の場合はそのまま返す
+          return data as ApiResponse<T>;
+        } else {
+          // 生データの場合は、ApiResponse形式にラップして返す
+          return {
+            success: true,
+            data: data as T,
+          } as ApiResponse<T>;
+        }
       } catch (error) {
         lastError = error as Error;
 

@@ -40,7 +40,11 @@ export const useProfileManager = () => {
   );
 
   const handleProfileUpdate = async (updateData: UpdateProfileRequest) => {
-    await updateProfile(updateData);
+    try {
+      await updateProfile(updateData);
+    } catch (error) {
+      throw error; // エラーを再スローして上位に伝播
+    }
   };
 
   const handleEditButtonClick = () => {
