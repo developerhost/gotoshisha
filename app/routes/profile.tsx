@@ -8,7 +8,7 @@
  * - ログアウト機能
  */
 
-import React from "react";
+import React, { useState } from "react";
 import {
   YStack,
   Text,
@@ -17,11 +17,13 @@ import {
   Card,
   XStack,
   Avatar,
+  Input,
+  TextArea,
 } from "tamagui";
 import { useRouter } from "expo-router";
 import { TabBar } from "../components/TabBar";
-import { ProfileEditSheet } from "../features/profile/ProfileEditSheet";
 import { useProfileManager } from "../features/profile/useProfileManager";
+import { UpdateProfileRequest } from "../api/profile";
 
 /**
  * プロフィール画面コンポーネント
@@ -36,11 +38,64 @@ export default function ProfileScreen() {
     isAuthenticated,
     profile,
     isProfileLoading,
-    isEditSheetOpen,
     handleProfileUpdate,
-    handleEditButtonClick,
-    handleEditSheetClose,
   } = useProfileManager();
+
+  // インライン編集の状態管理
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editBio, setEditBio] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // 編集モード開始時の初期値設定
+  const handleStartEdit = () => {
+    setEditName(profile?.name || user?.name || "");
+    setEditBio(profile?.bio || "");
+    setIsEditMode(true);
+    setSaveError(null);
+  };
+
+  // 編集のキャンセル
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setEditName("");
+    setEditBio("");
+    setSaveError(null);
+  };
+
+  // 編集内容の保存
+  const handleSaveEdit = async () => {
+    try {
+      setIsSaving(true);
+      setSaveError(null);
+
+      const updateData: UpdateProfileRequest = {};
+
+      // 変更があった場合のみ更新データに含める
+      if (editName !== profile?.name) {
+        updateData.name = editName;
+      }
+      if (editBio !== profile?.bio) {
+        updateData.bio = editBio;
+      }
+
+      // 何も変更がない場合は編集モードを終了
+      if (Object.keys(updateData).length === 0) {
+        setIsEditMode(false);
+        return;
+      }
+
+      await handleProfileUpdate(updateData);
+      setIsEditMode(false);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "更新に失敗しました";
+      setSaveError(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -122,26 +177,76 @@ export default function ProfileScreen() {
               <Text fontSize="$5" fontWeight="600">
                 アカウント情報
               </Text>
-              <Button
-                size="$3"
-                backgroundColor="$blue10"
-                onPress={handleEditButtonClick}
-                pressStyle={{ opacity: 0.8 }}
-                disabled={isProfileLoading || !profile}
-              >
-                <Text color="white" fontSize="$3" fontWeight="600">
-                  {isProfileLoading ? "読み込み中..." : "編集"}
-                </Text>
-              </Button>
+              {!isEditMode ? (
+                <Button
+                  size="$3"
+                  backgroundColor="$blue10"
+                  onPress={handleStartEdit}
+                  pressStyle={{ opacity: 0.8 }}
+                  disabled={isProfileLoading}
+                >
+                  <Text color="white" fontSize="$3" fontWeight="600">
+                    {isProfileLoading ? "読み込み中..." : "編集"}
+                  </Text>
+                </Button>
+              ) : (
+                <XStack gap="$2">
+                  <Button
+                    size="$3"
+                    backgroundColor="$gray8"
+                    onPress={handleCancelEdit}
+                    pressStyle={{ opacity: 0.8 }}
+                    disabled={isSaving}
+                  >
+                    <Text color="$gray12" fontSize="$3" fontWeight="600">
+                      キャンセル
+                    </Text>
+                  </Button>
+                  <Button
+                    size="$3"
+                    backgroundColor="$blue10"
+                    onPress={handleSaveEdit}
+                    pressStyle={{ opacity: 0.8 }}
+                    disabled={isSaving}
+                  >
+                    <Text color="white" fontSize="$3" fontWeight="600">
+                      {isSaving ? "保存中..." : "保存"}
+                    </Text>
+                  </Button>
+                </XStack>
+              )}
             </XStack>
+
+            {saveError && (
+              <Card backgroundColor="$red2" padding="$2" marginBottom="$3">
+                <Text color="$red11" fontSize="$3">
+                  {saveError}
+                </Text>
+              </Card>
+            )}
+
             <YStack gap="$3">
               <XStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="$4" color="$gray11">
                   名前
                 </Text>
-                <Text fontSize="$4">
-                  {profile?.name || user?.name || "未設定"}
-                </Text>
+                {isEditMode ? (
+                  <Input
+                    value={editName}
+                    onChangeText={setEditName}
+                    placeholder="名前を入力"
+                    backgroundColor="$backgroundSoft"
+                    borderRadius="$3"
+                    size="$3"
+                    flex={1}
+                    maxWidth={200}
+                    disabled={isSaving}
+                  />
+                ) : (
+                  <Text fontSize="$4">
+                    {profile?.name || user?.name || "未設定"}
+                  </Text>
+                )}
               </XStack>
               <XStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="$4" color="$gray11">
@@ -162,19 +267,25 @@ export default function ProfileScreen() {
               <Text fontSize="$5" fontWeight="600">
                 自己紹介
               </Text>
-              <Button
-                size="$3"
-                backgroundColor="$blue10"
-                onPress={handleEditButtonClick}
-                pressStyle={{ opacity: 0.8 }}
-                disabled={isProfileLoading || !profile}
-              >
-                <Text color="white" fontSize="$3" fontWeight="600">
-                  {isProfileLoading ? "読み込み中..." : "編集"}
-                </Text>
-              </Button>
             </XStack>
-            {profile?.bio ? (
+            {isEditMode ? (
+              <YStack gap="$2">
+                <TextArea
+                  value={editBio}
+                  onChangeText={setEditBio}
+                  placeholder="自己紹介を入力（最大500文字）"
+                  backgroundColor="$backgroundSoft"
+                  borderRadius="$3"
+                  size="$4"
+                  minHeight={120}
+                  maxLength={500}
+                  disabled={isSaving}
+                />
+                <Text fontSize="$2" color="$gray10" textAlign="right">
+                  {editBio.length}/500
+                </Text>
+              </YStack>
+            ) : profile?.bio ? (
               <Text fontSize="$4" lineHeight="$5" color="$gray12">
                 {profile.bio}
               </Text>
@@ -268,16 +379,6 @@ export default function ProfileScreen() {
           </Button>
         </YStack>
       </ScrollView>
-
-      {/* プロフィール編集シート */}
-      {profile && (
-        <ProfileEditSheet
-          isOpen={isEditSheetOpen}
-          onClose={handleEditSheetClose}
-          userProfile={profile}
-          onSave={handleProfileUpdate}
-        />
-      )}
 
       {/* タブバー */}
       <TabBar user={user} />

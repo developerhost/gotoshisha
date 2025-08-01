@@ -85,7 +85,12 @@ export function useProfile(
       profile: UpdateProfileRequest;
     }) => {
       const token = getAccessToken ? await getAccessToken() : undefined;
-      return updateUserProfile(userId, profile, token || undefined);
+      const result = await updateUserProfile(
+        userId,
+        profile,
+        token || undefined
+      );
+      return result;
     },
     onSuccess: (updatedProfile) => {
       // キャッシュを更新
@@ -99,7 +104,13 @@ export function useProfile(
     if (!userId) {
       throw new Error("ユーザーIDが必要です");
     }
-    return updateMutation.mutateAsync({ userId, profile });
+
+    try {
+      const result = await updateMutation.mutateAsync({ userId, profile });
+      return result;
+    } catch (error) {
+      throw error;
+    }
   };
 
   return {
