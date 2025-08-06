@@ -4,9 +4,28 @@
 import { execSync } from "child_process";
 import { writeFileSync } from "fs";
 
-function executeQuery(sql: string): any[] {
+const EXPORT_TABLES = [
+  "shops",
+  "flavors",
+  "atmospheres",
+  "hobbies",
+  "payment_methods",
+  "events",
+  "shop_flavors",
+  "shop_atmospheres",
+  "shop_hobbies",
+  "shop_payment_methods",
+] as const;
+
+/**
+ * D1データベースに対してSQLクエリを実行する
+ * @param sql 実行するSQLコマンド
+ * @returns クエリ結果の配列
+ */
+function executeQuery(sql: string): Record<string, unknown>[] {
   try {
-    const command = `npx wrangler d1 execute gotoshisha-db --command="${sql}"`;
+    const dbName = process.env.D1_DATABASE_NAME || "gotoshisha-db";
+    const command = `npx wrangler d1 execute ${dbName} --command="${sql}"`;
     const result = execSync(command, { encoding: "utf8", stdio: "pipe" });
 
     const lines = result.split("\n");
@@ -22,28 +41,26 @@ function executeQuery(sql: string): any[] {
   }
 }
 
-async function exportData() {
+/**
+ * D1データベースからすべてのテーブルデータをエクスポートする
+ * @returns Promise<void>
+ */
+async function exportData(): Promise<void> {
   console.log("📤 D1データベースからデータをエクスポート中...\n");
 
-  const exportData: any = {
+  const dbName = process.env.D1_DATABASE_NAME || "gotoshisha-db";
+  const exportData: {
+    exportedAt: string;
+    database: string;
+    tables: Record<string, { count: number; data: Record<string, unknown>[] }>;
+  } = {
     exportedAt: new Date().toISOString(),
-    database: "gotoshisha-db",
+    database: dbName,
     tables: {},
   };
 
   // 各テーブルのデータを取得
-  const tables = [
-    "shops",
-    "flavors",
-    "atmospheres",
-    "hobbies",
-    "payment_methods",
-    "events",
-    "shop_flavors",
-    "shop_atmospheres",
-    "shop_hobbies",
-    "shop_payment_methods",
-  ];
+  const tables = EXPORT_TABLES;
 
   for (const table of tables) {
     console.log(`📋 ${table} テーブルを取得中...`);
@@ -63,7 +80,7 @@ async function exportData() {
 
   // サマリー表示
   console.log("\n📊 エクスポートサマリー:");
-  Object.entries(exportData.tables).forEach(([table, info]: [string, any]) => {
+  Object.entries(exportData.tables).forEach(([table, info]) => {
     console.log(`   ${table}: ${info.count}件`);
   });
 }

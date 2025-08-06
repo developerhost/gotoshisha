@@ -4,17 +4,24 @@
 import { execSync } from "child_process";
 
 interface QueryResult {
-  results: any[];
+  results: Record<string, unknown>[];
   success: boolean;
   meta: {
     duration: number;
   };
 }
 
+/**
+ * D1データベースに対してSQLクエリを実行する
+ * @param sql 実行するSQLコマンド
+ * @param remote リモート実行フラグ
+ * @returns クエリ結果の配列
+ */
 function executeQuery(sql: string, remote: boolean = false): QueryResult[] {
   try {
     const remoteFlag = remote ? "--remote" : "";
-    const command = `npx wrangler d1 execute gotoshisha-db --command="${sql}" ${remoteFlag}`;
+    const dbName = process.env.D1_DATABASE_NAME || "gotoshisha-db";
+    const command = `npx wrangler d1 execute ${dbName} --command="${sql}" ${remoteFlag}`;
 
     const result = execSync(command, {
       encoding: "utf8",
@@ -36,8 +43,11 @@ function executeQuery(sql: string, remote: boolean = false): QueryResult[] {
   }
 }
 
-// 使用例
-async function main() {
+/**
+ * D1データベースからさまざまなクエリを実行してデータを取得する使用例
+ * @returns Promise<void>
+ */
+async function main(): Promise<void> {
   console.log("🔍 D1データベースからデータを取得中...\n");
 
   // 1. 店舗一覧を取得

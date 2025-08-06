@@ -101,24 +101,28 @@ app.get("/api", (c) => {
 });
 
 /**
- * デバッグ用テストエンドポイント
+ * デバッグ用ショップ一覧取得エンドポイント
+ * @param c - Honoコンテキスト
+ * @returns ショップデータのJSON応答
  */
 app.get("/test/shops", async (c) => {
   try {
     const prisma = c.get("prisma");
     const shops = await prisma.shop.findMany();
-    return c.json({
-      success: true,
-      data: shops,
-      count: shops.length,
-    });
+    return c.json(
+      createSuccessResponse({
+        shops,
+        count: shops.length,
+      })
+    );
   } catch (error) {
     console.error("Test shops error:", error);
-    return c.json({
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    return c.json(
+      createErrorResponse(
+        error instanceof Error ? error.message : "Unknown error"
+      ),
+      500
+    );
   }
 });
 

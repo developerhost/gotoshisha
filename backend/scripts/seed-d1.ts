@@ -4,6 +4,15 @@
  */
 import { execSync } from "child_process";
 
+/**
+ * SQL文字列をエスケープしてSQLインジェクションを防ぐ
+ * @param str エスケープする文字列
+ * @returns エスケープされた文字列
+ */
+function escapeSqlString(str: string): string {
+  return str.replace(/'/g, "''");
+}
+
 // シーシャ店舗のシードデータ
 const seedData = {
   flavors: [
@@ -249,11 +258,17 @@ const seedData = {
   ],
 };
 
+/**
+ * D1データベースにSQLコマンドを実行する
+ * @param command 実行するSQLコマンド
+ * @returns void
+ */
 function executeD1Command(command: string): void {
   try {
     console.log(`実行中: ${command}`);
+    const dbName = process.env.D1_DATABASE_NAME || "gotoshisha-db";
     const result = execSync(
-      `npx wrangler d1 execute gotoshisha-db --command="${command}"`,
+      `npx wrangler d1 execute ${dbName} --command="${command}"`,
       {
         encoding: "utf8",
         stdio: "pipe",
@@ -262,50 +277,79 @@ function executeD1Command(command: string): void {
     console.log(result, "✅ 成功");
   } catch (error) {
     console.error("❌ エラー:", error);
+    throw error; // Re-throw to stop execution on error
   }
 }
 
-async function seedD1Database() {
+/**
+ * D1データベースにシードデータを投入する
+ * @returns Promise<void>
+ */
+async function seedD1Database(): Promise<void> {
   console.log("🚀 D1データベースにシードデータを投入開始...");
 
   // 1. フレーバーマスタを投入
   console.log("フレーバーマスタを作成中...");
   for (const flavor of seedData.flavors) {
-    const command = `INSERT OR IGNORE INTO flavors (id, name) VALUES ('flavor_${flavor}', '${flavor}');`;
+    const escapedFlavor = escapeSqlString(flavor);
+    const command = `INSERT OR IGNORE INTO flavors (id, name) VALUES ('flavor_${escapedFlavor}', '${escapedFlavor}');`;
     executeD1Command(command);
   }
 
   // 2. 雰囲気マスタを投入
   console.log("雰囲気マスタを作成中...");
   for (const atmosphere of seedData.atmospheres) {
-    const command = `INSERT OR IGNORE INTO atmospheres (id, name) VALUES ('atmosphere_${atmosphere}', '${atmosphere}');`;
+    const escapedAtmosphere = escapeSqlString(atmosphere);
+    const command = `INSERT OR IGNORE INTO atmospheres (id, name) VALUES ('atmosphere_${escapedAtmosphere}', '${escapedAtmosphere}');`;
     executeD1Command(command);
   }
 
   // 3. ホビーマスタを投入
   console.log("ホビーマスタを作成中...");
   for (const hobby of seedData.hobbies) {
-    const command = `INSERT OR IGNORE INTO hobbies (id, name) VALUES ('hobby_${hobby}', '${hobby}');`;
+    const escapedHobby = escapeSqlString(hobby);
+    const command = `INSERT OR IGNORE INTO hobbies (id, name) VALUES ('hobby_${escapedHobby}', '${escapedHobby}');`;
     executeD1Command(command);
   }
 
   // 4. 支払い方法マスタを投入
   console.log("支払い方法マスタを作成中...");
   for (const paymentMethod of seedData.paymentMethods) {
-    const command = `INSERT OR IGNORE INTO payment_methods (id, name) VALUES ('payment_${paymentMethod}', '${paymentMethod}');`;
+    const escapedPaymentMethod = escapeSqlString(paymentMethod);
+    const command = `INSERT OR IGNORE INTO payment_methods (id, name) VALUES ('payment_${escapedPaymentMethod}', '${escapedPaymentMethod}');`;
     executeD1Command(command);
   }
 
   // 5. イベントマスタを投入
   console.log("イベントマスタを作成中...");
   for (const event of seedData.events) {
-    const command = `INSERT OR IGNORE INTO events (id, name, description, schedule) VALUES ('event_${event.name}', '${event.name}', '${event.description}', '${event.schedule}');`;
+    const escapedName = escapeSqlString(event.name);
+    const escapedDescription = escapeSqlString(event.description);
+    const escapedSchedule = escapeSqlString(event.schedule);
+    const command = `INSERT OR IGNORE INTO events (id, name, description, schedule) VALUES ('event_${escapedName}', '${escapedName}', '${escapedDescription}', '${escapedSchedule}');`;
     executeD1Command(command);
   }
 
   // 6. 店舗データを投入
   console.log("店舗データを作成中...");
   for (const shop of seedData.shops) {
+    const escapedId = escapeSqlString(shop.id);
+    const escapedName = escapeSqlString(shop.name);
+    const escapedAddress = escapeSqlString(shop.address);
+    const escapedNearestStation = escapeSqlString(shop.nearestStation);
+    const escapedOpeningHours = escapeSqlString(shop.openingHours);
+    const escapedHolidays = escapeSqlString(shop.holidays);
+    const escapedSeatingTypes = escapeSqlString(shop.seatingTypes);
+    const escapedReservation = escapeSqlString(shop.reservation);
+    const escapedSmokingPolicy = escapeSqlString(shop.smokingPolicy);
+    const escapedParkingInfo = escapeSqlString(shop.parkingInfo);
+    const escapedTimeLimit = escapeSqlString(shop.timeLimit);
+    const escapedHookahBrand = escapeSqlString(shop.hookahBrand);
+    const escapedPhotos = escapeSqlString(shop.photos);
+    const escapedWebsiteUrl = escapeSqlString(shop.websiteUrl);
+    const escapedGoogleMapUrl = escapeSqlString(shop.googleMapUrl);
+    const escapedSnsLinks = escapeSqlString(shop.snsLinks);
+
     const command = `INSERT OR IGNORE INTO shops (
       id, name, address, nearestStation, stationWalkTime, openingHours, holidays,
       budgetMin, budgetMax, seatingCount, seatingTypes, reservation, privateBooking,
@@ -313,12 +357,12 @@ async function seedD1Database() {
       flavorCount, photos, websiteUrl, googleMapUrl, snsLinks, latitude, longitude,
       createdAt, updatedAt
     ) VALUES (
-      '${shop.id}', '${shop.name}', '${shop.address}', '${shop.nearestStation}', ${shop.stationWalkTime},
-      '${shop.openingHours}', '${shop.holidays}', ${shop.budgetMin}, ${shop.budgetMax}, ${shop.seatingCount},
-      '${shop.seatingTypes}', '${shop.reservation}', ${shop.privateBooking}, ${shop.wifi}, ${shop.powerOutlet},
-      '${shop.smokingPolicy}', '${shop.parkingInfo}', '${shop.timeLimit}', '${shop.hookahBrand}',
-      ${shop.flavorCount}, '${shop.photos}', '${shop.websiteUrl}', '${shop.googleMapUrl}',
-      '${shop.snsLinks}', ${shop.latitude}, ${shop.longitude}, datetime('now'), datetime('now')
+      '${escapedId}', '${escapedName}', '${escapedAddress}', '${escapedNearestStation}', ${shop.stationWalkTime},
+      '${escapedOpeningHours}', '${escapedHolidays}', ${shop.budgetMin}, ${shop.budgetMax}, ${shop.seatingCount},
+      '${escapedSeatingTypes}', '${escapedReservation}', ${shop.privateBooking}, ${shop.wifi}, ${shop.powerOutlet},
+      '${escapedSmokingPolicy}', '${escapedParkingInfo}', '${escapedTimeLimit}', '${escapedHookahBrand}',
+      ${shop.flavorCount}, '${escapedPhotos}', '${escapedWebsiteUrl}', '${escapedGoogleMapUrl}',
+      '${escapedSnsLinks}', ${shop.latitude}, ${shop.longitude}, datetime('now'), datetime('now')
     );`;
     executeD1Command(command);
   }

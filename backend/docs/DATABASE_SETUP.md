@@ -160,7 +160,7 @@ npx wrangler d1 execute gotoshisha-db --command "SELECT name FROM sqlite_master 
 
 1. **認証エラー**
 
-   ```
+   ```text
    Authentication error [code: 10000]
    ```
 
@@ -168,14 +168,14 @@ npx wrangler d1 execute gotoshisha-db --command "SELECT name FROM sqlite_master 
 
 2. **カラムが存在しない**
 
-   ```
+   ```text
    no such column: main.shops.nearestStation
    ```
 
    解決方法: 上記の拡張カラム追加コマンドを実行
 
 3. **重複エラー**
-   ```
+   ```text
    UNIQUE constraint failed
    ```
    解決方法: 既存データを削除するか、異なる ID を使用
