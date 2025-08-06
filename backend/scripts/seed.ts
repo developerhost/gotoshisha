@@ -246,6 +246,62 @@ async function main() {
 
   console.log("✅ コメントを作成しました");
 
+  // シーシャショップのデータを作成
+  const shops = await Promise.all([
+    prisma.shop.create({
+      data: {
+        name: "シーシャカフェ 渋谷店",
+        address: "東京都渋谷区渋谷1-2-3 シーシャビル2F",
+        latitude: 35.6598,
+        longitude: 139.7006,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    }),
+    prisma.shop.create({
+      data: {
+        name: "Hookah Lounge 新宿",
+        address: "東京都新宿区新宿3-4-5 フーカビル3F",
+        latitude: 35.6896,
+        longitude: 139.7006,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    }),
+    prisma.shop.create({
+      data: {
+        name: "煙草天国 池袋店",
+        address: "東京都豊島区池袋2-1-1 スモークタワー1F",
+        latitude: 35.7295,
+        longitude: 139.7109,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    }),
+    prisma.shop.create({
+      data: {
+        name: "Oriental Smoke 原宿",
+        address: "東京都渋谷区神宮前1-2-3 オリエンタルビル2F",
+        latitude: 35.6751,
+        longitude: 139.7028,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    }),
+    prisma.shop.create({
+      data: {
+        name: "シーシャパラダイス 六本木",
+        address: "東京都港区六本木6-7-8 パラダイスタワー4F",
+        latitude: 35.6627,
+        longitude: 139.7279,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    }),
+  ]);
+
+  console.log(`✅ ${shops.length}軒のシーシャショップを作成しました`);
+
   console.log("🎉 シードデータの投入が完了しました！");
 }
 

@@ -1,4 +1,4 @@
-name = "gotoshisha-backend"
+name = "shisha-up"
 main = "src/index.ts"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
@@ -15,7 +15,7 @@ database_id = "${DATABASE_ID}"
 
 # 本番環境用の設定
 [env.production]
-name = "gotoshisha-backend-prod"
+name = "shisha-up-prod"
 vars = { ENVIRONMENT = "production" }
 
 [[env.production.d1_databases]]
@@ -25,7 +25,7 @@ database_id = "" # 本番用データベースID
 
 # ステージング環境用の設定
 [env.staging]
-name = "gotoshisha-backend-staging"
+name = "shisha-up-staging"
 vars = { ENVIRONMENT = "staging" }
 
 [[env.staging.d1_databases]]

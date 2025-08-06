@@ -101,15 +101,36 @@ app.get("/api", (c) => {
 });
 
 /**
+ * デバッグ用ショップ一覧取得エンドポイント
+ * @param c - Honoコンテキスト
+ * @returns ショップデータのJSON応答
+ */
+app.get("/test/shops", async (c) => {
+  try {
+    const prisma = c.get("prisma");
+    const shops = await prisma.shop.findMany();
+    return c.json(
+      createSuccessResponse({
+        shops,
+        count: shops.length,
+      })
+    );
+  } catch (error) {
+    console.error("Test shops error:", error);
+    return c.json(
+      createErrorResponse(
+        error instanceof Error ? error.message : "Unknown error"
+      ),
+      500
+    );
+  }
+});
+
+/**
  * ルーターの登録
  */
 app.route("/api/shops", shops);
 app.route("/api/profile", profile);
-// app.route('/api/users', usersRouter);
-// app.route('/api/posts', postsRouter);
-// app.route('/api/comments', commentsRouter);
-// app.route('/api/tags', tagsRouter);
-// app.route('/api/likes', likesRouter);
 
 /**
  * 404エラーハンドリング
