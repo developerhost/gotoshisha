@@ -157,7 +157,65 @@ pnpm db:push           # スキーマ同期（開発用）
 pnpm db:migrate        # マイグレーション（本番用）
 pnpm db:studio         # Prisma Studio（GUI）
 pnpm db:seed           # シードデータ投入
+
+# Cloudflare D1 操作
+wrangler d1 migrations apply gotoshisha-db --local     # ローカルにマイグレーション適用
+wrangler d1 migrations apply gotoshisha-db --remote    # リモートにマイグレーション適用
+wrangler d1 list                                       # データベース一覧
+wrangler d1 info gotoshisha-db                        # データベース情報確認
 ```
+
+## Cloudflare Workers デプロイメント
+
+### 初回セットアップ
+
+```bash
+cd backend
+
+# 1. 自動セットアップスクリプト実行
+./scripts/setup-cloudflare.sh
+
+# 2. wrangler.toml にデータベースID を設定（スクリプトで表示される値を使用）
+
+# 3. データベースの準備
+pnpm db:generate
+wrangler d1 migrations apply gotoshisha-db --local
+wrangler d1 migrations apply gotoshisha-db --remote
+
+# 4. デプロイ
+pnpm deploy
+```
+
+### 日常的なデプロイ
+
+```bash
+cd backend
+
+# 開発環境へデプロイ
+pnpm run deploy
+
+# ステージング環境へデプロイ
+pnpm run deploy:staging
+
+# 本番環境へデプロイ
+pnpm run deploy:prod
+```
+
+### API エンドポイント
+
+デプロイ後、以下の URL で API が利用可能：
+
+- **開発**: `https://your-worker-name.your-subdomain.workers.dev`
+- **本番**: `https://your-worker-name-prod.your-subdomain.workers.dev`
+
+主要エンドポイント：
+
+- `GET /health` - ヘルスチェック
+- `GET /api/shops` - 店舗一覧（位置情報検索対応）
+- `GET /api/shops/:id` - 店舗詳細
+- `POST /api/shops` - 店舗作成（要認証）
+
+詳細は [backend/docs/api-reference.md](backend/docs/api-reference.md) を参照。
 
 ## 認証システム
 
