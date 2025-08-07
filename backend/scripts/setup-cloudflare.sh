@@ -39,9 +39,19 @@ echo "📊 D1 データベースを作成しています..."
 # 開発用データベース作成
 echo "開発用データベースを作成中..."
 DEV_DB_OUTPUT=$(wrangler d1 create gotoshisha-db 2>&1 || true)
-if echo "$DEV_DB_OUTPUT" | grep -q "database_id"; then
-    DEV_DB_ID=$(echo "$DEV_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
-    echo "✅ 開発用データベース作成完了: $DEV_DB_ID"
+if echo "$DEV_DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
+    # 新しい形式 "DB ID: uuid" をまず試す
+    DEV_DB_ID=$(echo "$DEV_DB_OUTPUT" | grep -oE "DB ID:[[:space:]]*[a-f0-9-]+" | sed 's/DB ID:[[:space:]]*//')
+    # 古い形式 "database_id = \"uuid\"" も試す
+    if [[ -z "$DEV_DB_ID" ]]; then
+        DEV_DB_ID=$(echo "$DEV_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
+    fi
+    if [[ -n "$DEV_DB_ID" ]]; then
+        echo "✅ 開発用データベース作成完了: $DEV_DB_ID"
+    else
+        echo "⚠️  データベースIDの抽出に失敗しました"
+        echo "$DEV_DB_OUTPUT"
+    fi
 else
     echo "⚠️  開発用データベースは既に存在するか、作成に失敗しました"
     echo "$DEV_DB_OUTPUT"
@@ -50,9 +60,19 @@ fi
 # ステージング用データベース作成
 echo "ステージング用データベースを作成中..."
 STAGING_DB_OUTPUT=$(wrangler d1 create gotoshisha-db-staging 2>&1 || true)
-if echo "$STAGING_DB_OUTPUT" | grep -q "database_id"; then
-    STAGING_DB_ID=$(echo "$STAGING_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
-    echo "✅ ステージング用データベース作成完了: $STAGING_DB_ID"
+if echo "$STAGING_DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
+    # 新しい形式 "DB ID: uuid" をまず試す
+    STAGING_DB_ID=$(echo "$STAGING_DB_OUTPUT" | grep -oE "DB ID:[[:space:]]*[a-f0-9-]+" | sed 's/DB ID:[[:space:]]*//')
+    # 古い形式 "database_id = \"uuid\"" も試す
+    if [[ -z "$STAGING_DB_ID" ]]; then
+        STAGING_DB_ID=$(echo "$STAGING_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
+    fi
+    if [[ -n "$STAGING_DB_ID" ]]; then
+        echo "✅ ステージング用データベース作成完了: $STAGING_DB_ID"
+    else
+        echo "⚠️  データベースIDの抽出に失敗しました"
+        echo "$STAGING_DB_OUTPUT"
+    fi
 else
     echo "⚠️  ステージング用データベースは既に存在するか、作成に失敗しました"
     echo "$STAGING_DB_OUTPUT"
@@ -61,9 +81,19 @@ fi
 # 本番用データベース作成
 echo "本番用データベースを作成中..."
 PROD_DB_OUTPUT=$(wrangler d1 create gotoshisha-db-prod 2>&1 || true)
-if echo "$PROD_DB_OUTPUT" | grep -q "database_id"; then
-    PROD_DB_ID=$(echo "$PROD_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
-    echo "✅ 本番用データベース作成完了: $PROD_DB_ID"
+if echo "$PROD_DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
+    # 新しい形式 "DB ID: uuid" をまず試す
+    PROD_DB_ID=$(echo "$PROD_DB_OUTPUT" | grep -oE "DB ID:[[:space:]]*[a-f0-9-]+" | sed 's/DB ID:[[:space:]]*//')
+    # 古い形式 "database_id = \"uuid\"" も試す
+    if [[ -z "$PROD_DB_ID" ]]; then
+        PROD_DB_ID=$(echo "$PROD_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
+    fi
+    if [[ -n "$PROD_DB_ID" ]]; then
+        echo "✅ 本番用データベース作成完了: $PROD_DB_ID"
+    else
+        echo "⚠️  データベースIDの抽出に失敗しました"
+        echo "$PROD_DB_OUTPUT"
+    fi
 else
     echo "⚠️  本番用データベースは既に存在するか、作成に失敗しました"
     echo "$PROD_DB_OUTPUT"
