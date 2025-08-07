@@ -7,9 +7,13 @@ set -e
 
 echo "🚀 Cloudflare Workers セットアップを開始します..."
 
+# スクリプトのディレクトリとプロジェクトルートを取得
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 # 現在のディレクトリを確認
-if [[ ! -f "wrangler.toml" ]]; then
-    echo "❌ エラー: backend ディレクトリで実行してください"
+if [[ ! -f "$PROJECT_ROOT/wrangler.toml" ]]; then
+    echo "❌ エラー: wrangler.toml が見つかりません ($PROJECT_ROOT/wrangler.toml)"
     exit 1
 fi
 
