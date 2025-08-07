@@ -3,6 +3,7 @@
  */
 
 // 環境変数から取得、デフォルト値は開発環境
+// 本番環境では Cloudflare Workers の URL を設定
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_URL || "http://localhost:8787";
 

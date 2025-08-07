@@ -11,7 +11,7 @@ ENVIRONMENT = "development"
 [[d1_databases]]
 binding = "DB"
 database_name = "gotoshisha-db"
-database_id = "${DATABASE_ID}"
+database_id = "4ef2320c-4159-4c27-9a38-2c34be72f830"
 
 # 本番環境用の設定
 [env.production]
