@@ -21,7 +21,7 @@ vars = { ENVIRONMENT = "production" }
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "gotoshisha-db-prod"
-database_id = "" # 本番用データベースID
+database_id = "80e2f98c-c266-41a6-b584-213727c6fb8c" # 本番用データベースID
 
 # ステージング環境用の設定
 [env.staging]
