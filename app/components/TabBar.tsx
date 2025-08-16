@@ -30,7 +30,12 @@ interface TabButtonProps {
 function TabButton({ icon, label, isActive, onPress }: TabButtonProps) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        // アクティブなタブの場合は何もしない
+        if (!isActive) {
+          onPress();
+        }
+      }}
       style={{
         flex: 1,
         alignItems: "center",

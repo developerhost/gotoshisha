@@ -85,6 +85,7 @@ function NotificationItem({
  * @returns 通知画面のJSXエレメント
  */
 export default function NotificationsScreen() {
+  // TODO: APIから通知データを取得するロジックを追加する
   // モックデータ（実際の実装では API から取得）
   const notifications: NotificationItem[] = [
     {
