@@ -89,18 +89,62 @@ export default function HomeScreen() {
               bordered
               padding="$4"
               pressStyle={{ scale: 0.97, backgroundColor: "$purple3" }}
-              onPress={() => router.push("/routes/map")}
+              onPress={() => router.push("/routes/search")}
               backgroundColor="$purple1"
               borderColor="$purple6"
             >
               <XStack alignItems="center" gap="$3">
-                <Text fontSize="$6">🗺️</Text>
+                <Text fontSize="$6">🔍</Text>
                 <YStack flex={1}>
                   <Text fontSize="$5" fontWeight="600" color="$purple11">
-                    シーシャマップ
+                    シーシャを探す
+                  </Text>
+                  <Text fontSize="$3" color="$gray10" marginTop="$1">
+                    お気に入りのシーシャを見つける
+                  </Text>
+                </YStack>
+              </XStack>
+            </Card>
+
+            <Card
+              elevate
+              bordered
+              padding="$4"
+              pressStyle={{ scale: 0.97, backgroundColor: "$blue3" }}
+              onPress={() => router.push("/routes/map")}
+              backgroundColor="$blue1"
+              borderColor="$blue6"
+            >
+              <XStack alignItems="center" gap="$3">
+                <Text fontSize="$6">🗺️</Text>
+                <YStack flex={1}>
+                  <Text fontSize="$5" fontWeight="600" color="$blue11">
+                    地図からシーシャを探す
                   </Text>
                   <Text fontSize="$3" color="$gray10" marginTop="$1">
                     近くのシーシャカフェを地図で探す
+                  </Text>
+                </YStack>
+              </XStack>
+            </Card>
+
+            <Card
+              elevate
+              bordered
+              padding="$4"
+              pressStyle={{ scale: 0.97, backgroundColor: "$green3" }}
+              onPress={() => router.push("/routes/categories")}
+              backgroundColor="$green1"
+              borderColor="$green6"
+            >
+              <XStack alignItems="center" gap="$3">
+                <Text fontSize="$6">📋</Text>
+                <YStack flex={1}>
+                  <Text fontSize="$5" fontWeight="600" color="$green11">
+                    タイプから探す
+                  </Text>
+                  <Text fontSize="$3" color="$gray10" marginTop="$1">
+                    カテゴリー別にシーシャを探す
                   </Text>
                 </YStack>
               </XStack>

@@ -32,6 +32,13 @@ export default function RootLayout() {
                 headerBackTitle: "戻る",
               }}
             />
+            <Stack.Screen
+              name="routes/notifications"
+              options={{
+                title: "通知",
+                headerBackTitle: "戻る",
+              }}
+            />
           </Stack>
         </AuthProvider>
       </TamaguiProvider>
