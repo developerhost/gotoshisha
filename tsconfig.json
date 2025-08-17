@@ -4,11 +4,6 @@
     "strict": true,
     "types": ["vitest/globals"]
   },
-  "exclude": [
-    "backend/**/*",
-    "node_modules",
-    ".expo",
-    "dist",
-    "build"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "vitest.d.ts"],
+  "exclude": ["backend/**/*", "node_modules", ".expo", "dist", "build"]
 }
