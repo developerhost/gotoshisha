@@ -49,12 +49,4 @@ type Point = { x: number; y: number };
 export function distance(a: Point, b: Point): number {
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
-
-if (import.meta.vitest) {
-  const { test, expect } = import.meta.vitest;
-  test("ユークリッド距離を計算する", () => {
-    const result = distance({ x: 0, y: 0 }, { x: 3, y: 4 });
-    expect(result).toBe(5);
-  });
-}
 ```
