@@ -24,6 +24,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
+          standalone: true
 
       - name: Get pnpm store directory
         shell: bash
@@ -67,6 +68,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
+          standalone: true
 
       - name: Get pnpm store directory
         shell: bash
@@ -123,6 +125,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
+          standalone: true
 
       - name: Get pnpm store directory
         shell: bash
