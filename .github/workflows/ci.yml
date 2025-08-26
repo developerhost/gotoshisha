@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --network-timeout 300000
+        run: pnpm install --frozen-lockfile --network-timeout=300000
 
       - name: Type check
         run: pnpm type-check
@@ -83,7 +83,7 @@ jobs:
 
       - name: Install root dependencies
         run: |
-          pnpm install --frozen-lockfile --network-timeout 300000
+          pnpm install --frozen-lockfile --network-timeout=300000
 
       - name: Verify Prisma installation
         working-directory: backend
@@ -138,11 +138,11 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile --network-timeout 300000
+        run: pnpm install --frozen-lockfile --network-timeout=300000
 
       - name: Install backend dependencies
         working-directory: ./backend
-        run: pnpm install --frozen-lockfile --network-timeout 300000
+        run: pnpm install --frozen-lockfile --network-timeout=300000
 
       - name: Generate Prisma client
         working-directory: ./backend
