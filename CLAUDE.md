@@ -189,22 +189,15 @@ pnpm deploy
 ```bash
 cd backend
 
-# 開発環境へデプロイ
-pnpm run deploy
-
-# ステージング環境へデプロイ
-pnpm run deploy:staging
-
 # 本番環境へデプロイ
-pnpm run deploy:prod
+pnpm run deploy
 ```
 
 ### API エンドポイント
 
 デプロイ後、以下の URL で API が利用可能：
 
-- **開発**: `https://your-worker-name.your-subdomain.workers.dev`
-- **本番**: `https://your-worker-name-prod.your-subdomain.workers.dev`
+- **本番環境**: `https://shisha-up.shisha-up.workers.dev`
 
 主要エンドポイント：
 
@@ -280,10 +273,7 @@ eas build --platform android
 cd backend
 
 # 本番デプロイ
-pnpm deploy --env production
-
-# ステージングデプロイ
-pnpm deploy --env staging
+pnpm deploy
 ```
 
 ## 重要な設定ファイル
