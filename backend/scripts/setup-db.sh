@@ -6,24 +6,12 @@ set -e
 
 echo "🚀 Cloudflare D1データベースのセットアップを開始します..."
 
-# 開発環境用データベースの作成
-echo "📦 開発環境用データベースを作成中..."
+# データベースの作成（全環境で同じgotoshisha-dbを使用）
+echo "📦 データベースを作成中..."
 wrangler d1 create gotoshisha-db
 
-echo "✅ 開発環境用データベースが作成されました"
+echo "✅ データベースが作成されました"
 echo "📝 wrangler.tomlファイルのdatabase_idを更新してください"
-
-# ステージング環境用データベースの作成
-echo "📦 ステージング環境用データベースを作成中..."
-wrangler d1 create gotoshisha-db-staging
-
-echo "✅ ステージング環境用データベースが作成されました"
-
-# 本番環境用データベースの作成
-echo "📦 本番環境用データベースを作成中..."
-wrangler d1 create gotoshisha-db-prod
-
-echo "✅ 本番環境用データベースが作成されました"
 
 echo ""
 echo "🎉 データベースのセットアップが完了しました！"

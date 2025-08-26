@@ -78,25 +78,25 @@ else
     echo "$STAGING_DB_OUTPUT"
 fi
 
-# 本番用データベース作成
-echo "本番用データベースを作成中..."
-PROD_DB_OUTPUT=$(wrangler d1 create gotoshisha-db-prod 2>&1 || true)
-if echo "$PROD_DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
+# データベース作成（全環境共通）
+echo "データベースを作成中..."
+DB_OUTPUT=$(wrangler d1 create gotoshisha-db 2>&1 || true)
+if echo "$DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
     # 新しい形式 "DB ID: uuid" をまず試す
-    PROD_DB_ID=$(echo "$PROD_DB_OUTPUT" | grep -oE "DB ID:[[:space:]]*[a-f0-9-]+" | sed 's/DB ID:[[:space:]]*//')
+    DB_ID=$(echo "$DB_OUTPUT" | grep -oE "DB ID:[[:space:]]*[a-f0-9-]+" | sed 's/DB ID:[[:space:]]*//')
     # 古い形式 "database_id = \"uuid\"" も試す
-    if [[ -z "$PROD_DB_ID" ]]; then
-        PROD_DB_ID=$(echo "$PROD_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
+    if [[ -z "$DB_ID" ]]; then
+        DB_ID=$(echo "$DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
     fi
-    if [[ -n "$PROD_DB_ID" ]]; then
-        echo "✅ 本番用データベース作成完了: $PROD_DB_ID"
+    if [[ -n "$DB_ID" ]]; then
+        echo "✅ データベース作成完了: $DB_ID"
     else
         echo "⚠️  データベースIDの抽出に失敗しました"
-        echo "$PROD_DB_OUTPUT"
+        echo "$DB_OUTPUT"
     fi
 else
-    echo "⚠️  本番用データベースは既に存在するか、作成に失敗しました"
-    echo "$PROD_DB_OUTPUT"
+    echo "⚠️  データベースは既に存在するか、作成に失敗しました"
+    echo "$DB_OUTPUT"
 fi
 
 echo ""
@@ -104,25 +104,21 @@ echo "📝 wrangler.toml を更新する必要があります"
 echo ""
 echo "以下の情報を wrangler.toml ファイルに追加してください:"
 echo ""
-if [[ -n "$DEV_DB_ID" ]]; then
-    echo "開発環境:"
-    echo "database_id = \"$DEV_DB_ID\""
+if [[ -n "$DB_ID" ]]; then
+    echo "全環境共通設定:"
+    echo "database_id = \"$DB_ID\""
     echo ""
-fi
-if [[ -n "$STAGING_DB_ID" ]]; then
-    echo "ステージング環境:"
-    echo "[[env.staging.d1_databases]]"
-    echo "binding = \"DB\""
-    echo "database_name = \"gotoshisha-db-staging\""
-    echo "database_id = \"$STAGING_DB_ID\""
-    echo ""
-fi
-if [[ -n "$PROD_DB_ID" ]]; then
     echo "本番環境:"
     echo "[[env.production.d1_databases]]"
     echo "binding = \"DB\""
-    echo "database_name = \"gotoshisha-db-prod\""
-    echo "database_id = \"$PROD_DB_ID\""
+    echo "database_name = \"gotoshisha-db\""
+    echo "database_id = \"$DB_ID\""
+    echo ""
+    echo "ステージング環境:"
+    echo "[[env.staging.d1_databases]]"
+    echo "binding = \"DB\""
+    echo "database_name = \"gotoshisha-db\""
+    echo "database_id = \"$DB_ID\""
     echo ""
 fi
 
@@ -132,7 +128,7 @@ echo "2. pnpm db:generate でPrismaクライアントを生成"
 echo "3. マイグレーションをデータベースに適用:"
 echo "   - ローカル: wrangler d1 migrations apply gotoshisha-db --local"
 echo "   - リモート: wrangler d1 migrations apply gotoshisha-db --remote"
-echo "   - 本番: wrangler d1 migrations apply gotoshisha-db-prod --env production --remote"
+echo "   - 本番: wrangler d1 migrations apply gotoshisha-db --env production --remote"
 echo "4. pnpm deploy でデプロイ"
 echo ""
 echo "✨ セットアップスクリプト完了!"

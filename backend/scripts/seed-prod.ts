@@ -363,7 +363,7 @@ async function executeSeedSQL() {
     // D1データベースに対してSQLを実行
     console.log("📤 本番環境のD1データベースにSQLを実行中...");
 
-    const command = `npx wrangler d1 execute gotoshisha-db-prod --env production --remote --file="${sqlFilePath}"`;
+    const command = `npx wrangler d1 execute gotoshisha-db --env production --remote --file="${sqlFilePath}"`;
 
     execSync(command, {
       stdio: "inherit",
