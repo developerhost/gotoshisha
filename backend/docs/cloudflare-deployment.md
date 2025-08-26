@@ -28,11 +28,9 @@ cd backend
 # 開発用データベース作成
 npx wrangler d1 create gotoshisha-db
 
-# ステージング用データベース作成（オプション）
-npx wrangler d1 create gotoshisha-db-staging
 
-# 本番用データベース作成
-npx wrangler d1 create gotoshisha-db-prod
+# データベースは既に作成済みのgotoshisha-dbを使用
+# npx wrangler d1 create gotoshisha-db
 ```
 
 **重要**: コマンド実行後、出力される `database_id` をメモしてください。
@@ -51,7 +49,7 @@ database_id = "your-dev-database-id-here"
 # 本番環境
 [[env.production.d1_databases]]
 binding = "DB"
-database_name = "gotoshisha-db-prod"
+database_name = "gotoshisha-db"
 database_id = "your-prod-database-id-here"
 
 # ステージング環境
@@ -74,7 +72,7 @@ npx wrangler d1 migrations apply gotoshisha-db --local
 npx wrangler d1 migrations apply gotoshisha-db --remote
 
 # 本番データベースにマイグレーション適用
-npx wrangler d1 migrations apply gotoshisha-db-prod --env production --remote
+npx wrangler d1 migrations apply gotoshisha-db --env production --remote
 
 # シードデータの投入（開発環境）
 pnpm db:seed
@@ -311,14 +309,14 @@ curl https://your-worker.workers.dev/health
 
 ```bash
 # D1 データベースのバックアップ（SQLite形式でエクスポート）
-npx wrangler d1 backup create gotoshisha-db-prod --env production
+npx wrangler d1 backup create gotoshisha-db --env production
 ```
 
 ### バックアップからのリストア
 
 ```bash
 # バックアップファイルをリストア
-npx wrangler d1 backup restore gotoshisha-db-prod [backup-id] --env production
+npx wrangler d1 backup restore gotoshisha-db [backup-id] --env production
 ```
 
 ## 参考リンク

@@ -87,9 +87,7 @@ gotoshisha/
 
 ### 環境別 DB 設定
 
-- **開発**: `gotoshisha-db`
-- **ステージング**: `gotoshisha-db-staging`
-- **本番**: `gotoshisha-db-prod`
+- **すべての環境**: `gotoshisha-db`
 
 ## 開発ワークフロー
 

@@ -52,8 +52,8 @@ database_id = "your-dev-database-id-here"
 # 本番環境
 [[env.production.d1_databases]]
 binding = "DB"
-database_name = "gotoshisha-db-prod"
-database_id = "your-prod-database-id-here"
+database_name = "gotoshisha-db"
+database_id = "4ef2320c-4159-4c27-9a38-2c34be72f830"
 ```
 
 ### 5. データベースの準備

@@ -1,14 +1,14 @@
 # Gotoshisha Backend
 
-Hono + Cloudflare Workers + Cloudflare D1 + Prismaを使用したバックエンドAPI
+Hono + Cloudflare Workers + Cloudflare D1 + Prisma を使用したバックエンド API
 
 ## 技術スタック
 
-- **フレームワーク**: [Hono](https://hono.dev/) - 軽量で高速なWebフレームワーク
+- **フレームワーク**: [Hono](https://hono.dev/) - 軽量で高速な Web フレームワーク
 - **ランタイム**: [Cloudflare Workers](https://workers.cloudflare.com/) - エッジコンピューティングプラットフォーム
-- **データベース**: [Cloudflare D1](https://developers.cloudflare.com/d1/) - SQLiteベースのサーバーレスデータベース
+- **データベース**: [Cloudflare D1](https://developers.cloudflare.com/d1/) - SQLite ベースのサーバーレスデータベース
 - **ORM**: [Prisma](https://www.prisma.io/) - 型安全なデータベースクライアント
-- **バリデーション**: [Zod](https://zod.dev/) - TypeScriptファーストなスキーマバリデーション
+- **バリデーション**: [Zod](https://zod.dev/) - TypeScript ファーストなスキーマバリデーション
 
 ## セットアップ
 
@@ -19,9 +19,9 @@ cd backend
 pnpm install
 ```
 
-### 2. Cloudflare Workers CLIの設定
+### 2. Cloudflare Workers CLI の設定
 
-Cloudflareアカウントにログインします：
+Cloudflare アカウントにログインします：
 
 ```bash
 pnpm wrangler login
@@ -37,13 +37,12 @@ chmod +x scripts/setup-db.sh
 ```
 
 このスクリプトは以下のデータベースを作成します：
-- `gotoshisha-db` (開発環境)
-- `gotoshisha-db-staging` (ステージング環境)
-- `gotoshisha-db-prod` (本番環境)
 
-### 4. wrangler.tomlの更新
+- `gotoshisha-db` (全環境共通)
 
-スクリプト実行後に表示されるデータベースIDを`wrangler.toml`ファイルの該当箇所に設定してください：
+### 4. wrangler.toml の更新
+
+スクリプト実行後に表示されるデータベース ID を`wrangler.toml`ファイルの該当箇所に設定してください：
 
 ```toml
 [[d1_databases]]
@@ -52,7 +51,7 @@ database_name = "gotoshisha-db"
 database_id = "ここにデータベースIDを設定"
 ```
 
-### 5. Prismaクライアントの生成
+### 5. Prisma クライアントの生成
 
 ```bash
 pnpm db:generate
@@ -83,7 +82,7 @@ pnpm dev
 ### 利用可能なエンドポイント
 
 - `GET /health` - ヘルスチェック
-- `GET /api` - API情報
+- `GET /api` - API 情報
 - `GET /api/users` - ユーザー一覧（実装予定）
 - `GET /api/posts` - 投稿一覧（実装予定）
 - `GET /api/comments` - コメント一覧（実装予定）
@@ -99,7 +98,7 @@ pnpm dev
 pnpm db:migrate
 
 # 本番環境でのマイグレーション
-pnpm wrangler d1 migrations apply gotoshisha-db-prod --remote
+pnpm wrangler d1 migrations apply gotoshisha-db --remote
 ```
 
 ### Prisma Studio
@@ -173,11 +172,11 @@ cp .env.example .env
 
 ### データベース接続エラー
 
-1. `wrangler.toml`のデータベースIDが正しく設定されているか確認
-2. Cloudflareアカウントにログインしているか確認
+1. `wrangler.toml`のデータベース ID が正しく設定されているか確認
+2. Cloudflare アカウントにログインしているか確認
 3. データベースが正しく作成されているか確認
 
-### Prismaクライアントエラー
+### Prisma クライアントエラー
 
 ```bash
 # Prismaクライアントを再生成
@@ -197,7 +196,7 @@ pnpm install
 1. 依存関係をインストール: `pnpm install`
 2. データベースをセットアップ: `./scripts/setup-db.sh`
 3. 開発サーバーを起動: `pnpm dev`
-4. APIルートの実装
+4. API ルートの実装
 5. 認証機能の追加
 6. テストの実装
 
