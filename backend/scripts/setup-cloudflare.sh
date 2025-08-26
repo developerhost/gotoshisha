@@ -36,50 +36,8 @@ fi
 echo ""
 echo "📊 D1 データベースを作成しています..."
 
-# 開発用データベース作成
-echo "開発用データベースを作成中..."
-DEV_DB_OUTPUT=$(wrangler d1 create gotoshisha-db 2>&1 || true)
-if echo "$DEV_DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
-    # 新しい形式 "DB ID: uuid" をまず試す
-    DEV_DB_ID=$(echo "$DEV_DB_OUTPUT" | grep -oE "DB ID:[[:space:]]*[a-f0-9-]+" | sed 's/DB ID:[[:space:]]*//')
-    # 古い形式 "database_id = \"uuid\"" も試す
-    if [[ -z "$DEV_DB_ID" ]]; then
-        DEV_DB_ID=$(echo "$DEV_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
-    fi
-    if [[ -n "$DEV_DB_ID" ]]; then
-        echo "✅ 開発用データベース作成完了: $DEV_DB_ID"
-    else
-        echo "⚠️  データベースIDの抽出に失敗しました"
-        echo "$DEV_DB_OUTPUT"
-    fi
-else
-    echo "⚠️  開発用データベースは既に存在するか、作成に失敗しました"
-    echo "$DEV_DB_OUTPUT"
-fi
-
-# ステージング用データベース作成
-echo "ステージング用データベースを作成中..."
-STAGING_DB_OUTPUT=$(wrangler d1 create gotoshisha-db-staging 2>&1 || true)
-if echo "$STAGING_DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
-    # 新しい形式 "DB ID: uuid" をまず試す
-    STAGING_DB_ID=$(echo "$STAGING_DB_OUTPUT" | grep -oE "DB ID:[[:space:]]*[a-f0-9-]+" | sed 's/DB ID:[[:space:]]*//')
-    # 古い形式 "database_id = \"uuid\"" も試す
-    if [[ -z "$STAGING_DB_ID" ]]; then
-        STAGING_DB_ID=$(echo "$STAGING_DB_OUTPUT" | grep -o 'database_id = "[^"]*"' | sed 's/database_id = "\(.*\)"/\1/')
-    fi
-    if [[ -n "$STAGING_DB_ID" ]]; then
-        echo "✅ ステージング用データベース作成完了: $STAGING_DB_ID"
-    else
-        echo "⚠️  データベースIDの抽出に失敗しました"
-        echo "$STAGING_DB_OUTPUT"
-    fi
-else
-    echo "⚠️  ステージング用データベースは既に存在するか、作成に失敗しました"
-    echo "$STAGING_DB_OUTPUT"
-fi
-
-# データベース作成（全環境共通）
-echo "データベースを作成中..."
+# 本番用データベース作成
+echo "本番用データベースを作成中..."
 DB_OUTPUT=$(wrangler d1 create gotoshisha-db 2>&1 || true)
 if echo "$DB_OUTPUT" | grep -qE "(database_id|DB ID:)"; then
     # 新しい形式 "DB ID: uuid" をまず試す
@@ -105,21 +63,16 @@ echo ""
 echo "以下の情報を wrangler.toml ファイルに追加してください:"
 echo ""
 if [[ -n "$DB_ID" ]]; then
-    echo "全環境共通設定:"
+    echo "本番環境設定:"
+    echo "[[d1_databases]]"
+    echo "binding = \"DB\""
+    echo "database_name = \"gotoshisha-db\""
     echo "database_id = \"$DB_ID\""
     echo ""
-    echo "本番環境:"
     echo "[[env.production.d1_databases]]"
     echo "binding = \"DB\""
     echo "database_name = \"gotoshisha-db\""
     echo "database_id = \"$DB_ID\""
-    echo ""
-    echo "ステージング環境:"
-    echo "[[env.staging.d1_databases]]"
-    echo "binding = \"DB\""
-    echo "database_name = \"gotoshisha-db\""
-    echo "database_id = \"$DB_ID\""
-    echo ""
 fi
 
 echo "🔧 次に実行すべきステップ:"

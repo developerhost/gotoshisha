@@ -6,8 +6,7 @@ Gotoshisha API は、シーシャ店舗情報を管理する RESTful API です�
 
 ## ベース URL
 
-- **開発環境**: `https://shisha-up.shisha-up.workers.dev`
-- **本番環境**: `https://api.gotoshisha.app` (予定)
+- **本番環境**: `shisha-up.shisha-up.workers.dev`
 
 ## 認証
 
