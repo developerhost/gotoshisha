@@ -25,10 +25,7 @@ npx wrangler login
 # backend ディレクトリに移動
 cd backend
 
-# 開発用データベース作成
-npx wrangler d1 create gotoshisha-db
-
-
+# 本番用データベース作成
 # データベースは既に作成済みのgotoshisha-dbを使用
 # npx wrangler d1 create gotoshisha-db
 ```
@@ -40,23 +37,16 @@ npx wrangler d1 create gotoshisha-db
 `wrangler.toml` ファイルを更新し、データベース ID を設定します：
 
 ```toml
-# 開発環境
+# 本番環境
 [[d1_databases]]
 binding = "DB"
 database_name = "gotoshisha-db"
-database_id = "your-dev-database-id-here"
+database_id = "4ef2320c-4159-4c27-9a38-2c34be72f830"
 
-# 本番環境
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "gotoshisha-db"
-database_id = "your-prod-database-id-here"
-
-# ステージング環境
-[[env.staging.d1_databases]]
-binding = "DB"
-database_name = "gotoshisha-db-staging"
-database_id = "your-staging-database-id-here"
+database_id = "4ef2320c-4159-4c27-9a38-2c34be72f830"
 ```
 
 ### 4. データベーススキーマの適用
@@ -65,16 +55,13 @@ database_id = "your-staging-database-id-here"
 # Prisma クライアント生成
 pnpm db:generate
 
-# 開発用データベースにマイグレーション適用
+# ローカルデータベースにマイグレーション適用
 npx wrangler d1 migrations apply gotoshisha-db --local
-
-# リモート開発データベースにマイグレーション適用
-npx wrangler d1 migrations apply gotoshisha-db --remote
 
 # 本番データベースにマイグレーション適用
 npx wrangler d1 migrations apply gotoshisha-db --env production --remote
 
-# シードデータの投入（開発環境）
+# シードデータの投入
 pnpm db:seed
 ```
 
@@ -90,14 +77,8 @@ npx wrangler secret put DATABASE_URL --env production
 ### 6. デプロイ実行
 
 ```bash
-# 開発環境へのデプロイ
-pnpm deploy
-
-# ステージング環境へのデプロイ
-pnpm deploy --env staging
-
 # 本番環境へのデプロイ
-pnpm deploy --env production
+pnpm deploy
 ```
 
 ## パッケージスクリプト
@@ -108,14 +89,8 @@ pnpm deploy --env production
 # ローカル開発サーバー起動
 pnpm dev
 
-# デプロイ（開発環境）
-pnpm deploy
-
 # 本番デプロイ
-pnpm deploy:prod
-
-# ステージングデプロイ
-pnpm deploy:staging
+pnpm deploy
 
 # データベース操作
 pnpm db:generate     # Prisma クライアント生成
@@ -140,9 +115,7 @@ pnpm type-check      # TypeScript 型チェック
 
 ### ベース URL
 
-- **開発**: `https://your-worker-name.your-subdomain.workers.dev`
-- **ステージング**: `https://your-worker-name-staging.your-subdomain.workers.dev`
-- **本番**: `https://your-worker-name-prod.your-subdomain.workers.dev`
+- **本番環境**: `https://shisha-up.shisha-up.workers.dev`
 
 ### エンドポイント一覧
 
@@ -213,31 +186,19 @@ pnpm type-check      # TypeScript 型チェック
 
 ```bash
 # 東京駅周辺 5km 以内の店舗を検索
-curl "https://your-worker.workers.dev/api/shops?latitude=35.681236&longitude=139.767125&radius=5"
+curl "https://shisha-up.shisha-up.workers.dev/api/shops?latitude=35.681236&longitude=139.767125&radius=5"
 
 # 新宿駅周辺 3km 以内で Wi-Fi ありの店舗を検索
-curl "https://your-worker.workers.dev/api/shops?latitude=35.689487&longitude=139.691711&radius=3&wifi=true"
+curl "https://shisha-up.shisha-up.workers.dev/api/shops?latitude=35.689487&longitude=139.691711&radius=3&wifi=true"
 ```
 
 ## 環境別設定
 
-### 開発環境
-
-- ローカル D1 データベースを使用
-- 詳細なログ出力
-- CORS 設定でローカル開発サーバーを許可
-
-### ステージング環境
-
-- リモート D1 データベース（staging）を使用
-- 本番に近い設定でテスト可能
-- 限定的な CORS 設定
-
 ### 本番環境
 
-- リモート D1 データベース（production）を使用
-- 最適化されたログレベル
-- セキュアな CORS 設定
+- Cloudflare D1 データベースを使用
+- プロダクション用最適化設定
+- HTTPS でセキュアな通信
 - レート制限やセキュリティ機能を有効化
 
 ## トラブルシューティング
@@ -272,7 +233,7 @@ npx wrangler auth list
 npx wrangler tail
 
 # ヘルスチェックでサービス状態を確認
-curl https://your-worker.workers.dev/health
+curl https://shisha-up.shisha-up.workers.dev/health
 ```
 
 #### 4. CORS エラー

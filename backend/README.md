@@ -119,16 +119,10 @@ pnpm db:seed
 
 ## デプロイ
 
-### ステージング環境
-
-```bash
-pnpm wrangler deploy --env staging
-```
-
 ### 本番環境
 
 ```bash
-pnpm wrangler deploy --env production
+pnpm wrangler deploy
 ```
 
 ## プロジェクト構造

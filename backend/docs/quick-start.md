@@ -35,7 +35,7 @@ pnpm install
 このスクリプトが以下を自動実行します：
 
 - Cloudflare ログイン
-- D1 データベース作成（開発・ステージング・本番）
+- D1 データベース作成（本番環境用）
 - データベース ID の表示
 
 ### 4. wrangler.toml の更新
@@ -43,13 +43,12 @@ pnpm install
 スクリプトで表示されたデータベース ID を `wrangler.toml` に設定：
 
 ```toml
-# 開発環境
+# 本番環境
 [[d1_databases]]
 binding = "DB"
 database_name = "gotoshisha-db"
-database_id = "your-dev-database-id-here"
+database_id = "4ef2320c-4159-4c27-9a38-2c34be72f830"
 
-# 本番環境
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "gotoshisha-db"
@@ -83,11 +82,8 @@ http://localhost:8787 で API が利用可能になります。
 ### 7. デプロイ
 
 ```bash
-# 開発環境へデプロイ
-pnpm deploy
-
 # 本番環境へデプロイ
-pnpm deploy:prod
+pnpm deploy
 ```
 
 ## 動作確認
@@ -95,17 +91,17 @@ pnpm deploy:prod
 ### ヘルスチェック
 
 ```bash
-curl https://your-worker.workers.dev/health
+curl https://shisha-up.shisha-up.workers.dev/health
 ```
 
 ### 店舗 API
 
 ```bash
 # 店舗一覧取得
-curl https://your-worker.workers.dev/api/shops
+curl https://shisha-up.shisha-up.workers.dev/api/shops
 
 # テスト用の店舗データ取得
-curl https://your-worker.workers.dev/test/shops
+curl https://shisha-up.shisha-up.workers.dev/test/shops
 ```
 
 ## フロントエンドの設定
@@ -123,7 +119,7 @@ cp .env.example .env
 
 ```env
 # API URL を Cloudflare Workers の URL に設定
-EXPO_PUBLIC_API_URL=https://your-worker.workers.dev
+EXPO_PUBLIC_API_URL=https://shisha-up.shisha-up.workers.dev
 
 # Auth0 設定
 EXPO_PUBLIC_AUTH0_DOMAIN=your-auth0-domain
@@ -206,9 +202,7 @@ pnpm db:studio          # Prisma Studio（GUI）起動
 pnpm db:seed            # シードデータ投入
 
 # デプロイ
-pnpm deploy             # 開発環境
-pnpm deploy:staging     # ステージング環境
-pnpm deploy:prod        # 本番環境
+pnpm deploy             # 本番環境
 
 # コード品質
 pnpm lint               # ESLint 実行

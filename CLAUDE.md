@@ -154,7 +154,7 @@ pnpm db:generate       # クライアント生成
 pnpm db:push           # スキーマ同期（開発用）
 pnpm db:migrate        # マイグレーション（本番用）
 pnpm db:studio         # Prisma Studio（GUI）
-pnpm db:seed           # シードデータ投入
+pnpm db:seed           # 統一シードデータ投入（テーブル別ファイル使用）
 
 # Cloudflare D1 操作
 wrangler d1 migrations apply gotoshisha-db --local     # ローカルにマイグレーション適用
@@ -162,6 +162,27 @@ wrangler d1 migrations apply gotoshisha-db --remote    # リモートにマイ�
 wrangler d1 list                                       # データベース一覧
 wrangler d1 info gotoshisha-db                        # データベース情報確認
 ```
+
+### シードデータ構造
+
+シードデータは以下のようにテーブル別に整理されています：
+
+```
+backend/scripts/
+├── seed.ts                    # メインシードファイル
+└── seed/
+    ├── users.ts              # ユーザーデータ
+    ├── tags.ts               # タグデータ
+    ├── posts.ts              # 投稿データ
+    ├── likes.ts              # いいねデータ
+    ├── comments.ts           # コメントデータ
+    ├── shisha-masters.ts     # シーシャマスターデータ（フレーバー等）
+    └── shops.ts              # シーシャショップデータ
+```
+
+- ローカル・D1両方のデータベースに対応
+- 依存関係を考慮した実行順序
+- テーブル別に分割されメンテナンス性向上
 
 ## Cloudflare Workers デプロイメント
 
@@ -189,22 +210,15 @@ pnpm deploy
 ```bash
 cd backend
 
-# 開発環境へデプロイ
-pnpm run deploy
-
-# ステージング環境へデプロイ
-pnpm run deploy:staging
-
 # 本番環境へデプロイ
-pnpm run deploy:prod
+pnpm run deploy
 ```
 
 ### API エンドポイント
 
 デプロイ後、以下の URL で API が利用可能：
 
-- **開発**: `https://your-worker-name.your-subdomain.workers.dev`
-- **本番**: `https://your-worker-name-prod.your-subdomain.workers.dev`
+- **本番環境**: `https://shisha-up.shisha-up.workers.dev`
 
 主要エンドポイント：
 
@@ -280,10 +294,7 @@ eas build --platform android
 cd backend
 
 # 本番デプロイ
-pnpm deploy --env production
-
-# ステージングデプロイ
-pnpm deploy --env staging
+pnpm deploy
 ```
 
 ## 重要な設定ファイル
