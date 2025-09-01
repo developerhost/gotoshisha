@@ -231,20 +231,39 @@ export async function seedShops(prisma: PrismaClient, masters: ShishaMasters) {
     },
   ];
 
-  // 既存の店舗を更新または新規作成
+  // D1環境の場合は既存データを削除してから新規作成（upsertの問題を回避）
+  const isD1Environment =
+    process.env.USE_D1 === "true" || "D1Database" in globalThis;
+
+  if (isD1Environment) {
+    console.log("🗑️  D1環境: 既存の店舗データを削除中...");
+    // 関連データも含めて削除（カスケード削除）
+    await prisma.shop.deleteMany({});
+  }
+
+  // 店舗データを作成
   const shops = [];
   for (const shopData of shopsData) {
-    const existingShop = await prisma.shop.findFirst({
-      where: { name: shopData.name },
-    });
-
-    if (existingShop) {
-      const updated = await prisma.shop.update({
-        where: { id: existingShop.id },
-        data: shopData,
+    if (!isD1Environment) {
+      // ローカル環境: upsert使用（既存データを保持）
+      const existingShop = await prisma.shop.findFirst({
+        where: { name: shopData.name },
       });
-      shops.push(updated);
+
+      if (existingShop) {
+        const updated = await prisma.shop.update({
+          where: { id: existingShop.id },
+          data: shopData,
+        });
+        shops.push(updated);
+      } else {
+        const created = await prisma.shop.create({
+          data: shopData,
+        });
+        shops.push(created);
+      }
     } else {
+      // D1環境: 新規作成のみ（既に削除済みなので）
       const created = await prisma.shop.create({
         data: shopData,
       });

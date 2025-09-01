@@ -18,11 +18,18 @@ import { seedShops } from "./seed/shops.js";
  * 環境に応じたPrismaクライアントを初期化
  */
 function createPrismaClient(): PrismaClient {
-  // Cloudflare Workers環境での実行の場合
+  // Cloudflare Workers環境またはD1環境での実行の場合
   if ("D1Database" in globalThis && process.env.DB) {
-    console.log("🌐 Cloudflare D1データベースを使用します");
+    console.log("🌐 Cloudflare D1データベースを使用します（Workers環境）");
     const adapter = new PrismaD1(process.env.DB as any);
     return new PrismaClient({ adapter });
+  }
+
+  // 環境変数USE_D1でD1の使用を明示的に指定
+  if (process.env.USE_D1 === "true") {
+    console.log("🌐 Cloudflare D1データベースを使用します（環境変数指定）");
+    // 通常のPrismaクライアント（DATABASE_URLがD1を指している想定）
+    return new PrismaClient();
   }
 
   // ローカル開発環境の場合
