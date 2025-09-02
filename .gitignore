@@ -70,3 +70,6 @@ yarn-error.*
 *.tsbuildinfo
 
 # @end expo-cli
+
+# Serena MCP server cache
+.serena/
