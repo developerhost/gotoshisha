@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Region } from "react-native-maps";
 import type { Shop } from "../../types/api";
+import { validateShop } from "./useMapState";
 import {
-  validateShop,
   filterValidShops,
   calculateSearchRadius,
   combineLoadingState,
   selectShops,
   hasLocationPermission,
-} from "./useMapState";
+} from "./mapUtils";
 
 /**
  * useMapStateのロジック関数のテスト
@@ -274,7 +274,7 @@ describe("useMapState ロジック関数", () => {
         },
       ];
 
-      const result = filterValidShops(mixedShops);
+      const result = filterValidShops(mixedShops as any[]);
 
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe("1");
@@ -297,7 +297,7 @@ describe("useMapState ロジック関数", () => {
         },
       ];
 
-      const result = filterValidShops(invalidShops);
+      const result = filterValidShops(invalidShops as any[]);
       expect(result).toHaveLength(0);
     });
 
