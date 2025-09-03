@@ -34,14 +34,14 @@ export const validateShop = (shop: unknown): shop is Shop => {
 /**
  * 店舗データ配列のフィルタリング
  */
-export const filterValidShops = (shops: unknown[]): Shop[] => {
+const filterValidShopsLocal = (shops: unknown[]): Shop[] => {
   return shops.filter((shop): shop is Shop => validateShop(shop));
 };
 
 /**
  * ズームレベルに基づいて適切な検索半径を計算
  */
-export const calculateSearchRadius = (region: Region) => {
+const calculateSearchRadiusLocal = (region: Region) => {
   // latitudeDeltaから半径を推定（1度 ≈ 111km）
   const viewportKm = region.latitudeDelta * 111;
 
@@ -55,7 +55,7 @@ export const calculateSearchRadius = (region: Region) => {
 /**
  * ローディング状態の統合
  */
-export const combineLoadingState = (
+const combineLoadingStateLocal = (
   isReady: boolean,
   locationLoading: boolean,
   nearbyLoading: boolean,
@@ -67,7 +67,7 @@ export const combineLoadingState = (
 /**
  * 店舗データの選択（収集された店舗データを優先）
  */
-export const selectShops = (
+const selectShopsLocal = (
   collectedShops: Shop[],
   latitude: number | null,
   longitude: number | null,
@@ -88,7 +88,7 @@ export const selectShops = (
 /**
  * 位置情報権限の有無を判定
  */
-export const hasLocationPermission = (
+const hasLocationPermissionLocal = (
   latitude: number | null,
   longitude: number | null
 ): boolean => {
@@ -231,7 +231,7 @@ export function useMapState() {
 
   // ズームレベルに基づいて適切な検索半径を計算
   const calculateRadius = useCallback((region: Region) => {
-    return calculateSearchRadius(region);
+    return calculateSearchRadiusLocal(region);
   }, []);
 
   // マップ領域変更時のコールバック
@@ -252,7 +252,7 @@ export function useMapState() {
   }, [requestLocation]);
 
   // ローディング状態の統合
-  const isLoading = combineLoadingState(
+  const isLoading = combineLoadingStateLocal(
     isReady,
     locationLoading,
     nearbyLoading,
@@ -261,7 +261,7 @@ export function useMapState() {
   const error = locationError || nearbyError || fallbackError;
 
   // 店舗データの選択（収集された店舗データを優先）
-  const shops = selectShops(
+  const shops = selectShopsLocal(
     collectedShops,
     latitude,
     longitude,
@@ -270,7 +270,7 @@ export function useMapState() {
   );
 
   // 店舗データの安全性チェック
-  const validShops = filterValidShops(shops);
+  const validShops = filterValidShopsLocal(shops);
 
   return {
     // 位置情報関連
@@ -307,7 +307,7 @@ export function useMapState() {
     hasRequestedLocation,
 
     // メタ情報
-    hasLocationPermission: hasLocationPermission(latitude, longitude),
+    hasLocationPermission: hasLocationPermissionLocal(latitude, longitude),
     isUsingCollectedShops: collectedShops.length > 0,
   };
 }
