@@ -49,7 +49,7 @@
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^3.1.4",
-    "wrangler": "^4.20.0",
+    "wrangler": "^4.59.1",
     "zod-prisma-types": "^3.2.4"
   },
   "private": true
